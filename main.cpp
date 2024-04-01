@@ -29,17 +29,6 @@ int main(int argc, char *argv[])
     QRect screenGeometry = screen->geometry();
     w.setGeometry(screenGeometry);
 
-    // Crear el menú "Archivo"
-    QMenu *menuArchivo = w.menuBar()->addMenu("&Archivo");
-    QMenu *menu = w.menuBar()->addMenu("&Archivo");
-
-    // Crear cinco acciones (botones) en el menú "Archivo"
-    QAction *action1 = menuArchivo->addAction("Abrir");
-    QAction *action2 = menuArchivo->addAction("Cerrar");
-    QAction *action3 = menuArchivo->addAction("Salvar");
-    QAction *action4 = menuArchivo->addAction("Salvar como");
-
-
     w.show();
 
     return a.exec();
