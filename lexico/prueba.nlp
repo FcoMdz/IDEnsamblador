@@ -1,0 +1,6 @@
+int x,y,z;
+if (x == 10){
+	compi1 = x * y;
+}
+float a=60.60;
+esto es una prueba de codigo int float miranda

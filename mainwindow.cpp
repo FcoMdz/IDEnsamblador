@@ -19,6 +19,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QTableWidget>
+#include "lex.yy.c"
 
 class CustomQPlainTextEdit : public QPlainTextEdit {
 public:
@@ -38,6 +40,21 @@ int dialogYesNo(QString message){
     msgBox.setText(message);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     return msgBox.exec();
+}
+
+void showLexicData(std::vector<Lexico> *vec, QTableWidget *table){
+    table->setColumnCount(4);
+    table->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
+    table->setRowCount(vec->size());
+    for(int i = 0; i<vec->size(); i++){
+        //qDebug() << vec->at(i).lexema;
+        table->setItem(i,0, new QTableWidgetItem(QString::fromStdString(vec->at(i).clave)));
+        table->setItem(i,1, new QTableWidgetItem(QString::fromStdString(vec->at(i).lexema)));
+        table->setItem(i,2, new QTableWidgetItem(QString::number(vec->at(i).fila)));
+        table->setItem(i,3, new QTableWidgetItem(QString::number(vec->at(i).columna)));
+    }
+    table->resizeColumnsToContents();
+    table->resizeRowsToContents();
 }
 
 
@@ -113,7 +130,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QDockWidget *codeDockWidget = new QDockWidget("Editor de Código", this);
     codeDockWidget->setWidget(codeEditorWidget);
     addDockWidget(Qt::TopDockWidgetArea, codeDockWidget);
-    codeDockWidget->setMinimumWidth(static_cast<int>(0.6 * this->width()));
+    codeDockWidget->setMinimumWidth(static_cast<int>(0.7 * this->width()));
+    codeDockWidget->setMinimumHeight(static_cast<int>(0.8 * this->height()));
 
     // Crear varios botones en una sola fila
     QGridLayout *buttonLayout = new QGridLayout;
@@ -122,18 +140,26 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *button3 = new QPushButton("Semántica");
     QPushButton *button4 = new QPushButton("Código intermedio");
 
+
+
     buttonLayout->addWidget(button1, 0, 0);
     buttonLayout->addWidget(button2, 0, 1);
     buttonLayout->addWidget(button3, 0, 2);
     buttonLayout->addWidget(button4, 0, 3);
 
     // Crear el cuadro de texto
-    QTextEdit *editText = new QTextEdit;
-    editText->setReadOnly(true);
+    //QTextEdit *editText = new QTextEdit;
+    //editText->setReadOnly(true);
+    QTableWidget *resultsTable = new QTableWidget();
+    resultsTable->setColumnCount(4);
+    resultsTable->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
+    resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
     buttonTextEditLayout->addLayout(buttonLayout);
-    buttonTextEditLayout->addWidget(editText);
+    buttonTextEditLayout->addWidget(resultsTable);
+
 
     // Widget para contener los botones y el cuadro de texto
     QWidget *buttonTextEditWidget = new QWidget;
@@ -143,7 +169,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QDockWidget *buttonDockWidget = new QDockWidget("Depuración", this);
     buttonDockWidget->setWidget(buttonTextEditWidget);
     addDockWidget(Qt::TopDockWidgetArea, buttonDockWidget);
-    buttonDockWidget->setMinimumWidth(static_cast<int>(0.3 * this->width()));
+    buttonDockWidget->setMinimumWidth(static_cast<int>(0.4 * this->width()));
+    buttonDockWidget->setMinimumHeight(static_cast<int>(0.8 * this->height()));
 
     // Convertir la ventana de texto en un dockWidget
     QDockWidget *bottomDockWidget = new QDockWidget("Vista de Texto Abajo", this);
@@ -151,7 +178,7 @@ MainWindow::MainWindow(QWidget *parent) :
     textVistaAbajo->setReadOnly(true);
     bottomDockWidget->setWidget(textVistaAbajo);
     addDockWidget(Qt::BottomDockWidgetArea, bottomDockWidget);
-    bottomDockWidget->setMinimumHeight(static_cast<int>(0.3 * this->height()));
+    bottomDockWidget->setMinimumHeight(static_cast<int>(0.4 * this->height()));
 
 
     //Opciones del menu de arriba
@@ -163,9 +190,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Crear cinco acciones (botones) en el menú "Archivo"
     QAction *action1 = menuArchivo->addAction("Abrir");
-    QAction *action2 = menuArchivo->addAction("Cerrar");
     QAction *action3 = menuArchivo->addAction("Salvar");
     QAction *action4 = menuArchivo->addAction("Salvar como");
+    QAction *action2 = menuArchivo->addAction("Cerrar");
     QAction *action5 = menuArchivo->addAction("Salir");
     QString *fileName = new QString;
     QObject::connect(action1, &QAction::triggered, this,[=](){
@@ -184,8 +211,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         QStringList partesRuta = fileName->split("/");
         QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
-        this->setWindowTitle("IDE - " + nombreArchivo);
-        qDebug() << fileName->toStdString().c_str();
+        this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
     });
 
     QObject::connect(action2, &QAction::triggered, this,[=](){
@@ -207,8 +233,8 @@ MainWindow::MainWindow(QWidget *parent) :
         codeEditor->clear();
         QStringList partesRuta = fileName->split("/");
         QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
-        this->setWindowTitle("IDE - " + nombreArchivo);
-        qDebug() << fileName->toStdString().c_str();
+        this->setWindowTitle("IDEnsamblador");
+        //qDebug() << fileName->toStdString().c_str();
     });
 
     QObject::connect(action3, &QAction::triggered, this,[=](){
@@ -233,8 +259,8 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         QStringList partesRuta = fileName->split("/");
         QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
-        this->setWindowTitle("IDE - " + nombreArchivo);
-        qDebug() << fileName->toStdString().c_str();
+        this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
+        //qDebug() << fileName->toStdString().c_str();
     });
 
     QObject::connect(action4, &QAction::triggered, this,[=](){
@@ -249,8 +275,8 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         QStringList partesRuta = fileName->split("/");
         QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
-        this->setWindowTitle("IDE - " + nombreArchivo);
-        qDebug() << fileName->toStdString().c_str();
+        this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
+        //qDebug() << fileName->toStdString().c_str();
     });
 
     QObject::connect(action5, &QAction::triggered,[&](){
@@ -283,7 +309,56 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *codAction1 = menuCodigo->addAction("Compilar");
     QAction *codAction2 = menuCodigo->addAction("Correr");
     QAction *codAction3 = menuCodigo->addAction("Depurar");
+    std::vector<Lexico> *lex = new std::vector<Lexico>;
 
+    //Conecta los botones de la sección de depuración
+    connect(button1, &QPushButton::clicked, this, [=](){
+        showLexicData(lex, resultsTable);
+    });
+
+    QObject::connect(codAction1, &QAction::triggered, this,[=](){
+        bool open = false;
+        //Revisa si hay algun archivo abierto, si no pide que se abra uno
+        if(fileName->isEmpty()){
+            int resp = dialogYesNo("No hay un archivo abierto ¿Desea seleccionar uno?");
+            if(resp == QMessageBox::Yes){
+                fileName->assign(QFileDialog::getOpenFileName(this, "Cree o seleccione un archivo destino", "", "Archivos de código (*.nlp)"));
+                if(fileName->isEmpty()) return;
+                open = true;
+                QFile *file = new QFile;
+                file->setFileName(fileName->toStdString().c_str());
+                if(file->open(QIODevice::ReadOnly)){
+                    QTextStream in(file);
+                    QString text = in.readAll();
+                    codeEditor->clear();
+                    codeEditor->insertPlainText(text);
+                    file->close();
+                }
+                QStringList partesRuta = fileName->split("/");
+                QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
+                this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
+            }
+        }else{
+            //Si hay un archivo abierto pregunta si se quieren guardar cambios
+            int resp = QMessageBox::No;
+            resp = dialogYesNo("¿Desea guardar los cambios antes de compilar?");
+            if(resp == QMessageBox::Yes){
+                QFile file(fileName->toStdString().c_str());
+                if(file.open(QIODevice::WriteOnly)){
+                    QTextStream out(&file);
+                    out << codeEditor->toPlainText();
+                    file.close();
+                }
+            }
+            open = true;
+        }
+        if(open){
+            lex->clear();
+            std::vector<Lexico> vec = analyzeFile(fileName->toStdString().c_str());
+            lex->swap(vec);
+            showLexicData(lex, resultsTable);
+        }
+    });
 
     //Shortcuts
 
