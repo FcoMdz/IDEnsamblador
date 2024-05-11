@@ -1,6 +1,21 @@
-int x,y,z;
+//Mi primer programa
+int x,y,z,b;
 if (x == 10){
 	compi1 = x * y;
 }
 float a=60.60;
-esto es una prueba de codigo int float miranda
+esto es una prueba de codigo
+if(y==true){
+	return false;
+}
+if(b>10 and x<y){
+	return true;
+}
+/*Retorna falso si mi prueba es menor a 5
+si o no raza
+*/
+if(prueba<5){
+	return false;
+}else{
+	char *hola = "Hola"
+}

@@ -4,6 +4,10 @@
     #include <vector>
     int countLines = 1;
     int countColumn = 1;
+    const char *input_text;
+    int text_index = 0;
+
+
     struct Lexico{
         std::string clave;
         std::string lexema;
@@ -13,6 +17,14 @@
     int yylex(void);
     void yyrestart(FILE *);
     std::vector<Lexico> lexVec;
+
+   int yyinput(char *buf, int max_size) {
+        int num_to_copy = std::min(max_size - 1, (int)strlen(input_text + text_index));
+        strncpy(buf, input_text + text_index, num_to_copy);
+        text_index += num_to_copy;
+        return num_to_copy;
+    }
+
     std::vector<Lexico> analyzeFile(const char *filename) {
         FILE *file = fopen(filename, "r");
         if (!file) {
@@ -27,15 +39,27 @@
         fclose(file);
         return lexVec;
     }
+    std::vector<Lexico> analyzeText(const char *text) {
+        countColumn = 1;
+        countLines = 1;
+        lexVec.clear();  // Limpia cualquier resultado anterior
+        input_text = text;
+        text_index = 0;
+        yy_scan_string(input_text);
+        yylex();
+        return lexVec;
+    }
 %}
 
 /*Especificaciones regex*/
 LETRA [a-z|A-Z]
 DIGITO [0-9]
-RESERVADAS "program"|"if"|"else"|"fi"|"do"|"until"|"while"|"read"|"write"|"float"|"int"|"bool"|"not"|"and"|"or"|"true"|"false"
+RESERVADAS "program"|"if"|"else"|"fi"|"do"|"until"|"while"|"read"|"write"|"float"|"int"|"bool"|"not"|"and"|"or"|"true"|"false"|"char"
 SIMBOLO \+|\-|\*|\/|\^|<|<=|>|>=|==|!=|=|;|,|\(|\)|\{|\}
 IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
-CADENA ["]*["]
+CADENA ["][^"]*["]
+COMENTARIO_LINEA \/\/.*
+COMENTARIO_MULTI \/\*(.|\n)*\*\/
 NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
 
 /*Reglas de detección*/
@@ -66,6 +90,14 @@ NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
     }
+{COMENTARIO_LINEA}|{COMENTARIO_MULTI} {
+    lexVec.push_back(Lexico());
+    lexVec[lexVec.size()-1].clave = "Comentario";
+    lexVec[lexVec.size()-1].lexema = yytext;
+    lexVec[lexVec.size()-1].columna = countColumn;
+    lexVec[lexVec.size()-1].fila = countLines;
+    countColumn += strlen(yytext);
+}
 {NUMERO} {
         lexVec.push_back(Lexico());
         lexVec[lexVec.size()-1].clave = "Numero";
@@ -93,6 +125,8 @@ NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
 int yywrap(){
     return 1;
 } //Parsea el codigo anterior
+
+
 
 /*int main(int argc, char **argv){
     if(argc < 2){

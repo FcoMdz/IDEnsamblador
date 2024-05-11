@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QTableWidget>
+#include <QTimer>
 #include "lex.yy.c"
 
 class CustomQPlainTextEdit : public QPlainTextEdit {
@@ -56,6 +57,48 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table){
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
 }
+
+struct myInt{
+    int initialEditPosition;
+};
+
+void formatText(QPlainTextEdit *editor, int initialCursor){
+    //Estilos especificos para cada tipo de clave
+    QTextCharFormat claveFormat;
+    claveFormat.setForeground(QColor("#F53A41"));
+    QTextCharFormat identifierFormat;
+    identifierFormat.setForeground(QColor("#003BEB"));
+    QTextCharFormat cadenaFormat;
+    cadenaFormat.setForeground(QColor("#F09200"));
+    QTextCharFormat comentarioFormat;
+    comentarioFormat.setForeground(QColor("#008000"));
+    QTextCharFormat elseFormat;
+    elseFormat.setForeground(QColor("#000000"));
+    std::vector<Lexico> vec = analyzeText(editor->toPlainText().toStdString().c_str());
+    QTextCursor cursor(editor->document());
+    cursor.setPosition(initialCursor); //Evita que realicé lecutras o cambios de elementos pasados, da un mejor rendimiento
+    for(const auto&token : vec){
+        int start = editor->toPlainText().indexOf(QString::fromStdString(token.lexema), cursor.position(), Qt::CaseSensitive);
+        if(start!=-1){
+            int length = QString::fromStdString(token.lexema).length();
+            cursor.setPosition(start);
+            int pastPosition = cursor.position();
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
+            if(token.clave == "Reservada"){
+                cursor.setCharFormat(claveFormat);
+            }else if(token.clave == "Identificador"){
+                cursor.setCharFormat(identifierFormat);
+            }else if(token.clave == "Cadena"){
+                cursor.setCharFormat(cadenaFormat);
+            }else if(token.clave=="Comentario"){
+                cursor.setCharFormat(comentarioFormat);
+            }else{
+                cursor.setCharFormat(elseFormat);
+            }
+        }
+    }
+}
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -109,6 +152,47 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     });
 
+    //Posición del cursor para ir actualizando unicamente lo más reciente;
+
+
+    /*struct myInt *myCursor = new struct myInt;
+    struct myInt *antCursor = new struct myInt;
+    myCursor->initialEditPosition = 0;
+    antCursor->initialEditPosition = 0;
+    // Conexión de la señal cursorPositionChanged para rastrear la posición del cursor
+    connect(codeEditor, &QPlainTextEdit::cursorPositionChanged, this, [=]() {
+        // antCursor, lleva el control de donde esta el cursor cuando se mueve.
+        antCursor->initialEditPosition = codeEditor->textCursor().position();
+        if(codeEditor->textCursor().position() < myCursor->initialEditPosition){
+            /* Si el usuario coloca el cursor en una posición previa, se regresa
+             * el apuntador inicial del analisis para observar todos los cambios que
+             * hace el usuario.
+            myCursor->initialEditPosition = codeEditor->textCursor().position();
+        }
+    });*/
+
+    // Declaración de QTimer en tu clase
+    QTimer *timer;
+    // Configuración del temporizador en tu constructor
+    // Timer para evitar que se hagan muchas llamadas a los estilos del codigo
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+
+    connect(timer, &QTimer::timeout, this, [=]() {
+        //Formatea el texto
+        formatText(codeEditor, 0);
+        /* Actualiza el puntero donde inicia el análisis a una posición mayor
+         * de esta forma evitamos reanalizar texto anterior, haciendolo un poco
+         * más eficiente
+         *  myCursor->initialEditPosition = antCursor->initialEditPosition;
+         */
+
+    });
+
+    connect(codeEditor, &QPlainTextEdit::textChanged, this, [=](){
+        //Se llama a hacer update del color del texto después de 500ms para evitar una sobre carga
+        timer->start(500);
+    });
 
     //Cada vez que cambie el numero de lineas en el documento se actualizará en el widget lateral
     connect(codeEditor->document(), &QTextDocument::blockCountChanged, [codeEditor, rowsCount, fontMetrics](int newBlockCount) {
@@ -195,6 +279,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *action2 = menuArchivo->addAction("Cerrar");
     QAction *action5 = menuArchivo->addAction("Salir");
     QString *fileName = new QString;
+
+
+
+
     QObject::connect(action1, &QAction::triggered, this,[=](){
         fileName->assign(QFileDialog::getOpenFileName(this,"Seleccionar el archivo","", "Archivos de código (*.nlp)"));
         if(!fileName->isEmpty()){
@@ -206,6 +294,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 QString text = in.readAll();
                 codeEditor->clear();
                 codeEditor->insertPlainText(text);
+                formatText(codeEditor,0);
                 file->close();
             }
         }
@@ -232,7 +321,6 @@ MainWindow::MainWindow(QWidget *parent) :
         fileName->assign("");
         codeEditor->clear();
         QStringList partesRuta = fileName->split("/");
-        QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
         this->setWindowTitle("IDEnsamblador");
         //qDebug() << fileName->toStdString().c_str();
     });
@@ -332,6 +420,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     QString text = in.readAll();
                     codeEditor->clear();
                     codeEditor->insertPlainText(text);
+                    formatText(codeEditor,0);
                     file->close();
                 }
                 QStringList partesRuta = fileName->split("/");
