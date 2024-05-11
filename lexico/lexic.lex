@@ -39,6 +39,7 @@
         fclose(file);
         return lexVec;
     }
+
     std::vector<Lexico> analyzeText(const char *text) {
         countColumn = 1;
         countLines = 1;
@@ -48,6 +49,10 @@
         yy_scan_string(input_text);
         yylex();
         return lexVec;
+    }
+
+    void showError(){
+
     }
 %}
 
@@ -60,6 +65,7 @@ IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
 CADENA ["][^"]*["]
 COMENTARIO_LINEA \/\/.*
 COMENTARIO_MULTI \/\*(.|\n)*\*\/
+SPACE [ ]
 NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
 
 /*Reglas de detección*/
@@ -114,7 +120,21 @@ NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
     }
-. {
+{SPACE} {
+    lexVec.push_back(Lexico());
+    lexVec[lexVec.size()-1].clave = "Espacio";
+    lexVec[lexVec.size()-1].lexema = yytext;
+    lexVec[lexVec.size()-1].columna = countColumn;
+    lexVec[lexVec.size()-1].fila = countLines;
+    countColumn += strlen(yytext);
+}
+[^\s] {
+    /*if(yytext != " "){
+        lexVec[lexVec.size()-1].clave = "Error";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+    }*/
     countColumn++;
 }
 "-stop" {return 0;}
@@ -128,7 +148,7 @@ int yywrap(){
 
 
 
-/*int main(int argc, char **argv){
+int main(int argc, char **argv){
     if(argc < 2){
         printf("Ingrese el texto a evaluar:\n");
         yyin=stdin;
@@ -140,4 +160,4 @@ int yywrap(){
         std::cout << lexVec[i].clave << "\t" << lexVec[i].lexema << "\t" << lexVec[i].fila << "\t" << lexVec[i].columna << "\n";
     }
     return 0;
-}*/
+}
