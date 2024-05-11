@@ -408,24 +408,44 @@ MainWindow::MainWindow(QWidget *parent) :
         bool open = false;
         //Revisa si hay algun archivo abierto, si no pide que se abra uno
         if(fileName->isEmpty()){
-            int resp = dialogYesNo("No hay un archivo abierto ¿Desea seleccionar uno?");
-            if(resp == QMessageBox::Yes){
-                fileName->assign(QFileDialog::getOpenFileName(this, "Cree o seleccione un archivo destino", "", "Archivos de código (*.nlp)"));
-                if(fileName->isEmpty()) return;
-                open = true;
-                QFile *file = new QFile;
-                file->setFileName(fileName->toStdString().c_str());
-                if(file->open(QIODevice::ReadOnly)){
-                    QTextStream in(file);
-                    QString text = in.readAll();
-                    codeEditor->clear();
-                    codeEditor->insertPlainText(text);
-                    formatText(codeEditor,0);
-                    file->close();
+            if(codeEditor->toPlainText().length() == 0){
+                int resp = dialogYesNo("No hay un archivo abierto ¿Desea abrir uno para compilar?");
+                if(resp == QMessageBox::Yes){
+                    fileName->assign(QFileDialog::getOpenFileName(this, "Seleccione un archivo para compilar", "", "Archivos de código (*.nlp)"));
+                    if(fileName->isEmpty()) return;
+                    open = true;
+                    QFile *file = new QFile;
+                    file->setFileName(fileName->toStdString().c_str());
+                    if(file->open(QIODevice::ReadOnly)){
+                        QTextStream in(file);
+                        QString text = in.readAll();
+                        codeEditor->clear();
+                        codeEditor->insertPlainText(text);
+                        formatText(codeEditor,0);
+                        file->close();
+                    }
+                    QStringList partesRuta = fileName->split("/");
+                    QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
+                    this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
                 }
-                QStringList partesRuta = fileName->split("/");
-                QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
-                this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
+            }else{
+                if(fileName->isEmpty()){
+                    int resp = dialogYesNo("No hay un archivo para guardar los cambios ¿Desea crar uno?");
+                    if(resp == QMessageBox::Yes){
+                        fileName->assign(QFileDialog::getSaveFileName(this, "Cree o seleccione un archivo destino", "", "Archivos de código (*.nlp)"));
+                        if(fileName->isEmpty()) return;
+                        open = true;
+                        QFile file(fileName->toStdString().c_str());
+                        if(file.open(QIODevice::WriteOnly)){
+                            QTextStream out(&file);
+                            out << codeEditor->toPlainText();
+                            file.close();
+                        }
+                        QStringList partesRuta = fileName->split("/");
+                        QString nombreArchivo = partesRuta[partesRuta.length()-1].split(".")[0];
+                        this->setWindowTitle("IDEnsamblador - " + nombreArchivo);
+                    }
+                }
             }
         }else{
             //Si hay un archivo abierto pregunta si se quieren guardar cambios
