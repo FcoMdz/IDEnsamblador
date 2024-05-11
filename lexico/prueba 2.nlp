@@ -1,1 +1,13 @@
-Hola
+int main(){
+	int a,b,c;
+	a=1;
+	b=2;
+	c=3;
+	if(a<b)
+		if (b<c)
+		out "otro1\n";
+		else;
+	else
+		out "otro2\n";
+	return 0;
+}
