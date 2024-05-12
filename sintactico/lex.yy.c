@@ -2257,5 +2257,5 @@ void yyfree (void * ptr )
 /*Sección de codigo*/
 
 void showError(char* other){
-    printf("Error léxico %s\n", other);
+    printf("Error léxico %s\n",  other);
 }
