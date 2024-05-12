@@ -239,6 +239,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resultsTable->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
     resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
     resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    resultsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
     buttonTextEditLayout->addLayout(buttonLayout);

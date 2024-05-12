@@ -1,0 +1,9 @@
+program{
+	int x,y,z;
+	x=10;
+	if(x>5) then{
+		x = 90;
+	}else{
+		x=10;
+	}fi
+}
