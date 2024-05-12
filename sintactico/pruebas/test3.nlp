@@ -1,6 +1,6 @@
 program {
     int x, y;
-    x=0; // comentario 1
+    x=0; // comentario 
     y=4; /* comentario 2 */
     while (y>=0) {
         if(x<y) then{

@@ -497,16 +497,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   122
+#define YYLAST   92
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  45
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  57
+#define YYNRULES  55
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  105
+#define YYNSTATES  102
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   299
@@ -559,12 +559,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   104,   104,   105,   106,   107,   109,   111,   112,   113,
-     115,   116,   117,   118,   119,   121,   122,   123,   124,   125,
-     126,   127,   128,   130,   131,   133,   135,   137,   139,   141,
-     143,   145,   146,   147,   149,   150,   152,   153,   154,   156,
-     158,   159,   160,   161,   163,   164,   165,   167,   168,   169,
-     171,   172,   173,   175,   176,   177,   178,   179
+       0,   100,   100,   101,   102,   104,   106,   107,   108,   110,
+     111,   112,   113,   115,   116,   117,   118,   119,   120,   121,
+     122,   124,   125,   127,   129,   131,   133,   135,   137,   139,
+     140,   142,   143,   145,   146,   147,   149,   150,   152,   153,
+     154,   155,   157,   158,   159,   161,   162,   163,   165,   166,
+     167,   169,   170,   171,   172,   173
 };
 #endif
 
@@ -599,12 +599,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-38)
+#define YYPACT_NINF (-37)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-34)
+#define YYTABLE_NINF (-1)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -613,17 +613,17 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      11,   -18,    34,    -5,   -38,   -38,   -38,   -38,    15,   -38,
-       7,    18,    20,    24,   -38,    27,    35,    68,    40,   -38,
-      28,   -38,   -38,   -38,   -38,   -38,   -38,   -38,   -38,   -38,
-     -22,    75,    82,    75,    63,    65,    51,    75,   -38,   -38,
-     -38,    52,    75,   -38,   -38,    75,    75,   -38,   -38,   -15,
-      84,    14,   -38,    85,    23,   -38,    31,    67,    -2,   -38,
-     -38,   -38,    -1,   -38,   -38,   -38,   -38,     5,    75,    99,
-      75,    75,    75,    75,    75,   -38,   -38,   -38,   -38,    75,
-      75,    75,    75,    20,   -38,   -38,    84,    20,    14,   -38,
-     -38,    23,    23,    60,   -38,   -38,    37,   -38,    78,    71,
-      20,   -38,   -38,   102,   -38
+       1,   -36,    19,   -37,   -37,    23,   -37,   -37,   -37,   -37,
+     -35,     2,   -37,     8,   -27,    -9,    10,   -37,    26,    28,
+     -37,   -37,    16,   -37,   -37,   -37,   -37,   -37,   -37,   -37,
+     -37,   -37,    35,    11,    69,    11,    47,    49,    12,    11,
+     -37,    11,   -37,   -37,    11,    11,   -37,   -37,   -16,    66,
+      24,   -37,    44,    33,   -37,   -37,    50,   -11,   -37,   -37,
+     -37,    14,   -37,   -37,    -2,    11,    80,    11,    11,    11,
+      11,    11,   -37,   -37,   -37,   -37,    11,    11,    11,    11,
+      -9,   -37,   -37,    66,    -9,    24,   -37,   -37,    33,    33,
+      37,   -37,   -37,    -1,   -37,    55,    53,    -9,   -37,   -37,
+      81,   -37
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -631,33 +631,33 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     3,     1,     8,     7,     9,    12,     4,
-       0,     0,     0,     0,    22,     0,     0,    12,     0,     5,
-       0,    13,    15,    16,    17,    18,    19,    20,    21,    11,
-       0,     0,     0,     0,     0,     0,     0,     0,     2,    14,
-       6,     0,     0,    56,    57,     0,     0,    55,    54,     0,
-      32,    35,    38,     0,    46,    49,    52,     0,     0,    27,
-      28,    29,     0,    10,    50,    52,    51,     0,     0,     0,
-       0,     0,     0,     0,     0,    40,    41,    42,    43,     0,
-       0,     0,     0,     0,    30,    53,    31,     0,    34,    36,
-      37,    45,    44,    39,    47,    48,     0,    25,     0,     0,
-       0,    23,    26,     0,    24
+       0,     0,     0,     3,     1,    11,     7,     6,     8,     4,
+       0,     0,    10,     0,     0,     0,     0,    20,     0,     0,
+      11,     2,     0,    12,    13,    14,    15,    16,    17,    18,
+      19,     5,     0,     0,     0,     0,     0,     0,     0,     0,
+       9,     0,    54,    55,     0,     0,    53,    52,     0,    30,
+      32,    35,    37,    44,    47,    50,     0,     0,    25,    26,
+      27,     0,    48,    49,     0,     0,     0,     0,     0,     0,
+       0,     0,    38,    39,    40,    41,     0,     0,     0,     0,
+       0,    28,    51,    29,     0,    31,    33,    34,    43,    42,
+      36,    45,    46,     0,    23,     0,     0,     0,    21,    24,
+       0,    22
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -38,   -38,   -38,   110,   -38,   -38,   103,     1,   -38,   -38,
-     -38,   -38,   -38,   -12,   -38,   -31,    53,    49,    29,   -38,
-      43,    13,   -37,   -30
+     -37,   -37,   -37,   -37,   -37,   -37,    70,   -37,   -37,   -37,
+     -37,   -37,   -37,   -15,   -37,   -34,    27,    22,     7,   -37,
+      15,     9,   -14,   -37
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     8,     9,    10,    30,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    49,    50,    51,    52,    79,
-      53,    54,    55,    65
+       0,     2,     5,     9,    10,    13,    11,    23,    24,    25,
+      26,    27,    28,    29,    30,    48,    49,    50,    51,    76,
+      52,    53,    54,    55
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -665,75 +665,69 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      32,    56,    58,    56,    68,    64,    62,    56,    66,     5,
-       6,     7,    40,    41,     1,    67,    56,    68,    68,    11,
-       3,    39,    69,    12,    68,    13,    14,    15,    16,     5,
-       6,     7,    11,    84,     4,    83,    12,    39,    13,    14,
-      15,    16,    85,    94,    95,    71,    72,    80,    81,    29,
-     -33,    96,    56,    17,    31,    11,    68,    18,    17,    12,
-      33,    13,    14,    15,    16,   -33,    17,    38,   -33,    34,
-      18,    97,    11,    37,    99,    98,    12,    35,    13,    14,
-      15,    16,    73,    74,   100,   101,    91,    92,   103,    17,
-      61,    57,    42,    18,    63,    43,    44,    59,    45,    60,
-      89,    90,    70,    82,    87,   102,    17,    73,    74,   104,
-      18,    46,    75,    76,    77,    78,    47,    48,    19,    88,
-      36,    86,    93
+      34,    57,     3,    65,     1,    61,    14,    12,    65,    33,
+      15,    64,    16,    17,    18,    19,    14,    65,    65,     4,
+      15,    66,    16,    17,    18,    19,    80,    62,    41,    20,
+      63,    42,    43,    65,    44,    82,    96,     6,     7,     8,
+      20,    21,    31,    32,    22,    93,    35,    45,    81,    39,
+      20,    60,    46,    47,    22,    68,    69,    77,    78,    70,
+      71,    97,    98,    91,    92,    94,    70,    71,    36,    95,
+      37,    72,    73,    74,    75,    86,    87,    40,    56,    88,
+      89,    58,   100,    59,    67,    84,    79,    99,   101,    85,
+      38,    90,    83
 };
 
 static const yytype_int8 yycheck[] =
 {
-      12,    31,    33,    33,    19,    42,    37,    37,    45,    14,
-      15,    16,    34,    35,     3,    46,    46,    19,    19,     4,
-      38,    20,    37,     8,    19,    10,    11,    12,    13,    14,
-      15,    16,     4,    34,     0,    37,     8,    36,    10,    11,
-      12,    13,    37,    80,    81,    31,    32,    24,    25,    42,
-      19,    82,    82,    38,    36,     4,    19,    42,    38,     8,
-      36,    10,    11,    12,    13,    34,    38,    39,    37,    42,
-      42,    83,     4,    33,    37,    87,     8,    42,    10,    11,
-      12,    13,    22,    23,     6,     7,    73,    74,   100,    38,
-      39,     9,    17,    42,    42,    20,    21,    34,    23,    34,
-      71,    72,    18,    36,     5,    34,    38,    22,    23,     7,
-      42,    36,    27,    28,    29,    30,    41,    42,     8,    70,
-      17,    68,    79
+      15,    35,    38,    19,     3,    39,     4,    42,    19,    36,
+       8,    45,    10,    11,    12,    13,     4,    19,    19,     0,
+       8,    37,    10,    11,    12,    13,    37,    41,    17,    38,
+      44,    20,    21,    19,    23,    37,    37,    14,    15,    16,
+      38,    39,    34,    35,    42,    79,    36,    36,    34,    33,
+      38,    39,    41,    42,    42,    31,    32,    24,    25,    22,
+      23,     6,     7,    77,    78,    80,    22,    23,    42,    84,
+      42,    27,    28,    29,    30,    68,    69,    42,     9,    70,
+      71,    34,    97,    34,    18,     5,    36,    34,     7,    67,
+      20,    76,    65
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    46,    38,     0,    14,    15,    16,    47,    48,
-      49,     4,     8,    10,    11,    12,    13,    38,    42,    48,
-      51,    52,    53,    54,    55,    56,    57,    58,    59,    42,
-      50,    36,    58,    36,    42,    42,    51,    33,    39,    52,
-      34,    35,    17,    20,    21,    23,    36,    41,    42,    60,
-      61,    62,    63,    65,    66,    67,    68,     9,    60,    34,
-      34,    39,    60,    42,    67,    68,    67,    60,    19,    37,
-      18,    31,    32,    22,    23,    27,    28,    29,    30,    64,
-      24,    25,    36,    37,    34,    37,    61,     5,    62,    63,
-      63,    66,    66,    65,    67,    67,    60,    58,    58,    37,
-       6,     7,    34,    58,     7
+       0,     3,    46,    38,     0,    47,    14,    15,    16,    48,
+      49,    51,    42,    50,     4,     8,    10,    11,    12,    13,
+      38,    39,    42,    52,    53,    54,    55,    56,    57,    58,
+      59,    34,    35,    36,    58,    36,    42,    42,    51,    33,
+      42,    17,    20,    21,    23,    36,    41,    42,    60,    61,
+      62,    63,    65,    66,    67,    68,     9,    60,    34,    34,
+      39,    60,    67,    67,    60,    19,    37,    18,    31,    32,
+      22,    23,    27,    28,    29,    30,    64,    24,    25,    36,
+      37,    34,    37,    61,     5,    62,    63,    63,    66,    66,
+      65,    67,    67,    60,    58,    58,    37,     6,     7,    34,
+      58,     7
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    45,    46,    47,    47,    47,    48,    49,    49,    49,
-      50,    50,    51,    51,    51,    52,    52,    52,    52,    52,
-      52,    52,    52,    53,    53,    54,    55,    56,    57,    58,
-      59,    60,    60,    60,    61,    61,    62,    62,    62,    63,
-      64,    64,    64,    64,    65,    65,    65,    66,    66,    66,
-      67,    67,    67,    68,    68,    68,    68,    68
+       0,    45,    46,    47,    47,    48,    49,    49,    49,    50,
+      50,    51,    51,    52,    52,    52,    52,    52,    52,    52,
+      52,    53,    53,    54,    55,    56,    57,    58,    59,    60,
+      60,    61,    61,    62,    62,    62,    63,    63,    64,    64,
+      64,    64,    65,    65,    65,    66,    66,    66,    67,    67,
+      67,    68,    68,    68,    68,    68
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     5,     0,     1,     2,     3,     1,     1,     1,
-       3,     1,     0,     1,     2,     1,     1,     1,     1,     1,
-       1,     1,     1,     7,     9,     5,     7,     3,     3,     3,
-       4,     3,     1,     1,     3,     1,     3,     3,     1,     3,
-       1,     1,     1,     1,     3,     3,     1,     3,     3,     1,
-       2,     2,     1,     3,     1,     1,     1,     1
+       0,     2,     5,     0,     2,     3,     1,     1,     1,     3,
+       1,     0,     2,     1,     1,     1,     1,     1,     1,     1,
+       1,     7,     9,     5,     7,     3,     3,     3,     4,     3,
+       1,     3,     1,     3,     3,     1,     3,     1,     1,     1,
+       1,     1,     3,     3,     1,     3,     3,     1,     2,     2,
+       1,     3,     1,     1,     1,     1
 };
 
 
@@ -1197,308 +1191,314 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: PROGRAM LI list-decl list-sent LD  */
-#line 104 "sintatic.y"
+#line 100 "sintatic.y"
                                           {printf("program\n");}
+#line 1197 "sintatic.tab.c"
+    break;
+
+  case 4: /* list-decl: list-decl decl  */
+#line 102 "sintatic.y"
+                         {printf("list-decl decl\n");}
 #line 1203 "sintatic.tab.c"
     break;
 
-  case 4: /* list-decl: decl  */
-#line 106 "sintatic.y"
-               {printf("decl\n");}
+  case 5: /* decl: tipo list-id PYC  */
+#line 104 "sintatic.y"
+                         {printf("tipo list-id;\n");}
 #line 1209 "sintatic.tab.c"
     break;
 
-  case 5: /* list-decl: list-decl decl  */
-#line 107 "sintatic.y"
-                         {printf("list-decl decl\n");}
+  case 6: /* tipo: INT  */
+#line 106 "sintatic.y"
+            {printf("int\n");}
 #line 1215 "sintatic.tab.c"
     break;
 
-  case 6: /* decl: tipo list-id PYC  */
-#line 109 "sintatic.y"
-                         {printf("tipo list-id;\n");}
+  case 7: /* tipo: FLOAT  */
+#line 107 "sintatic.y"
+                {printf("float\n");}
 #line 1221 "sintatic.tab.c"
     break;
 
-  case 7: /* tipo: INT  */
-#line 111 "sintatic.y"
-            {printf("int\n");}
+  case 8: /* tipo: BOOL  */
+#line 108 "sintatic.y"
+               {printf("bool\n");}
 #line 1227 "sintatic.tab.c"
     break;
 
-  case 8: /* tipo: FLOAT  */
-#line 112 "sintatic.y"
-                {printf("float\n");}
+  case 9: /* list-id: list-id COM IDENTIFICADOR  */
+#line 110 "sintatic.y"
+                                   {printf("list-id, id: %s\n",(yyvsp[0].identificador));}
 #line 1233 "sintatic.tab.c"
     break;
 
-  case 9: /* tipo: BOOL  */
-#line 113 "sintatic.y"
-               {printf("bool\n");}
+  case 10: /* list-id: IDENTIFICADOR  */
+#line 111 "sintatic.y"
+                        {printf("id: %s\n", (yyvsp[0].identificador));}
 #line 1239 "sintatic.tab.c"
     break;
 
-  case 10: /* list-id: list-id COM IDENTIFICADOR  */
-#line 115 "sintatic.y"
-                                   {printf("list-id, id\n");}
+  case 12: /* list-sent: list-sent sent  */
+#line 113 "sintatic.y"
+                         {printf("list-sent sent\n");}
 #line 1245 "sintatic.tab.c"
     break;
 
-  case 11: /* list-id: IDENTIFICADOR  */
-#line 116 "sintatic.y"
-                        {printf("id\n");}
+  case 13: /* sent: sent-if  */
+#line 115 "sintatic.y"
+                {printf("sent-if\n");}
 #line 1251 "sintatic.tab.c"
     break;
 
-  case 13: /* list-sent: sent  */
-#line 118 "sintatic.y"
-               {printf("sent\n");}
+  case 14: /* sent: sent-while  */
+#line 116 "sintatic.y"
+                     {printf("sent-while\n");}
 #line 1257 "sintatic.tab.c"
     break;
 
-  case 14: /* list-sent: list-sent sent  */
-#line 119 "sintatic.y"
-                         {printf("list-sent sent\n");}
+  case 15: /* sent: sent-do  */
+#line 117 "sintatic.y"
+                  {printf("sent-do\n");}
 #line 1263 "sintatic.tab.c"
     break;
 
-  case 15: /* sent: sent-if  */
-#line 121 "sintatic.y"
-                {printf("sent-if\n");}
+  case 16: /* sent: sent-read  */
+#line 118 "sintatic.y"
+                    {printf("sent-read\n");}
 #line 1269 "sintatic.tab.c"
     break;
 
-  case 16: /* sent: sent-while  */
-#line 122 "sintatic.y"
-                     {printf("sent-while\n");}
+  case 17: /* sent: sent-write  */
+#line 119 "sintatic.y"
+                     {printf("sent-write\n");}
 #line 1275 "sintatic.tab.c"
     break;
 
-  case 17: /* sent: sent-do  */
-#line 123 "sintatic.y"
-                  {printf("sent-do\n");}
+  case 18: /* sent: bloque  */
+#line 120 "sintatic.y"
+                 {printf("bloque\n");}
 #line 1281 "sintatic.tab.c"
     break;
 
-  case 18: /* sent: sent-read  */
-#line 124 "sintatic.y"
-                    {printf("sent-read\n");}
+  case 19: /* sent: sent-assign  */
+#line 121 "sintatic.y"
+                      {printf("sent-assign\n");}
 #line 1287 "sintatic.tab.c"
     break;
 
-  case 19: /* sent: sent-write  */
-#line 125 "sintatic.y"
-                     {printf("sent-write\n");}
+  case 20: /* sent: BREAK  */
+#line 122 "sintatic.y"
+                {printf("break\n");}
 #line 1293 "sintatic.tab.c"
     break;
 
-  case 20: /* sent: bloque  */
-#line 126 "sintatic.y"
-                 {printf("bloque\n");}
+  case 21: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
+#line 124 "sintatic.y"
+                                         {printf("if\n");}
 #line 1299 "sintatic.tab.c"
     break;
 
-  case 21: /* sent: sent-assign  */
-#line 127 "sintatic.y"
-                      {printf("sent-assign\n");}
+  case 22: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
+#line 125 "sintatic.y"
+                                                       {printf("if-else\n");}
 #line 1305 "sintatic.tab.c"
     break;
 
-  case 22: /* sent: BREAK  */
-#line 128 "sintatic.y"
-                {printf("break\n");}
+  case 23: /* sent-while: WHILE PI exp-bool PD bloque  */
+#line 127 "sintatic.y"
+                                    {printf("while\n");}
 #line 1311 "sintatic.tab.c"
     break;
 
-  case 23: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
-#line 130 "sintatic.y"
-                                         {printf("if: %s %s %s %s %s\n", (yyvsp[-6].i),(yyvsp[-5].pi),(yyvsp[-3].pd),(yyvsp[-2].then),(yyvsp[0].fi));}
+  case 24: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
+#line 129 "sintatic.y"
+                                           {printf("do\n");}
 #line 1317 "sintatic.tab.c"
     break;
 
-  case 24: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
+  case 25: /* sent-read: READ IDENTIFICADOR PYC  */
 #line 131 "sintatic.y"
-                                                       {printf("if-else: %s %s %s %s %s %s\n", (yyvsp[-8].i),(yyvsp[-7].pi),(yyvsp[-5].pd),(yyvsp[-4].then),(yyvsp[-2].els),(yyvsp[0].fi));}
+                               {printf("read\n");}
 #line 1323 "sintatic.tab.c"
     break;
 
-  case 25: /* sent-while: WHILE PI exp-bool PD bloque  */
+  case 26: /* sent-write: WRITE IDENTIFICADOR PYC  */
 #line 133 "sintatic.y"
-                                    {printf("while: %s %s %s\n", (yyvsp[-4].whil),(yyvsp[-3].pi),(yyvsp[-1].pd));}
+                                {printf("write\n");}
 #line 1329 "sintatic.tab.c"
     break;
 
-  case 26: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
+  case 27: /* bloque: LI list-sent LD  */
 #line 135 "sintatic.y"
-                                           {printf("do: %s %s %s %s %s\n", (yyvsp[-6].d),(yyvsp[-4].until),(yyvsp[-3].pi),(yyvsp[-1].pd),(yyvsp[0].pyc));}
+                        {printf("bloque\n");}
 #line 1335 "sintatic.tab.c"
     break;
 
-  case 27: /* sent-read: READ IDENTIFICADOR PYC  */
+  case 28: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
 #line 137 "sintatic.y"
-                               {printf("read: %s %s %s\n", (yyvsp[-2].read),(yyvsp[-1].identificador),(yyvsp[0].pyc));}
+                                        {printf("asignacion\n");}
 #line 1341 "sintatic.tab.c"
     break;
 
-  case 28: /* sent-write: WRITE IDENTIFICADOR PYC  */
+  case 29: /* exp-bool: exp-bool OR comb  */
 #line 139 "sintatic.y"
-                                {printf("write: %s %s\n", (yyvsp[-1].identificador),(yyvsp[0].pyc));}
+                          {printf("or\n");}
 #line 1347 "sintatic.tab.c"
     break;
 
-  case 29: /* bloque: LI list-sent LD  */
-#line 141 "sintatic.y"
-                        {printf("bloque: %s  %s\n", (yyvsp[-2].li),(yyvsp[0].ld));}
+  case 30: /* exp-bool: comb  */
+#line 140 "sintatic.y"
+               {printf("comb\n");}
 #line 1353 "sintatic.tab.c"
     break;
 
-  case 30: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
-#line 143 "sintatic.y"
-                                        {printf("asignacion: %s %s %s\n", (yyvsp[-3].identificador),(yyvsp[-2].asig),(yyvsp[0].pyc));}
+  case 31: /* comb: comb AND igualdad  */
+#line 142 "sintatic.y"
+                          {printf("and\n");}
 #line 1359 "sintatic.tab.c"
     break;
 
-  case 31: /* exp-bool: exp-bool OR comb  */
-#line 145 "sintatic.y"
-                          {printf("or: %s\n",(yyvsp[-1].o));}
+  case 32: /* comb: igualdad  */
+#line 143 "sintatic.y"
+                   {printf("igualdad\n");}
 #line 1365 "sintatic.tab.c"
     break;
 
-  case 32: /* exp-bool: comb  */
-#line 146 "sintatic.y"
-               {printf("comb\n");}
+  case 33: /* igualdad: igualdad IGU rel  */
+#line 145 "sintatic.y"
+                         {printf("igual igual\n");}
 #line 1371 "sintatic.tab.c"
     break;
 
-  case 33: /* exp-bool: factor  */
-#line 147 "sintatic.y"
-                 {printf("factor\n");}
+  case 34: /* igualdad: igualdad DIS rel  */
+#line 146 "sintatic.y"
+                           {printf("distinto\n");}
 #line 1377 "sintatic.tab.c"
     break;
 
-  case 34: /* comb: comb AND igualdad  */
-#line 149 "sintatic.y"
-                          {printf("and: %s\n", (yyvsp[-1].an));}
+  case 35: /* igualdad: rel  */
+#line 147 "sintatic.y"
+              {printf("rel\n");}
 #line 1383 "sintatic.tab.c"
     break;
 
-  case 35: /* comb: igualdad  */
-#line 150 "sintatic.y"
-                   {printf("igualdad\n");}
+  case 36: /* rel: expr op-rel expr  */
+#line 149 "sintatic.y"
+                         {printf("operacion\n");}
 #line 1389 "sintatic.tab.c"
     break;
 
-  case 36: /* igualdad: igualdad IGU rel  */
-#line 152 "sintatic.y"
-                         {printf("igualdad: %s\n", (yyvsp[-1].igu));}
+  case 37: /* rel: expr  */
+#line 150 "sintatic.y"
+               {printf("expresion\n");}
 #line 1395 "sintatic.tab.c"
     break;
 
-  case 37: /* igualdad: igualdad DIS rel  */
-#line 153 "sintatic.y"
-                           {printf("distinto: %s\n", (yyvsp[-1].dis));}
+  case 38: /* op-rel: MEN  */
+#line 152 "sintatic.y"
+            {printf("menor\n");}
 #line 1401 "sintatic.tab.c"
     break;
 
-  case 38: /* igualdad: rel  */
-#line 154 "sintatic.y"
-              {printf("rel\n");}
+  case 39: /* op-rel: MENIGL  */
+#line 153 "sintatic.y"
+                 {printf("menor igual\n");}
 #line 1407 "sintatic.tab.c"
     break;
 
-  case 39: /* rel: expr op-rel expr  */
-#line 156 "sintatic.y"
-                         {printf("operacion\n");}
+  case 40: /* op-rel: MAY  */
+#line 154 "sintatic.y"
+              {printf("mayor\n");}
 #line 1413 "sintatic.tab.c"
     break;
 
-  case 40: /* op-rel: MEN  */
-#line 158 "sintatic.y"
-            {printf("menor: %s\n", (yyvsp[0].men));}
+  case 41: /* op-rel: MAYIGL  */
+#line 155 "sintatic.y"
+                 {printf("mayor igual\n");}
 #line 1419 "sintatic.tab.c"
     break;
 
-  case 41: /* op-rel: MENIGL  */
-#line 159 "sintatic.y"
-                 {printf("menor igual: %s\n", (yyvsp[0].menigl));}
+  case 42: /* expr: expr RES term  */
+#line 157 "sintatic.y"
+                      {printf("resta\n");}
 #line 1425 "sintatic.tab.c"
     break;
 
-  case 42: /* op-rel: MAY  */
-#line 160 "sintatic.y"
-              {printf("mayor: %s\n", (yyvsp[0].may));}
+  case 43: /* expr: expr MAS term  */
+#line 158 "sintatic.y"
+                        {printf("suma\n");}
 #line 1431 "sintatic.tab.c"
     break;
 
-  case 43: /* op-rel: MAYIGL  */
-#line 161 "sintatic.y"
-                 {printf("mayor igual: %s\n", (yyvsp[0].mayigl));}
+  case 44: /* expr: term  */
+#line 159 "sintatic.y"
+               {printf("term\n");}
 #line 1437 "sintatic.tab.c"
     break;
 
-  case 44: /* expr: expr RES term  */
-#line 163 "sintatic.y"
-                      {printf("resta: %s\n", (yyvsp[-1].res));}
+  case 45: /* term: term MUL unario  */
+#line 161 "sintatic.y"
+                        {printf("multiplicacion\n");}
 #line 1443 "sintatic.tab.c"
     break;
 
-  case 45: /* expr: expr MAS term  */
-#line 164 "sintatic.y"
-                        {printf("suma: %s\n",(yyvsp[-1].mas));}
+  case 46: /* term: term DIV unario  */
+#line 162 "sintatic.y"
+                          {printf("division\n");}
 #line 1449 "sintatic.tab.c"
     break;
 
-  case 47: /* term: term MUL unario  */
-#line 167 "sintatic.y"
-                        {printf("multiplicacion: %s\n", (yyvsp[-1].mul));}
+  case 47: /* term: unario  */
+#line 163 "sintatic.y"
+                 {printf("unario\n");}
 #line 1455 "sintatic.tab.c"
     break;
 
-  case 48: /* term: term DIV unario  */
-#line 168 "sintatic.y"
-                          {printf("division: %s\n",(yyvsp[-1].div));}
+  case 48: /* unario: NOT unario  */
+#line 165 "sintatic.y"
+                   {printf("negacion\n");}
 #line 1461 "sintatic.tab.c"
     break;
 
-  case 50: /* unario: NOT unario  */
-#line 171 "sintatic.y"
-                   {printf("negacion: %s\n", (yyvsp[-1].no));}
+  case 49: /* unario: RES unario  */
+#line 166 "sintatic.y"
+                     {printf("negativo\n");}
 #line 1467 "sintatic.tab.c"
     break;
 
-  case 51: /* unario: RES unario  */
-#line 172 "sintatic.y"
-                     {printf("negativo: %s\n", (yyvsp[-1].res));}
+  case 50: /* unario: factor  */
+#line 167 "sintatic.y"
+                 {printf("factor\n");}
 #line 1473 "sintatic.tab.c"
     break;
 
-  case 53: /* factor: PI exp-bool PD  */
-#line 175 "sintatic.y"
-                       {printf("factor: %s %s\n", (yyvsp[-2].pi),(yyvsp[0].pd));}
+  case 51: /* factor: PI exp-bool PD  */
+#line 169 "sintatic.y"
+                       {printf("factor\n");}
 #line 1479 "sintatic.tab.c"
     break;
 
-  case 54: /* factor: IDENTIFICADOR  */
-#line 176 "sintatic.y"
-                        {printf("id: %s\n", (yyvsp[0].identificador));}
+  case 52: /* factor: IDENTIFICADOR  */
+#line 170 "sintatic.y"
+                        {printf("id: %s\n",(yyvsp[0].identificador));}
 #line 1485 "sintatic.tab.c"
     break;
 
-  case 55: /* factor: NUMERO  */
-#line 177 "sintatic.y"
-                 {printf("int: %f\n", (yyvsp[0].numero));}
+  case 53: /* factor: NUMERO  */
+#line 171 "sintatic.y"
+                 {printf("numero: %f\n",(yyvsp[0].numero));}
 #line 1491 "sintatic.tab.c"
     break;
 
-  case 56: /* factor: TRUE  */
-#line 178 "sintatic.y"
-               {printf("true: %s\n", (yyvsp[0].tru));}
+  case 54: /* factor: TRUE  */
+#line 172 "sintatic.y"
+               {printf("true\n");}
 #line 1497 "sintatic.tab.c"
     break;
 
-  case 57: /* factor: FALSE  */
-#line 179 "sintatic.y"
-                {printf("false: %s\n", (yyvsp[0].fals));}
+  case 55: /* factor: FALSE  */
+#line 173 "sintatic.y"
+                {printf("false\n");}
 #line 1503 "sintatic.tab.c"
     break;
 
@@ -1696,7 +1696,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 180 "sintatic.y"
+#line 174 "sintatic.y"
 
 
 int yyerror(char *s){

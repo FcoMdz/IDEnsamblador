@@ -84,13 +84,13 @@ void formatText(QPlainTextEdit *editor, int initialCursor){
             cursor.setPosition(start);
             int pastPosition = cursor.position();
             cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
-            if(token.clave == "Reservada"){
+            if(token.estilo == "Reservada" ){
                 cursor.setCharFormat(claveFormat);
-            }else if(token.clave == "Identificador"){
+            }else if(token.estilo == "Simbolo"){
                 cursor.setCharFormat(identifierFormat);
-            }else if(token.clave == "Cadena"){
+            }else if(token.estilo == "Cadena"){
                 cursor.setCharFormat(cadenaFormat);
-            }else if(token.clave=="Comentario"){
+            }else if(token.estilo=="Comentario"){
                 cursor.setCharFormat(comentarioFormat);
             }else{
                 cursor.setCharFormat(elseFormat);

@@ -11,6 +11,7 @@
     struct Lexico{
         std::string clave;
         std::string lexema;
+        std::string estilo;
         int fila;
         int columna;
     };
@@ -57,32 +58,387 @@
 %}
 
 /*Especificaciones regex*/
+SPACE [ ]|[\t]|[\r]
 LETRA [a-z|A-Z]
 DIGITO [0-9]
-RESERVADAS "program"|"if"|"else"|"fi"|"do"|"until"|"while"|"read"|"write"|"float"|"int"|"bool"|"not"|"and"|"or"|"true"|"false"|"char"
-SIMBOLO \+|\-|\*|\/|\^|<|<=|>|>=|==|!=|=|;|,|\(|\)|\{|\}
+PROGRAM "program"
+IF "if"
+THEN "then"
+ELSE "else"
+FI "fi"
+DO "do"
+UNTIL "until"
+WHILE "while"
+BREAK "break"
+READ "read"
+WRITE "write"
+FLOAT "float"
+INT "int"
+BOOL "bool"
+NOT "not"
+AND "and"
+OR "or"
+TRUE "true"
+FALSE "false"
+MAS [+]
+RES [-]
+MUL [*]
+DIV [/]
+ELE [\^]
+MEN [<]
+MENIGL [<][=]
+MAY [>]
+MAYIGL [>][=]
+IGU [=][=]
+DIS [!][=]
+ASIG [=]
+PYC [;]
+COM [,]
+PI [(]
+PD [)]
+LI [{]
+LD [}]
 IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
 CADENA ["][^"]*["]
 COMENTARIO_LINEA \/\/.*
 COMENTARIO_MULTI \/\*(.|\n)*\*\/
-SPACE [ ]
-NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
+NUMERO {DIGITO}+(\.{DIGITO}+)?
 
 /*Reglas de detección*/
 %%
 
 "\n" {countLines++; countColumn=1;}
-{RESERVADAS} {
+{SPACE} {
+    countColumn++;
+}
+{PROGRAM} {
         lexVec.push_back(Lexico());
-        lexVec[lexVec.size()-1].clave = "Reservada";
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "PROGRAM";
         lexVec[lexVec.size()-1].lexema = yytext;
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
     }
-{SIMBOLO} {
+{IF} {
         lexVec.push_back(Lexico());
-        lexVec[lexVec.size()-1].clave = "Simbolo";
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "IF";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{THEN} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "THEN";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{ELSE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "ELSE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{FI} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "FI";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{DO} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "DO";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{UNTIL} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "UNTIL";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{WHILE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "WHILE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{BREAK} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "BREAK";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{READ} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "READ";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{WRITE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "WRITE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{FLOAT} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "FLOAT";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{INT} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "INT";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{BOOL} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "BOOL";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{NOT} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "NOT";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{AND} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "AND";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{OR} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "OR";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{TRUE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "TRUE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{FALSE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Reservada";
+        lexVec[lexVec.size()-1].clave = "FALSE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MAS} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MAS";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{RES} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "RES";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MUL} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MUL";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{DIV} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "DIV";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{ELE} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "ELE";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MEN} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MEN";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MENIGL} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MENIGL";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MAY} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MAY";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{MAYIGL} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "MAYIGL";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{IGU} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "IGU";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{DIS} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "DIS";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{ASIG} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "ASIG";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{PYC} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Otro";
+        lexVec[lexVec.size()-1].clave = "PYC";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{COM} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Otro";
+        lexVec[lexVec.size()-1].clave = "COM";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{PI} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "PI";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{PD} {
+       lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "PD";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{LI} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "LI";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+    }
+{LD} {
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Simbolo";
+        lexVec[lexVec.size()-1].clave = "LD";
         lexVec[lexVec.size()-1].lexema = yytext;
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
@@ -90,23 +446,26 @@ NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
     }
 {CADENA} {
         lexVec.push_back(Lexico());
-        lexVec[lexVec.size()-1].clave = "Cadena";
+        lexVec[lexVec.size()-1].estilo = "Cadena";
+        lexVec[lexVec.size()-1].clave = "CADENA";
         lexVec[lexVec.size()-1].lexema = yytext;
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
     }
 {COMENTARIO_LINEA}|{COMENTARIO_MULTI} {
-    lexVec.push_back(Lexico());
-    lexVec[lexVec.size()-1].clave = "Comentario";
-    lexVec[lexVec.size()-1].lexema = yytext;
-    lexVec[lexVec.size()-1].columna = countColumn;
-    lexVec[lexVec.size()-1].fila = countLines;
-    countColumn += strlen(yytext);
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Comentario";
+        lexVec[lexVec.size()-1].clave = "COMENTARIO";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
 }
 {NUMERO} {
         lexVec.push_back(Lexico());
-        lexVec[lexVec.size()-1].clave = "Numero";
+        lexVec[lexVec.size()-1].estilo = "Numero";
+        lexVec[lexVec.size()-1].clave = "NUMERO";
         lexVec[lexVec.size()-1].lexema = yytext;
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
@@ -114,27 +473,14 @@ NUMERO {DIGITO}{DIGITO}*(.{DIGITO}{DIGITO}*)?
     }
 {IDENTIFICADOR} {
         lexVec.push_back(Lexico());
-        lexVec[lexVec.size()-1].clave = "Identificador";
+        lexVec[lexVec.size()-1].estilo = "Identificador";
+        lexVec[lexVec.size()-1].clave = "IDENTIFICADOR";
         lexVec[lexVec.size()-1].lexema = yytext;
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
     }
-{SPACE} {
-    lexVec.push_back(Lexico());
-    lexVec[lexVec.size()-1].clave = "Espacio";
-    lexVec[lexVec.size()-1].lexema = yytext;
-    lexVec[lexVec.size()-1].columna = countColumn;
-    lexVec[lexVec.size()-1].fila = countLines;
-    countColumn += strlen(yytext);
-}
-[^\s] {
-    /*if(yytext != " "){
-        lexVec[lexVec.size()-1].clave = "Error";
-        lexVec[lexVec.size()-1].lexema = yytext;
-        lexVec[lexVec.size()-1].columna = countColumn;
-        lexVec[lexVec.size()-1].fila = countLines;
-    }*/
+. {
     countColumn++;
 }
 "-stop" {return 0;}
@@ -148,7 +494,7 @@ int yywrap(){
 
 
 
-int main(int argc, char **argv){
+/*int main(int argc, char **argv){
     if(argc < 2){
         printf("Ingrese el texto a evaluar:\n");
         yyin=stdin;
@@ -160,4 +506,4 @@ int main(int argc, char **argv){
         std::cout << lexVec[i].clave << "\t" << lexVec[i].lexema << "\t" << lexVec[i].fila << "\t" << lexVec[i].columna << "\n";
     }
     return 0;
-}
+}*/

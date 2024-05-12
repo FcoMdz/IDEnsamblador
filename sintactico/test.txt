@@ -1,0 +1,12 @@
+/*| IDENTIFICADOR ASIG exp-ope PYC {printf("asignacion operacional\n");}
+    exp-ope:
+        exp-ope RES term-ope {printf("resta\n");}
+        | exp-ope MAS term-ope {printf("suma\n");}
+        | term-ope {printf("term-ope\n");}
+    term-ope:
+        term-ope MUL factor-op {printf("multiplicacion\n");}
+        | term-ope DIV factor-op {printf("division\n");}
+    factor-op:
+        PI exp-ope PD {printf("(exp-ope)\n");}
+        | IDENTIFICADOR {printf("id: %s\n",$1);}
+        | NUMERO {printf("numero: %f\n",$1);}*/
