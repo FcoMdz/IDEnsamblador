@@ -1200,7 +1200,7 @@ case 40:
 YY_RULE_SETUP
 #line 254 "lexic.l"
 {
-        printf("lex: comentario\n");
+        //printf("lex: comentario\n");
     }
 	YY_BREAK
 case 41:

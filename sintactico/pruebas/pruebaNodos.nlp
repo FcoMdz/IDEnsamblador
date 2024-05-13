@@ -1,0 +1,15 @@
+program{
+    /*
+    int x,y,z;
+    bool test, test2;
+    read x;
+    write -x;
+    write x <= y;
+    write x != y;
+    write x and y;
+    write x or y;
+    write x + y;
+    write x * y;
+    */
+    write x+(y<z+1);  
+}

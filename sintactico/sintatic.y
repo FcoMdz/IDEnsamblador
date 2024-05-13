@@ -1,8 +1,86 @@
 /*Declaraciones*/
 %{
     #include <stdio.h>
+    #include <iostream>
+    #include <vector>
+    #include <string>
     int yylex();
     int yyerror(char *s);
+    struct Nodo{
+        std::string nombre;
+        std::string valor;
+        Nodo *padre;
+        std::vector<Nodo*> hijos;
+    };
+    Nodo *inicial = NULL;
+    void printNode(Nodo *init);
+
+    void checkListId(Nodo *init, Nodo *siguiente){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        //Busca el nodo del tipo
+        Nodo *recorrer = init;
+        while(recorrer->nombre.compare("bool") != 0 && recorrer->nombre.compare("int") != 0 && recorrer->nombre.compare("float") != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        //Le quita el tipo como hijo a la variable declarada
+        recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
+        //Hace que el padre del tipo sea la delcaración
+        recorrer->padre = siguiente;
+        
+        //Inserta los hijos en orden
+        siguiente->hijos.push_back(recorrer);
+    }
+
+    void checkSec(Nodo *init, Nodo *siguiente, std::string termino, int prof = 0, int limit = 1){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        if(init->nombre.compare(termino) == 0) return;
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            if(termino.compare("term")==0) std::cout << "check: " << recorrer->nombre << "\n";
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo 
+            if(termino.compare("term")==0) std::cout << "check inner: " << recorrer->valor << "\n";
+            if(prof == limit){
+                recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
+                //Hace que el padre del tipo sea la delcaración
+                recorrer->padre = siguiente;
+                //Inserta los hijos en orden
+                siguiente->hijos.push_back(recorrer);
+                return;
+            }
+            if(recorrer->hijos.size() != 0) checkSec(recorrer->hijos.at(0), siguiente, termino, ++prof, limit);
+        }
+        if(termino.compare("term")==0) std::cout << "check outer: " << recorrer->valor << "\n";
+        return;
+    }
+
+    void check(Nodo *init, Nodo *siguiente, std::string termino){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        if(init->nombre.compare(termino) == 0) return;
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo 
+            recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
+            //Hace que el padre del tipo sea la delcaración
+            recorrer->padre = siguiente;
+            if(recorrer->hijos.size() != 0) check(recorrer->hijos.at(0), siguiente, termino);
+            //Inserta los hijos en orden
+            siguiente->hijos.push_back(recorrer);
+        }
+        return;
+    }
+
 %}
 
 %token PROGRAM IF THEN ELSE FI DO UNTIL WHILE BREAK READ WRITE FLOAT INT BOOL NOT AND OR TRUE FALSE MAS RES MUL DIV ELE MEN MENIGL MAY MAYIGL IGU DIS ASIG PYC COM PI PD LI LD CADENA NUMERO IDENTIFICADOR OTRO SPACE
@@ -97,26 +175,162 @@
 
 %%
     program: 
-        PROGRAM LI list-decl list-sent LD {printf("program\n");}
+        PROGRAM LI list-decl list-sent LD {
+            if(inicial == NULL){
+                inicial = new struct Nodo;
+                inicial->nombre = "program";
+                inicial->valor = "";
+                inicial->padre = NULL;
+            }else{
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "program";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                check(inicial, siguiente, "list-decl");
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+            }
+        }
     list-decl:
-        | list-decl decl {printf("list-decl decl\n");}
+        | list-decl decl {
+            Nodo *siguiente = new struct Nodo;
+            siguiente->nombre = "list-decl";
+            siguiente->valor = "";
+            siguiente->padre = NULL;
+            //Busca el nodo del tipo
+            check(inicial, siguiente, "list-decl");
+            siguiente->hijos.push_back(inicial);
+            inicial = siguiente;
+        }
     decl: 
-        tipo list-id PYC {printf("tipo list-id;\n");}
+        tipo list-id PYC {
+            Nodo *siguiente = new struct Nodo;
+            siguiente->nombre = "decl";
+            siguiente->valor = "";
+            siguiente->padre = NULL;
+            checkListId(inicial, siguiente);
+            siguiente->hijos.push_back(inicial);
+            //Agrega el pyc como hijo
+            Nodo *pyc = new struct Nodo;
+            pyc->nombre = "pyc";
+            pyc->valor = ";";
+            pyc->padre = siguiente;
+            siguiente->hijos.push_back(pyc);
+            inicial = siguiente;
+        }
     tipo: 
-        INT {printf("int\n");}
-        | FLOAT {printf("float\n");}
-        | BOOL {printf("bool\n");}
+        INT {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "int";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "int";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+            }
+        | FLOAT {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "float";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "float";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+            }
+        | BOOL {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "bool";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "bool";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+            }
     list-id: 
-        list-id COM IDENTIFICADOR  {printf("list-id, id: %s\n",$3);}
-        | IDENTIFICADOR {printf("id: %s\n", $1);}
+        list-id COM IDENTIFICADOR  {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "list-id, id";
+                siguiente->valor = $3;
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+            }
+        | IDENTIFICADOR {
+            if(inicial == NULL){
+                inicial = new struct Nodo;
+                inicial->nombre = "id";
+                inicial->valor = $1;
+                inicial->padre = NULL;
+            }else{
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "id";
+                siguiente->valor = $1;
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+            }
+        }
     list-sent: 
-        | list-sent sent {printf("list-sent sent\n");}
+        | list-sent sent {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "list-sent";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                check(inicial, siguiente, "list-sent");
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("list-sent sent\n");
+            
+            }
     sent: 
         sent-if {printf("sent-if\n");}
         | sent-while {printf("sent-while\n");}
         | sent-do {printf("sent-do\n");}
-        | sent-read {printf("sent-read\n");}
-        | sent-write {printf("sent-write\n");}
+        | sent-read {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-read\n");
+            }
+        | sent-write {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-read\n");
+                printf("sent-write\n");
+            }
         | bloque {printf("bloque\n");}
         | sent-assign {printf("sent-assign\n");}
         | BREAK {printf("break\n");}
@@ -128,56 +342,575 @@
     sent-do:
         DO bloque UNTIL PI exp-bool PD PYC {printf("do\n");}
     sent-read: 
-        READ IDENTIFICADOR PYC {printf("read\n");}
+        READ IDENTIFICADOR PYC {
+            if(inicial == NULL){
+                //Crea el nodo padre
+                inicial = new struct Nodo;
+                inicial->nombre = "sent-read";
+                inicial->valor = "";
+                inicial->padre = NULL;
+                //Crea read como hijo
+                Nodo *read = new struct Nodo;
+                read->nombre = "read";
+                read->valor= "read";
+                read->padre=inicial;
+                inicial->hijos.push_back(read);
+                //Crea el id como hijo
+                Nodo *id = new struct Nodo;
+                id->nombre = "id";
+                id->valor = $2;
+                id->padre = inicial;
+                inicial->hijos.push_back(id);
+                //Crea el punto y coma como hijo
+                Nodo *pyc = new struct Nodo;
+                pyc->nombre = "pyc";
+                pyc->valor = ";";
+                pyc->padre = inicial;
+                inicial->hijos.push_back(pyc);
+            }else{
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent-read";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                //Crea su estructura
+                Nodo *read = new struct Nodo;
+                read->nombre = "read";
+                read->valor= "read";
+                read->padre=inicial;
+                siguiente->hijos.push_back(read);
+                //Crea el id como hijo
+                Nodo *id = new struct Nodo;
+                id->nombre = "id";
+                id->valor = $2;
+                id->padre = inicial;
+                siguiente->hijos.push_back(id);
+                //Crea el punto y coma como hijo
+                Nodo *pyc = new struct Nodo;
+                pyc->nombre = "pyc";
+                pyc->valor = ";";
+                pyc->padre = inicial;
+                siguiente->hijos.push_back(pyc);
+                inicial = siguiente;
+            }
+        }
     sent-write: 
-        WRITE IDENTIFICADOR PYC {printf("write\n");}
+        WRITE exp-bool PYC {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent-write";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                Nodo *exp_bool = new struct Nodo;
+                exp_bool->nombre = "exp-bool";
+                exp_bool->valor= "";
+                exp_bool->padre=siguiente;
+                exp_bool->hijos.push_back(inicial/*->hijos.at(0)*/);
+                //inicial->hijos.erase(inicial->hijos.begin());
+                siguiente->hijos.push_back(exp_bool);
+                //Crea su estructura
+                Nodo *wirte = new struct Nodo;
+                wirte->nombre = "write";
+                wirte->valor= "write";
+                wirte->padre=siguiente;
+                siguiente->hijos.push_back(wirte);
+                //Crea el punto y coma como hijo
+                Nodo *pyc = new struct Nodo;
+                pyc->nombre = "pyc";
+                pyc->valor = ";";
+                pyc->padre = siguiente;
+                siguiente->hijos.push_back(pyc);
+                inicial = siguiente;
+                printf("write\n");
+            }
+        
     bloque: 
         LI list-sent LD {printf("bloque\n");}
     sent-assign: 
         IDENTIFICADOR ASIG exp-bool PYC {printf("asignacion\n");}
     exp-bool:
-        exp-bool OR comb  {printf("or\n");}
-        | comb {printf("comb\n");}
+        exp-bool OR comb  {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "exp-bool OR comb";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "comb");
+                //Crea OR como hijo
+                Nodo *oi = new struct Nodo;
+                oi->nombre = "OR";
+                oi->valor= "or";
+                oi->padre=siguiente;
+                siguiente->hijos.push_back(oi);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("or\n");
+            }
+        | comb {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "comb";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("comb\n");
+            }
     comb: 
-        comb AND igualdad {printf("and\n");}
-        | igualdad {printf("igualdad\n");}
+        comb AND igualdad {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "comb AND igualdad";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "igualdad");
+                //Crea MAS como hijo
+                Nodo *an = new struct Nodo;
+                an->nombre = "AND";
+                an->valor= "and";
+                an->padre=siguiente;
+                siguiente->hijos.push_back(an);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("and\n");
+            }
+        | igualdad {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "igualdad";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("igualdad\n");
+            }
     igualdad: 
-        igualdad IGU rel {printf("igual igual\n");}
-        | igualdad DIS rel {printf("distinto\n");}
-        | rel {printf("rel\n");}
+        igualdad IGU rel {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "igualdad IGU rel";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "rel");
+                //Crea MAS como hijo
+                Nodo *igu = new struct Nodo;
+                igu->nombre = "IGU";
+                igu->valor= "==";
+                igu->padre=siguiente;
+                siguiente->hijos.push_back(igu);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("igual igual\n");
+            }
+        | igualdad DIS rel {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "igualdad DIS rel";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "rel");
+                //Crea MAS como hijo
+                Nodo *dis = new struct Nodo;
+                dis->nombre = "DIS";
+                dis->valor= "!=";
+                dis->padre=siguiente;
+                siguiente->hijos.push_back(dis);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("distinto\n");
+            }
+        | rel {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "rel";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("rel\n");
+            }
     rel: 
-        expr op-rel expr {printf("operacion\n");}
-        | expr {printf("expresion\n");}
+        expr op-rel expr {
+                
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "expr op-rel expr";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "op-rel");
+                if(siguiente->hijos.size() > 0){
+                    check(siguiente->hijos.at(0), siguiente, "term");
+                    Nodo *oprel = siguiente->hijos.at(0);
+                    siguiente->hijos.at(0) = siguiente->hijos.at(1);
+                    siguiente->hijos.at(1) = oprel;
+                }
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("operacion\n");
+            }
+        | expr {
+                std::cout<<"hola\n";
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "expr";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("expresion\n");
+            }
     op-rel: 
-        MEN {printf("menor\n");}
-        | MENIGL {printf("menor igual\n");}
-        | MAY {printf("mayor\n");}
-        | MAYIGL {printf("mayor igual\n");}
+        MEN {
+            Nodo *siguiente = new struct Nodo;
+            siguiente->nombre = "MEN";
+            siguiente->valor = $1;
+            siguiente->padre = NULL;
+            siguiente->hijos.push_back(inicial);
+            inicial->padre = siguiente;
+            inicial = siguiente;
+            Nodo *op_rel = new struct Nodo;
+            op_rel->nombre = "op-rel";
+            op_rel->valor = "";
+            op_rel->padre = NULL;
+            op_rel->hijos.push_back(inicial);
+            inicial->padre = op_rel;
+            inicial = op_rel;
+            printf("menor\n");
+        }
+        | MENIGL {
+                
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "MENIGL";
+                siguiente->valor = $1;
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                Nodo *op_rel = new struct Nodo;
+                op_rel->nombre = "op-rel";
+                op_rel->valor = "";
+                op_rel->padre = NULL;
+                op_rel->hijos.push_back(inicial);
+                inicial->padre = op_rel;
+                inicial = op_rel;
+                printf("menor igual\n");
+            }
+        | MAY {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "MAY";
+                siguiente->valor = $1;
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                Nodo *op_rel = new struct Nodo;
+                op_rel->nombre = "op-rel";
+                op_rel->valor = "";
+                op_rel->padre = NULL;
+                op_rel->hijos.push_back(inicial);
+                inicial->padre = op_rel;
+                inicial = op_rel;
+                printf("mayor\n");
+            }
+        | MAYIGL {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "MAYIGL";
+                siguiente->valor = $1;
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                Nodo *op_rel = new struct Nodo;
+                op_rel->nombre = "op-rel";
+                op_rel->valor = "";
+                op_rel->padre = NULL;
+                op_rel->hijos.push_back(inicial);
+                inicial->padre = op_rel;
+                inicial = op_rel;
+                printf("mayor igual\n");
+            }
     expr: 
-        expr RES term {printf("resta\n");}
-        | expr MAS term {printf("suma\n");}
-        | term {printf("term\n");}
+        expr RES term {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "expr RES term";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "expr");
+                check(inicial, siguiente, "term");
+                //Crea MAS como hijo
+                Nodo *res = new struct Nodo;
+                res->nombre = "RES";
+                res->valor= "-";
+                res->padre=siguiente;
+                siguiente->hijos.push_back(res);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("resta\n");
+            }
+        | expr MAS term {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "expr MAS term";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "expr");
+                check(inicial, siguiente, "term");
+                //Crea MAS como hijo
+                Nodo *mas = new struct Nodo;
+                mas->nombre = "MAS";
+                mas->valor= "+";
+                mas->padre=siguiente;
+                siguiente->hijos.push_back(mas);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("suma\n");
+            }
+        | term {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "term";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("term\n");
+            }
     term: 
-        term MUL unario {printf("multiplicacion\n");}
-        | term DIV unario {printf("division\n");}
-        | unario {printf("unario\n");}
+        term MUL unario {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "term MUL unario";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "term");
+                check(inicial, siguiente, "unario");
+                //Crea MUL como hijo
+                Nodo *mul = new struct Nodo;
+                mul->nombre = "MUL";
+                mul->valor= "*";
+                mul->padre=siguiente;
+                siguiente->hijos.push_back(mul);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("multiplicacion\n");
+            
+            }
+        | term DIV unario {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "term DIV unario";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                check(inicial, siguiente, "term");
+                check(inicial, siguiente, "unario");
+                //Crea div como hijo
+                Nodo *div = new struct Nodo;
+                div->nombre = "DIV";
+                div->valor= "/";
+                div->padre=siguiente;
+                siguiente->hijos.push_back(div);
+                siguiente->hijos.push_back(inicial);
+                inicial = siguiente;
+                printf("division\n");
+            }
+        | unario {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "unario";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("unario\n");
+            }
     unario: 
-        NOT unario {printf("negacion\n");}
-        | RES unario {printf("negativo\n");}
-        | factor {printf("factor\n");}
+        NOT unario {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "not unario";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                Nodo *unario = new struct Nodo;
+                unario->nombre = "unario";
+                unario->valor= "";
+                unario->padre=siguiente;
+                unario->hijos.push_back(inicial);
+                siguiente->hijos.push_back(unario);
+                //Crea not como hijo
+                Nodo *no = new struct Nodo;
+                no->nombre = "NOT";
+                no->valor= "not";
+                no->padre=siguiente;
+                siguiente->hijos.push_back(no);
+                inicial = siguiente;
+                printf("negacion\n");
+            }
+        | RES unario {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "-unario";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                Nodo *unario = new struct Nodo;
+                unario->nombre = "unario";
+                unario->valor= "";
+                unario->padre=siguiente;
+                unario->hijos.push_back(inicial);
+                siguiente->hijos.push_back(unario);
+                //Crea res como hijo
+                Nodo *res = new struct Nodo;
+                res->nombre = "RES";
+                res->valor= "-";
+                res->padre=siguiente;
+                siguiente->hijos.push_back(res);
+                inicial = siguiente;
+                printf("negativo\n");
+            }
+        | factor {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "factor";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("factor\n");
+            }
     factor: 
-        PI exp-bool PD {printf("factor\n");}
-        | IDENTIFICADOR {printf("id: %s\n",$1);}
-        | NUMERO {printf("numero: %f\n",$1);}
-        | TRUE {printf("true\n");}
-        | FALSE {printf("false\n");}
+        PI exp-bool PD {
+            //!Revisar
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "(exp-bool)";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                checkSec(inicial, siguiente, "term", 0, 1);
+                Nodo *exp_bool = new struct Nodo;
+                exp_bool->nombre = "exp-bool";
+                exp_bool->valor= "";
+                exp_bool->padre=siguiente;
+                exp_bool->hijos.push_back(inicial/*->hijos.at(0)*/);
+                //inicial->hijos.erase(inicial->hijos.begin());
+                siguiente->hijos.push_back(exp_bool);
+                //Crea pi como hijo
+                Nodo *pi = new struct Nodo;
+                pi->nombre = "PI";
+                pi->valor= "(";
+                pi->padre=siguiente;
+                siguiente->hijos.push_back(pi);
+                //Crea pd punto y coma como hijo
+                Nodo *pd = new struct Nodo;
+                pd->nombre = "PD";
+                pd->valor = ")";
+                pd->padre = siguiente;
+                siguiente->hijos.push_back(pd);
+                inicial = siguiente;
+                printf("(exp-bool)\n");
+            }
+        | IDENTIFICADOR {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "id";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "id";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+                printf("id: %s\n",$1);
+            }
+        | NUMERO {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "numero";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "numero";
+                    siguiente->valor = std::to_string($1);
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+                std::cout << "numero: " << std::to_string($1) << "\n";
+            }
+        | TRUE {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "true";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "true";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+                printf("true\n");
+            }
+        | FALSE {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;
+                    inicial->nombre = "false";
+                    inicial->valor = $1;
+                    inicial->padre = NULL;
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "false";
+                    siguiente->valor = $1;
+                    siguiente->padre = NULL;
+                    siguiente->hijos.push_back(inicial);
+                    inicial->padre = siguiente;
+                    inicial = siguiente;
+                }
+                printf("false\n");
+            }
 %%
 
 int yyerror(char *s){
     printf("->Error sintáctico: %s\n", s);
 }
 
+
+void printNode(Nodo *init, int tabuladores){
+    if(init != NULL){
+        for(int i=0; i<tabuladores; i++){
+            std::cout<<"   ";
+        } 
+        std::cout << init->nombre << ": " << init->valor << "\n";
+        for(int i=0; i<init->hijos.size(); i++){
+            printNode(init->hijos.at(i),tabuladores+1);
+        }
+    }
+}
+
 int main(int argc, char **argv){
     yyparse();
+    printNode(inicial,0);
     return 0;
 }

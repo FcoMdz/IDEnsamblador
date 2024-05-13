@@ -45,7 +45,7 @@ Grammar
 
    24 sent-read: READ IDENTIFICADOR PYC
 
-   25 sent-write: WRITE IDENTIFICADOR PYC
+   25 sent-write: WRITE exp-bool PYC
 
    26 bloque: LI list-sent LD
 
@@ -131,7 +131,7 @@ Terminals, with rules where they appear
     LD <ld> (294) 1 26
     CADENA <cadena> (295)
     NUMERO <numero> (296) 52
-    IDENTIFICADOR <identificador> (297) 8 9 24 25 27 51
+    IDENTIFICADOR <identificador> (297) 8 9 24 27 51
     OTRO (298)
     SPACE <space> (299)
 
@@ -184,7 +184,7 @@ Nonterminals, with rules where they appear
         on right: 18
     exp-bool (60)
         on left: 28 29
-        on right: 20 21 22 23 27 28 50
+        on right: 20 21 22 23 25 27 28 50
     comb (61)
         on left: 30 31
         on right: 28 29 30
@@ -384,9 +384,24 @@ State 18
 
 State 19
 
-   25 sent-write: WRITE • IDENTIFICADOR PYC
+   25 sent-write: WRITE • exp-bool PYC
 
-    IDENTIFICADOR  shift, and go to state 37
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    exp-bool  go to state 44
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
 State 20
@@ -395,7 +410,7 @@ State 20
 
     $default  reduce using rule 10 (list-sent)
 
-    list-sent  go to state 38
+    list-sent  go to state 52
 
 
 State 21
@@ -409,7 +424,7 @@ State 22
 
    27 sent-assign: IDENTIFICADOR • ASIG exp-bool PYC
 
-    ASIG  shift, and go to state 39
+    ASIG  shift, and go to state 53
 
 
 State 23
@@ -479,7 +494,7 @@ State 32
 
     8 list-id: list-id COM • IDENTIFICADOR
 
-    IDENTIFICADOR  shift, and go to state 40
+    IDENTIFICADOR  shift, and go to state 54
 
 
 State 33
@@ -487,22 +502,22 @@ State 33
    20 sent-if: IF PI • exp-bool PD THEN bloque FI
    21        | IF PI • exp-bool PD THEN bloque ELSE bloque FI
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    exp-bool  go to state 48
-    comb      go to state 49
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    exp-bool  go to state 55
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
 State 34
@@ -516,22 +531,22 @@ State 35
 
    22 sent-while: WHILE PI • exp-bool PD bloque
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
     exp-bool  go to state 57
-    comb      go to state 49
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
 State 36
@@ -543,12 +558,170 @@ State 36
 
 State 37
 
-   25 sent-write: WRITE IDENTIFICADOR • PYC
+   47 unario: NOT • unario
 
-    PYC  shift, and go to state 59
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    unario  go to state 59
+    factor  go to state 51
 
 
 State 38
+
+   53 factor: TRUE •
+
+    $default  reduce using rule 53 (factor)
+
+
+State 39
+
+   54 factor: FALSE •
+
+    $default  reduce using rule 54 (factor)
+
+
+State 40
+
+   48 unario: RES • unario
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    unario  go to state 60
+    factor  go to state 51
+
+
+State 41
+
+   50 factor: PI • exp-bool PD
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    exp-bool  go to state 61
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
+
+
+State 42
+
+   52 factor: NUMERO •
+
+    $default  reduce using rule 52 (factor)
+
+
+State 43
+
+   51 factor: IDENTIFICADOR •
+
+    $default  reduce using rule 51 (factor)
+
+
+State 44
+
+   25 sent-write: WRITE exp-bool • PYC
+   28 exp-bool: exp-bool • OR comb
+
+    OR   shift, and go to state 62
+    PYC  shift, and go to state 63
+
+
+State 45
+
+   29 exp-bool: comb •
+   30 comb: comb • AND igualdad
+
+    AND  shift, and go to state 64
+
+    $default  reduce using rule 29 (exp-bool)
+
+
+State 46
+
+   31 comb: igualdad •
+   32 igualdad: igualdad • IGU rel
+   33         | igualdad • DIS rel
+
+    IGU  shift, and go to state 65
+    DIS  shift, and go to state 66
+
+    $default  reduce using rule 31 (comb)
+
+
+State 47
+
+   34 igualdad: rel •
+
+    $default  reduce using rule 34 (igualdad)
+
+
+State 48
+
+   35 rel: expr • op-rel expr
+   36    | expr •
+   41 expr: expr • RES term
+   42     | expr • MAS term
+
+    MAS     shift, and go to state 67
+    RES     shift, and go to state 68
+    MEN     shift, and go to state 69
+    MENIGL  shift, and go to state 70
+    MAY     shift, and go to state 71
+    MAYIGL  shift, and go to state 72
+
+    $default  reduce using rule 36 (rel)
+
+    op-rel  go to state 73
+
+
+State 49
+
+   43 expr: term •
+   44 term: term • MUL unario
+   45     | term • DIV unario
+
+    MUL  shift, and go to state 74
+    DIV  shift, and go to state 75
+
+    $default  reduce using rule 43 (expr)
+
+
+State 50
+
+   46 term: unario •
+
+    $default  reduce using rule 46 (term)
+
+
+State 51
+
+   49 unario: factor •
+
+    $default  reduce using rule 49 (unario)
+
+
+State 52
 
    11 list-sent: list-sent • sent
    26 bloque: LI list-sent • LD
@@ -560,7 +733,7 @@ State 38
     READ           shift, and go to state 18
     WRITE          shift, and go to state 19
     LI             shift, and go to state 20
-    LD             shift, and go to state 60
+    LD             shift, and go to state 76
     IDENTIFICADOR  shift, and go to state 22
 
     sent         go to state 23
@@ -573,199 +746,43 @@ State 38
     sent-assign  go to state 30
 
 
-State 39
+State 53
 
    27 sent-assign: IDENTIFICADOR ASIG • exp-bool PYC
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    exp-bool  go to state 61
-    comb      go to state 49
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    exp-bool  go to state 77
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
-State 40
+State 54
 
     8 list-id: list-id COM IDENTIFICADOR •
 
     $default  reduce using rule 8 (list-id)
 
 
-State 41
-
-   47 unario: NOT • unario
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    unario  go to state 62
-    factor  go to state 55
-
-
-State 42
-
-   53 factor: TRUE •
-
-    $default  reduce using rule 53 (factor)
-
-
-State 43
-
-   54 factor: FALSE •
-
-    $default  reduce using rule 54 (factor)
-
-
-State 44
-
-   48 unario: RES • unario
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    unario  go to state 63
-    factor  go to state 55
-
-
-State 45
-
-   50 factor: PI • exp-bool PD
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    exp-bool  go to state 64
-    comb      go to state 49
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
-
-
-State 46
-
-   52 factor: NUMERO •
-
-    $default  reduce using rule 52 (factor)
-
-
-State 47
-
-   51 factor: IDENTIFICADOR •
-
-    $default  reduce using rule 51 (factor)
-
-
-State 48
+State 55
 
    20 sent-if: IF PI exp-bool • PD THEN bloque FI
    21        | IF PI exp-bool • PD THEN bloque ELSE bloque FI
    28 exp-bool: exp-bool • OR comb
 
-    OR  shift, and go to state 65
-    PD  shift, and go to state 66
-
-
-State 49
-
-   29 exp-bool: comb •
-   30 comb: comb • AND igualdad
-
-    AND  shift, and go to state 67
-
-    $default  reduce using rule 29 (exp-bool)
-
-
-State 50
-
-   31 comb: igualdad •
-   32 igualdad: igualdad • IGU rel
-   33         | igualdad • DIS rel
-
-    IGU  shift, and go to state 68
-    DIS  shift, and go to state 69
-
-    $default  reduce using rule 31 (comb)
-
-
-State 51
-
-   34 igualdad: rel •
-
-    $default  reduce using rule 34 (igualdad)
-
-
-State 52
-
-   35 rel: expr • op-rel expr
-   36    | expr •
-   41 expr: expr • RES term
-   42     | expr • MAS term
-
-    MAS     shift, and go to state 70
-    RES     shift, and go to state 71
-    MEN     shift, and go to state 72
-    MENIGL  shift, and go to state 73
-    MAY     shift, and go to state 74
-    MAYIGL  shift, and go to state 75
-
-    $default  reduce using rule 36 (rel)
-
-    op-rel  go to state 76
-
-
-State 53
-
-   43 expr: term •
-   44 term: term • MUL unario
-   45     | term • DIV unario
-
-    MUL  shift, and go to state 77
-    DIV  shift, and go to state 78
-
-    $default  reduce using rule 43 (expr)
-
-
-State 54
-
-   46 term: unario •
-
-    $default  reduce using rule 46 (term)
-
-
-State 55
-
-   49 unario: factor •
-
-    $default  reduce using rule 49 (unario)
+    OR  shift, and go to state 62
+    PD  shift, and go to state 78
 
 
 State 56
@@ -780,7 +797,7 @@ State 57
    22 sent-while: WHILE PI exp-bool • PD bloque
    28 exp-bool: exp-bool • OR comb
 
-    OR  shift, and go to state 65
+    OR  shift, and go to state 62
     PD  shift, and go to state 80
 
 
@@ -793,269 +810,269 @@ State 58
 
 State 59
 
-   25 sent-write: WRITE IDENTIFICADOR PYC •
-
-    $default  reduce using rule 25 (sent-write)
-
-
-State 60
-
-   26 bloque: LI list-sent LD •
-
-    $default  reduce using rule 26 (bloque)
-
-
-State 61
-
-   27 sent-assign: IDENTIFICADOR ASIG exp-bool • PYC
-   28 exp-bool: exp-bool • OR comb
-
-    OR   shift, and go to state 65
-    PYC  shift, and go to state 81
-
-
-State 62
-
    47 unario: NOT unario •
 
     $default  reduce using rule 47 (unario)
 
 
-State 63
+State 60
 
    48 unario: RES unario •
 
     $default  reduce using rule 48 (unario)
 
 
-State 64
+State 61
 
    28 exp-bool: exp-bool • OR comb
    50 factor: PI exp-bool • PD
 
-    OR  shift, and go to state 65
-    PD  shift, and go to state 82
+    OR  shift, and go to state 62
+    PD  shift, and go to state 81
+
+
+State 62
+
+   28 exp-bool: exp-bool OR • comb
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    comb      go to state 82
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
+
+
+State 63
+
+   25 sent-write: WRITE exp-bool PYC •
+
+    $default  reduce using rule 25 (sent-write)
+
+
+State 64
+
+   30 comb: comb AND • igualdad
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    igualdad  go to state 83
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
 State 65
 
-   28 exp-bool: exp-bool OR • comb
+   32 igualdad: igualdad IGU • rel
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    comb      go to state 83
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    rel     go to state 84
+    expr    go to state 48
+    term    go to state 49
+    unario  go to state 50
+    factor  go to state 51
 
 
 State 66
 
-   20 sent-if: IF PI exp-bool PD • THEN bloque FI
-   21        | IF PI exp-bool PD • THEN bloque ELSE bloque FI
+   33 igualdad: igualdad DIS • rel
 
-    THEN  shift, and go to state 84
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    rel     go to state 85
+    expr    go to state 48
+    term    go to state 49
+    unario  go to state 50
+    factor  go to state 51
 
 
 State 67
 
-   30 comb: comb AND • igualdad
+   42 expr: expr MAS • term
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    igualdad  go to state 85
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    term    go to state 86
+    unario  go to state 50
+    factor  go to state 51
 
 
 State 68
 
-   32 igualdad: igualdad IGU • rel
+   41 expr: expr RES • term
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    rel     go to state 86
-    expr    go to state 52
-    term    go to state 53
-    unario  go to state 54
-    factor  go to state 55
+    term    go to state 87
+    unario  go to state 50
+    factor  go to state 51
 
 
 State 69
-
-   33 igualdad: igualdad DIS • rel
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    rel     go to state 87
-    expr    go to state 52
-    term    go to state 53
-    unario  go to state 54
-    factor  go to state 55
-
-
-State 70
-
-   42 expr: expr MAS • term
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    term    go to state 88
-    unario  go to state 54
-    factor  go to state 55
-
-
-State 71
-
-   41 expr: expr RES • term
-
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    term    go to state 89
-    unario  go to state 54
-    factor  go to state 55
-
-
-State 72
 
    37 op-rel: MEN •
 
     $default  reduce using rule 37 (op-rel)
 
 
-State 73
+State 70
 
    38 op-rel: MENIGL •
 
     $default  reduce using rule 38 (op-rel)
 
 
-State 74
+State 71
 
    39 op-rel: MAY •
 
     $default  reduce using rule 39 (op-rel)
 
 
-State 75
+State 72
 
    40 op-rel: MAYIGL •
 
     $default  reduce using rule 40 (op-rel)
 
 
-State 76
+State 73
 
    35 rel: expr op-rel • expr
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
-    expr    go to state 90
-    term    go to state 53
-    unario  go to state 54
-    factor  go to state 55
+    expr    go to state 88
+    term    go to state 49
+    unario  go to state 50
+    factor  go to state 51
+
+
+State 74
+
+   44 term: term MUL • unario
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    unario  go to state 89
+    factor  go to state 51
+
+
+State 75
+
+   45 term: term DIV • unario
+
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
+
+    unario  go to state 90
+    factor  go to state 51
+
+
+State 76
+
+   26 bloque: LI list-sent LD •
+
+    $default  reduce using rule 26 (bloque)
 
 
 State 77
 
-   44 term: term MUL • unario
+   27 sent-assign: IDENTIFICADOR ASIG exp-bool • PYC
+   28 exp-bool: exp-bool • OR comb
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    unario  go to state 91
-    factor  go to state 55
+    OR   shift, and go to state 62
+    PYC  shift, and go to state 91
 
 
 State 78
 
-   45 term: term DIV • unario
+   20 sent-if: IF PI exp-bool PD • THEN bloque FI
+   21        | IF PI exp-bool PD • THEN bloque ELSE bloque FI
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
-
-    unario  go to state 92
-    factor  go to state 55
+    THEN  shift, and go to state 92
 
 
 State 79
 
    23 sent-do: DO bloque UNTIL PI • exp-bool PD PYC
 
-    NOT            shift, and go to state 41
-    TRUE           shift, and go to state 42
-    FALSE          shift, and go to state 43
-    RES            shift, and go to state 44
-    PI             shift, and go to state 45
-    NUMERO         shift, and go to state 46
-    IDENTIFICADOR  shift, and go to state 47
+    NOT            shift, and go to state 37
+    TRUE           shift, and go to state 38
+    FALSE          shift, and go to state 39
+    RES            shift, and go to state 40
+    PI             shift, and go to state 41
+    NUMERO         shift, and go to state 42
+    IDENTIFICADOR  shift, and go to state 43
 
     exp-bool  go to state 93
-    comb      go to state 49
-    igualdad  go to state 50
-    rel       go to state 51
-    expr      go to state 52
-    term      go to state 53
-    unario    go to state 54
-    factor    go to state 55
+    comb      go to state 45
+    igualdad  go to state 46
+    rel       go to state 47
+    expr      go to state 48
+    term      go to state 49
+    unario    go to state 50
+    factor    go to state 51
 
 
 State 80
@@ -1069,29 +1086,105 @@ State 80
 
 State 81
 
-   27 sent-assign: IDENTIFICADOR ASIG exp-bool PYC •
-
-    $default  reduce using rule 27 (sent-assign)
-
-
-State 82
-
    50 factor: PI exp-bool PD •
 
     $default  reduce using rule 50 (factor)
 
 
-State 83
+State 82
 
    28 exp-bool: exp-bool OR comb •
    30 comb: comb • AND igualdad
 
-    AND  shift, and go to state 67
+    AND  shift, and go to state 64
 
     $default  reduce using rule 28 (exp-bool)
 
 
+State 83
+
+   30 comb: comb AND igualdad •
+   32 igualdad: igualdad • IGU rel
+   33         | igualdad • DIS rel
+
+    IGU  shift, and go to state 65
+    DIS  shift, and go to state 66
+
+    $default  reduce using rule 30 (comb)
+
+
 State 84
+
+   32 igualdad: igualdad IGU rel •
+
+    $default  reduce using rule 32 (igualdad)
+
+
+State 85
+
+   33 igualdad: igualdad DIS rel •
+
+    $default  reduce using rule 33 (igualdad)
+
+
+State 86
+
+   42 expr: expr MAS term •
+   44 term: term • MUL unario
+   45     | term • DIV unario
+
+    MUL  shift, and go to state 74
+    DIV  shift, and go to state 75
+
+    $default  reduce using rule 42 (expr)
+
+
+State 87
+
+   41 expr: expr RES term •
+   44 term: term • MUL unario
+   45     | term • DIV unario
+
+    MUL  shift, and go to state 74
+    DIV  shift, and go to state 75
+
+    $default  reduce using rule 41 (expr)
+
+
+State 88
+
+   35 rel: expr op-rel expr •
+   41 expr: expr • RES term
+   42     | expr • MAS term
+
+    MAS  shift, and go to state 67
+    RES  shift, and go to state 68
+
+    $default  reduce using rule 35 (rel)
+
+
+State 89
+
+   44 term: term MUL unario •
+
+    $default  reduce using rule 44 (term)
+
+
+State 90
+
+   45 term: term DIV unario •
+
+    $default  reduce using rule 45 (term)
+
+
+State 91
+
+   27 sent-assign: IDENTIFICADOR ASIG exp-bool PYC •
+
+    $default  reduce using rule 27 (sent-assign)
+
+
+State 92
 
    20 sent-if: IF PI exp-bool PD THEN • bloque FI
    21        | IF PI exp-bool PD THEN • bloque ELSE bloque FI
@@ -1101,88 +1194,12 @@ State 84
     bloque  go to state 95
 
 
-State 85
-
-   30 comb: comb AND igualdad •
-   32 igualdad: igualdad • IGU rel
-   33         | igualdad • DIS rel
-
-    IGU  shift, and go to state 68
-    DIS  shift, and go to state 69
-
-    $default  reduce using rule 30 (comb)
-
-
-State 86
-
-   32 igualdad: igualdad IGU rel •
-
-    $default  reduce using rule 32 (igualdad)
-
-
-State 87
-
-   33 igualdad: igualdad DIS rel •
-
-    $default  reduce using rule 33 (igualdad)
-
-
-State 88
-
-   42 expr: expr MAS term •
-   44 term: term • MUL unario
-   45     | term • DIV unario
-
-    MUL  shift, and go to state 77
-    DIV  shift, and go to state 78
-
-    $default  reduce using rule 42 (expr)
-
-
-State 89
-
-   41 expr: expr RES term •
-   44 term: term • MUL unario
-   45     | term • DIV unario
-
-    MUL  shift, and go to state 77
-    DIV  shift, and go to state 78
-
-    $default  reduce using rule 41 (expr)
-
-
-State 90
-
-   35 rel: expr op-rel expr •
-   41 expr: expr • RES term
-   42     | expr • MAS term
-
-    MAS  shift, and go to state 70
-    RES  shift, and go to state 71
-
-    $default  reduce using rule 35 (rel)
-
-
-State 91
-
-   44 term: term MUL unario •
-
-    $default  reduce using rule 44 (term)
-
-
-State 92
-
-   45 term: term DIV unario •
-
-    $default  reduce using rule 45 (term)
-
-
 State 93
 
    23 sent-do: DO bloque UNTIL PI exp-bool • PD PYC
    28 exp-bool: exp-bool • OR comb
 
-    OR  shift, and go to state 65
+    OR  shift, and go to state 62
     PD  shift, and go to state 96
 
 

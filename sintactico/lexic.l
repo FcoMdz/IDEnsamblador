@@ -252,7 +252,7 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         return (CADENA);
     }
 {COMENTARIO_LINEA}|{COMENTARIO_MULTI} {
-        printf("lex: comentario\n");
+        //printf("lex: comentario\n");
     }
 {NUMERO} {
     //printf("lex num: %s\n",yytext);
