@@ -104,7 +104,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 88 "sintatic.y"
+#line 128 "sintatic.y"
 
     float numero;
     char* cadena;

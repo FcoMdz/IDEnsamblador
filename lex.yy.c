@@ -1443,20 +1443,27 @@ case 44:
 YY_RULE_SETUP
 #line 483 "lexic.lex"
 {
+    lexVec.push_back(Lexico());
+    lexVec[lexVec.size()-1].estilo = "Error";
+    lexVec[lexVec.size()-1].clave = "ERROR";
+    lexVec[lexVec.size()-1].lexema = yytext;
+    lexVec[lexVec.size()-1].columna = countColumn;
+    lexVec[lexVec.size()-1].fila = countLines;
     countColumn++;
+    return 0;
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 486 "lexic.lex"
+#line 493 "lexic.lex"
 {return 0;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 487 "lexic.lex"
+#line 494 "lexic.lex"
 ECHO;
 	YY_BREAK
-#line 1460 "lex.yy.c"
+#line 1467 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2473,7 +2480,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 487 "lexic.lex"
+#line 494 "lexic.lex"
 
 
 /*Sección de codigo*/

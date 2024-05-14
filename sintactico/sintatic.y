@@ -13,7 +13,7 @@
         std::vector<Nodo*> hijos;
     };
     Nodo *inicial = NULL;
-    void printNode(Nodo *init);
+    void printNode(Nodo *init, int tabuladores);
 
     void checkListId(Nodo *init, Nodo *siguiente){
         if (init == NULL || siguiente == NULL) {
@@ -40,12 +40,10 @@
         if(init->nombre.compare(termino) == 0) return;
         Nodo *recorrer = init;
         while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
-            if(termino.compare("term")==0) std::cout << "check: " << recorrer->nombre << "\n";
             recorrer = recorrer->hijos.at(0);
         }
         if(recorrer->nombre.compare(termino) == 0){
-            //Le quita el siguiente list-decl como hijo 
-            if(termino.compare("term")==0) std::cout << "check inner: " << recorrer->valor << "\n";
+            //Le quita el siguiente list-decl como hijo
             if(prof == limit){
                 recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
                 //Hace que el padre del tipo sea la delcaración
@@ -56,7 +54,6 @@
             }
             if(recorrer->hijos.size() != 0) checkSec(recorrer->hijos.at(0), siguiente, termino, ++prof, limit);
         }
-        if(termino.compare("term")==0) std::cout << "check outer: " << recorrer->valor << "\n";
         return;
     }
 
@@ -80,6 +77,49 @@
         }
         return;
     }
+
+    void checkDiv(Nodo *init, Nodo *siguiente, std::string termino){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo 
+            if(recorrer->hijos.at(0)->hijos.size() > 0){
+                Nodo *expresion = recorrer->hijos.at(0)->hijos.at(0);
+                recorrer->hijos.at(0)->hijos.erase(recorrer->hijos.at(0)->hijos.begin()); 
+                //Hace que el padre del tipo sea la delcaración
+                expresion->padre = siguiente;
+                //Inserta los hijos en orden
+                siguiente->hijos.push_back(expresion);
+            }
+        }
+        return;
+    }
+
+     void checkWhile(Nodo *init, Nodo *siguiente, std::string termino){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo
+            Nodo *expresion = recorrer;
+            recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
+            //Hace que el padre del tipo sea la delcaración
+            expresion->padre = siguiente;
+            //Inserta los hijos en orden
+            siguiente->hijos.push_back(expresion);
+        }
+        return;
+    }
+
 
 %}
 
@@ -190,6 +230,7 @@
                 siguiente->hijos.push_back(inicial);
                 inicial = siguiente;
             }
+            printf("program\n");
         }
     list-decl:
         | list-decl decl {
@@ -296,10 +337,11 @@
     list-sent: 
         | list-sent sent {
                 Nodo *siguiente = new struct Nodo;
-                siguiente->nombre = "list-sent";
+                siguiente->nombre = "list-sent sent";
                 siguiente->valor = "";
                 siguiente->padre = NULL;
-                check(inicial, siguiente, "list-sent");
+                check(inicial, siguiente, "list-sent sent");
+                
                 siguiente->hijos.push_back(inicial);
                 inicial->padre = siguiente;
                 inicial = siguiente;
@@ -308,12 +350,21 @@
             }
     sent: 
         sent-if {printf("sent-if\n");}
-        | sent-while {printf("sent-while\n");}
+        | sent-while {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "sent-while";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-while\n");
+            }
         | sent-do {printf("sent-do\n");}
         | sent-read {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "sent";
-                siguiente->valor = "";
+                siguiente->valor = "sent-read";
                 siguiente->padre = NULL;
                 siguiente->hijos.push_back(inicial);
                 inicial->padre = siguiente;
@@ -323,22 +374,79 @@
         | sent-write {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "sent";
-                siguiente->valor = "";
+                siguiente->valor = "sent-write";
                 siguiente->padre = NULL;
                 siguiente->hijos.push_back(inicial);
                 inicial->padre = siguiente;
                 inicial = siguiente;
-                printf("sent-read\n");
                 printf("sent-write\n");
             }
-        | bloque {printf("bloque\n");}
-        | sent-assign {printf("sent-assign\n");}
+        | sent-assign {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "sent-assign";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-assign\n");
+            }
         | BREAK {printf("break\n");}
     sent-if: 
         IF PI exp-bool PD THEN bloque FI {printf("if\n");}
         | IF PI exp-bool PD THEN bloque ELSE bloque FI {printf("if-else\n");}
     sent-while: 
-        WHILE PI exp-bool PD bloque {printf("while\n");}
+        WHILE PI exp-bool PD bloque {
+            Nodo *siguiente = new struct Nodo;
+            siguiente->nombre = "while";
+            siguiente->valor = "";
+            siguiente->padre = NULL;
+            inicial->padre = siguiente;
+            printf("\n--Pre operacion--\n");
+            printNode(inicial, 0);
+            checkDiv(inicial, siguiente, "factor");
+            checkWhile(inicial, siguiente, "comb");
+            Nodo *exp_bool = new struct Nodo;
+            exp_bool->nombre = "exp-bool";
+            exp_bool->valor= "";
+            exp_bool->padre=siguiente;
+            if(siguiente->hijos.size()>1){
+               if(siguiente->hijos.at(0)->nombre == "comb" && siguiente->hijos.at(1)->nombre != "comb"){
+                    std::cout << "Hijo en 0 es comb\n";
+                    exp_bool->hijos.push_back(siguiente->hijos.at(0));
+                    siguiente->hijos.erase(siguiente->hijos.begin());
+                }else if(siguiente->hijos.at(0)->nombre != "comb" && siguiente->hijos.at(1)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(1));
+                    siguiente->hijos.erase(siguiente->hijos.begin()+1);
+                }else if(siguiente->hijos.at(0)->nombre == "comb" && siguiente->hijos.at(1)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(1));
+                    siguiente->hijos.erase(siguiente->hijos.begin()+1);
+                }
+            }else{
+                if(siguiente->hijos.at(0)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(0));
+                    siguiente->hijos.erase(siguiente->hijos.begin());
+                }
+            }
+            siguiente->hijos.push_back(exp_bool);
+            //Crea su estructura
+            Nodo *pi = new struct Nodo;
+            pi->nombre = "pi";
+            pi->valor= "(";
+            pi->padre=inicial;
+            siguiente->hijos.push_back(pi);
+            //Crea el id como hijo
+            Nodo *pd = new struct Nodo;
+            pd->nombre = "pd";
+            pd->valor = ")";
+            pd->padre = inicial;
+            siguiente->hijos.push_back(pd);
+            siguiente->hijos.push_back(inicial);
+            inicial = siguiente;
+            printf("\n--Tras operacion--\n");
+            printNode(inicial, 0);
+            printf("while\n");
+        }
     sent-do:
         DO bloque UNTIL PI exp-bool PD PYC {printf("do\n");}
     sent-read: 
@@ -394,6 +502,7 @@
                 siguiente->hijos.push_back(pyc);
                 inicial = siguiente;
             }
+            printf("read\n");
         }
     sent-write: 
         WRITE exp-bool PYC {
@@ -427,9 +536,83 @@
             }
         
     bloque: 
-        LI list-sent LD {printf("bloque\n");}
+        LI list-sent LD {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;  
+                    inicial->nombre = "bloque";
+                    inicial->valor = "";
+                    inicial->padre = NULL;
+                    Nodo *li = new struct Nodo;
+                    li->nombre = "li";
+                    li->valor= "{";
+                    li->padre=inicial;
+                    inicial->hijos.push_back(li);
+                    //Assign
+                    Nodo *ld = new struct Nodo;
+                    ld->nombre = "ld";
+                    ld->valor= "}";
+                    ld->padre=inicial;
+                    inicial->hijos.push_back(ld);
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "bloque";
+                    siguiente->valor = "";
+                    siguiente->padre = NULL;
+                    inicial->padre = siguiente;
+                    //Buscar el nodo!!
+                    siguiente->hijos.push_back(inicial);
+                    //Crea su estructura
+                    Nodo *li = new struct Nodo;
+                    li->nombre = "li";
+                    li->valor= "{";
+                    li->padre=siguiente;
+                    siguiente->hijos.push_back(li);
+                    //Assign
+                    Nodo *ld = new struct Nodo;
+                    ld->nombre = "ld";
+                    ld->valor= "}";
+                    ld->padre=siguiente;
+                    siguiente->hijos.push_back(ld);
+                    inicial = siguiente;
+                    
+                }
+                printf("bloque\n");
+            }
     sent-assign: 
-        IDENTIFICADOR ASIG exp-bool PYC {printf("asignacion\n");}
+        IDENTIFICADOR ASIG exp-bool PYC {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent-assign";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                Nodo *exp_bool = new struct Nodo;
+                exp_bool->nombre = "exp-bool";
+                exp_bool->valor= "";
+                exp_bool->padre=siguiente;
+                exp_bool->hijos.push_back(inicial);
+                siguiente->hijos.push_back(exp_bool);
+                //Crea su estructura
+                Nodo *wirte = new struct Nodo;
+                wirte->nombre = "id";
+                wirte->valor= $1;
+                wirte->padre=siguiente;
+                siguiente->hijos.push_back(wirte);
+                //Assign
+                Nodo *asign = new struct Nodo;
+                asign->nombre = "asign";
+                asign->valor= "=";
+                asign->padre=siguiente;
+                siguiente->hijos.push_back(asign);
+                //Crea el punto y coma como hijo
+                Nodo *pyc = new struct Nodo;
+                pyc->nombre = "pyc";
+                pyc->valor = ";";
+                pyc->padre = siguiente;
+                siguiente->hijos.push_back(pyc);
+                inicial = siguiente;
+                printf("asignacion\n");
+            }
     exp-bool:
         exp-bool OR comb  {
                 Nodo *siguiente = new struct Nodo;
@@ -438,7 +621,7 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "comb");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea OR como hijo
                 Nodo *oi = new struct Nodo;
                 oi->nombre = "OR";
@@ -467,7 +650,7 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "igualdad");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *an = new struct Nodo;
                 an->nombre = "AND";
@@ -495,8 +678,8 @@
                 siguiente->valor = "";
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
-                //Buscar el nodo!!
-                check(inicial, siguiente, "rel");
+                 //Buscar el nodo!!
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *igu = new struct Nodo;
                 igu->nombre = "IGU";
@@ -514,7 +697,7 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "rel");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *dis = new struct Nodo;
                 dis->nombre = "DIS";
@@ -537,26 +720,25 @@
             }
     rel: 
         expr op-rel expr {
-                
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr op-rel expr";
                 siguiente->valor = "";
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "op-rel");
+                checkDiv(inicial, siguiente, "factor");
                 if(siguiente->hijos.size() > 0){
-                    check(siguiente->hijos.at(0), siguiente, "term");
+                    std::cout << "operacion sig factor: " << siguiente->hijos.at(0)->nombre << "\n";
                     Nodo *oprel = siguiente->hijos.at(0);
-                    siguiente->hijos.at(0) = siguiente->hijos.at(1);
-                    siguiente->hijos.at(1) = oprel;
+                    siguiente->hijos.at(0) = siguiente->hijos.at(0)->hijos.at(0)->hijos.at(0);
+                    oprel->hijos.at(0)->hijos.erase(oprel->hijos.at(0)->hijos.begin());
+                    siguiente->hijos.push_back(oprel);
                 }
                 siguiente->hijos.push_back(inicial);
                 inicial = siguiente;
                 printf("operacion\n");
             }
         | expr {
-                std::cout<<"hola\n";
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr";
                 siguiente->valor = "";
@@ -583,6 +765,7 @@
             inicial->padre = op_rel;
             inicial = op_rel;
             printf("menor\n");
+            printf("op-rel\n");
         }
         | MENIGL {
                 
@@ -601,6 +784,7 @@
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("menor igual\n");
+                printf("op-rel\n");
             }
         | MAY {
                 Nodo *siguiente = new struct Nodo;
@@ -618,6 +802,7 @@
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("mayor\n");
+                printf("op-rel\n");
             }
         | MAYIGL {
                 Nodo *siguiente = new struct Nodo;
@@ -635,6 +820,7 @@
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("mayor igual\n");
+                printf("op-rel\n");
             }
     expr: 
         expr RES term {
@@ -644,8 +830,8 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "expr");
-                check(inicial, siguiente, "term");
+                //check(inicial, siguiente, "expr");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *res = new struct Nodo;
                 res->nombre = "RES";
@@ -663,8 +849,8 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "expr");
-                check(inicial, siguiente, "term");
+                //check(inicial, siguiente, "expr");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *mas = new struct Nodo;
                 mas->nombre = "MAS";
@@ -693,8 +879,7 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "term");
-                check(inicial, siguiente, "unario");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MUL como hijo
                 Nodo *mul = new struct Nodo;
                 mul->nombre = "MUL";
@@ -713,9 +898,7 @@
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "term");
-                check(inicial, siguiente, "unario");
-                //Crea div como hijo
+                checkDiv(inicial, siguiente, "factor");
                 Nodo *div = new struct Nodo;
                 div->nombre = "DIV";
                 div->valor= "/";
@@ -756,7 +939,7 @@
                 no->padre=siguiente;
                 siguiente->hijos.push_back(no);
                 inicial = siguiente;
-                printf("negacion\n");
+                printf("not unario\n");
             }
         | RES unario {
                 Nodo *siguiente = new struct Nodo;
@@ -778,7 +961,7 @@
                 res->padre=siguiente;
                 siguiente->hijos.push_back(res);
                 inicial = siguiente;
-                printf("negativo\n");
+                printf("res unario\n");
             }
         | factor {
                 Nodo *siguiente = new struct Nodo;
@@ -900,7 +1083,7 @@ int yyerror(char *s){
 void printNode(Nodo *init, int tabuladores){
     if(init != NULL){
         for(int i=0; i<tabuladores; i++){
-            std::cout<<"   ";
+            std::cout<<"  |";
         } 
         std::cout << init->nombre << ": " << init->valor << "\n";
         for(int i=0; i<init->hijos.size(); i++){
@@ -911,6 +1094,7 @@ void printNode(Nodo *init, int tabuladores){
 
 int main(int argc, char **argv){
     yyparse();
+    std::cout << "\n\n---Arbol---\n\n";
     printNode(inicial,0);
     return 0;
 }

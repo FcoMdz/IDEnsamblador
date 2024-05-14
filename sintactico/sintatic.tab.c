@@ -82,7 +82,7 @@
         std::vector<Nodo*> hijos;
     };
     Nodo *inicial = NULL;
-    void printNode(Nodo *init);
+    void printNode(Nodo *init, int tabuladores);
 
     void checkListId(Nodo *init, Nodo *siguiente){
         if (init == NULL || siguiente == NULL) {
@@ -109,12 +109,10 @@
         if(init->nombre.compare(termino) == 0) return;
         Nodo *recorrer = init;
         while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
-            if(termino.compare("term")==0) std::cout << "check: " << recorrer->nombre << "\n";
             recorrer = recorrer->hijos.at(0);
         }
         if(recorrer->nombre.compare(termino) == 0){
-            //Le quita el siguiente list-decl como hijo 
-            if(termino.compare("term")==0) std::cout << "check inner: " << recorrer->valor << "\n";
+            //Le quita el siguiente list-decl como hijo
             if(prof == limit){
                 recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
                 //Hace que el padre del tipo sea la delcaración
@@ -125,7 +123,6 @@
             }
             if(recorrer->hijos.size() != 0) checkSec(recorrer->hijos.at(0), siguiente, termino, ++prof, limit);
         }
-        if(termino.compare("term")==0) std::cout << "check outer: " << recorrer->valor << "\n";
         return;
     }
 
@@ -150,8 +147,51 @@
         return;
     }
 
+    void checkDiv(Nodo *init, Nodo *siguiente, std::string termino){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo 
+            if(recorrer->hijos.at(0)->hijos.size() > 0){
+                Nodo *expresion = recorrer->hijos.at(0)->hijos.at(0);
+                recorrer->hijos.at(0)->hijos.erase(recorrer->hijos.at(0)->hijos.begin()); 
+                //Hace que el padre del tipo sea la delcaración
+                expresion->padre = siguiente;
+                //Inserta los hijos en orden
+                siguiente->hijos.push_back(expresion);
+            }
+        }
+        return;
+    }
 
-#line 155 "sintatic.tab.c"
+     void checkWhile(Nodo *init, Nodo *siguiente, std::string termino){
+        if (init == NULL || siguiente == NULL) {
+            return;
+        }
+        Nodo *recorrer = init;
+        while(recorrer->hijos.size() != 0 && recorrer->nombre.compare(termino) != 0){
+            recorrer = recorrer->hijos.at(0);
+        }
+        if(recorrer->nombre.compare(termino) == 0){
+            //Le quita el siguiente list-decl como hijo
+            Nodo *expresion = recorrer;
+            recorrer->padre->hijos.erase(recorrer->padre->hijos.begin()); 
+            //Hace que el padre del tipo sea la delcaración
+            expresion->padre = siguiente;
+            //Inserta los hijos en orden
+            siguiente->hijos.push_back(expresion);
+        }
+        return;
+    }
+
+
+
+#line 195 "sintatic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -575,16 +615,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   94
+#define YYLAST   90
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  45
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  55
+#define YYNRULES  54
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  102
+#define YYNSTATES  101
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   299
@@ -637,12 +677,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   178,   178,   194,   195,   206,   222,   238,   254,   271,
-     280,   296,   297,   310,   311,   312,   313,   323,   334,   335,
-     336,   338,   339,   341,   343,   345,   399,   430,   432,   434,
-     452,   463,   481,   492,   510,   528,   539,   558,   570,   587,
-     605,   622,   640,   659,   678,   689,   709,   728,   739,   761,
-     783,   794,   825,   842,   859,   876
+       0,   218,   218,   235,   236,   247,   263,   279,   295,   312,
+     321,   337,   338,   352,   353,   363,   364,   374,   384,   394,
+     396,   397,   399,   451,   453,   508,   539,   582,   617,   635,
+     646,   664,   675,   693,   711,   722,   741,   752,   770,   789,
+     807,   826,   845,   864,   875,   894,   911,   922,   944,   966,
+     977,  1008,  1025,  1042,  1059
 };
 #endif
 
@@ -677,7 +717,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-37)
+#define YYPACT_NINF (-49)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -691,17 +731,17 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      16,   -36,    36,   -37,   -37,    -9,   -37,   -37,   -37,   -37,
-       4,     0,   -37,    -6,    19,    38,    42,   -37,    39,    20,
-     -37,   -37,    46,   -37,   -37,   -37,   -37,   -37,   -37,   -37,
-     -37,   -37,    43,    20,    71,    20,    49,    20,   -37,   -37,
-      20,    20,   -37,   -37,    14,    66,    -1,   -37,    41,    33,
-     -37,   -37,    12,    20,   -37,    -5,    50,    -2,   -37,   -37,
-     -37,     7,    20,   -37,    20,    20,    20,    20,    20,   -37,
-     -37,   -37,   -37,    20,    20,    20,   -37,    15,    82,    20,
-      38,   -37,    66,    -1,   -37,   -37,    33,    33,    37,   -37,
-     -37,   -37,    38,     8,   -37,    60,    54,    38,   -37,   -37,
-      83,   -37
+      -1,   -20,    29,   -49,   -49,    45,   -49,   -49,   -49,   -49,
+     -10,     0,   -49,   -29,     4,    -3,    36,   -49,    31,    13,
+     -49,    43,   -49,   -49,   -49,   -49,   -49,   -49,   -49,   -49,
+      38,    13,   -49,    68,    13,    47,    13,   -49,   -49,    13,
+      13,   -49,   -49,   -18,    65,     6,   -49,    35,    42,   -49,
+     -49,    13,   -49,   -12,    11,    48,     7,   -49,   -49,   -49,
+       8,    13,   -49,    13,    13,    13,    13,    13,   -49,   -49,
+     -49,   -49,    13,    13,    13,    22,    77,   -49,    13,    -3,
+     -49,    65,     6,   -49,   -49,    42,    42,    46,   -49,   -49,
+     -49,    -3,     9,   -49,    64,    51,    -3,   -49,   -49,    79,
+     -49
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -710,32 +750,32 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     3,     1,    11,     7,     6,     8,     4,
-       0,     0,    10,     0,     0,     0,     0,    20,     0,     0,
-      11,     2,     0,    12,    13,    14,    15,    16,    17,    18,
-      19,     5,     0,     0,     0,     0,     0,     0,    54,    55,
-       0,     0,    53,    52,     0,    30,    32,    35,    37,    44,
-      47,    50,     0,     0,     9,     0,     0,     0,    25,    48,
-      49,     0,     0,    26,     0,     0,     0,     0,     0,    38,
-      39,    40,    41,     0,     0,     0,    27,     0,     0,     0,
-       0,    51,    29,    31,    33,    34,    43,    42,    36,    45,
-      46,    28,     0,     0,    23,     0,     0,     0,    21,    24,
-       0,    22
+       0,     0,    10,     0,     0,     0,     0,    19,     0,     0,
+       2,     0,    12,    13,    14,    15,    16,    17,    18,     5,
+       0,     0,    11,     0,     0,     0,     0,    53,    54,     0,
+       0,    52,    51,     0,    29,    31,    34,    36,    43,    46,
+      49,     0,     9,     0,     0,     0,     0,    24,    47,    48,
+       0,     0,    25,     0,     0,     0,     0,     0,    37,    38,
+      39,    40,     0,     0,     0,     0,     0,    26,     0,     0,
+      50,    28,    30,    32,    33,    42,    41,    35,    44,    45,
+      27,     0,     0,    22,     0,     0,     0,    20,    23,     0,
+      21
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -37,   -37,   -37,   -37,   -37,   -37,    69,   -37,   -37,   -37,
-     -37,   -37,   -37,   -15,   -37,   -32,    29,    28,     9,   -37,
-      21,     5,   -22,   -37
+     -49,   -49,   -49,   -49,   -49,   -49,    55,   -49,   -49,   -49,
+     -49,   -49,   -49,   -48,   -49,   -31,    27,    26,    10,   -49,
+      18,    12,   -22,   -49
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     5,     9,    10,    13,    11,    23,    24,    25,
-      26,    27,    28,    29,    30,    44,    45,    46,    47,    73,
-      48,    49,    50,    51
+       0,     2,     5,     9,    10,    13,    11,    22,    23,    24,
+      25,    26,    27,    33,    28,    43,    44,    45,    46,    72,
+      47,    48,    49,    50
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -743,30 +783,30 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      34,    55,     3,    57,    14,     6,     7,     8,    15,    61,
-      16,    17,    18,    19,    62,    59,    14,    62,    60,     1,
-      15,    77,    16,    17,    18,    19,    62,    62,    31,    32,
-      65,    66,    78,    62,    62,    80,     4,    37,    20,    21,
-      38,    39,    22,    40,    81,    96,    12,    93,    63,    91,
-      20,    76,    89,    90,    22,    33,    41,    74,    75,    67,
-      68,    42,    43,    67,    68,    94,    97,    98,    69,    70,
-      71,    72,    86,    87,    84,    85,    20,    95,    35,    53,
-      56,    36,   100,    58,    64,    54,    79,    92,    99,    52,
-     101,    82,    83,     0,    88
+      53,    61,     1,    56,    14,    29,    30,    61,    15,    60,
+      16,    17,    18,    19,    58,    14,    62,    59,     3,    15,
+      75,    16,    17,    18,    19,    76,    61,    61,    61,     4,
+      36,    93,    12,    37,    38,    32,    39,    64,    65,    20,
+      31,    61,    21,    94,    79,    80,    95,    92,    99,    40,
+      77,    88,    89,    21,    41,    42,    90,    66,    67,     6,
+       7,     8,    68,    69,    70,    71,    73,    74,    66,    67,
+      96,    97,    34,    35,    83,    84,    51,    55,    85,    86,
+      52,    57,    91,    63,    78,    98,   100,    54,    81,    82,
+      87
 };
 
 static const yytype_int8 yycheck[] =
 {
-      15,    33,    38,    35,     4,    14,    15,    16,     8,    41,
-      10,    11,    12,    13,    19,    37,     4,    19,    40,     3,
-       8,    53,    10,    11,    12,    13,    19,    19,    34,    35,
-      31,    32,    37,    19,    19,    37,     0,    17,    38,    39,
-      20,    21,    42,    23,    37,    37,    42,    79,    34,    34,
-      38,    39,    74,    75,    42,    36,    36,    24,    25,    22,
-      23,    41,    42,    22,    23,    80,     6,     7,    27,    28,
-      29,    30,    67,    68,    65,    66,    38,    92,    36,    33,
-       9,    42,    97,    34,    18,    42,    36,     5,    34,    20,
-       7,    62,    64,    -1,    73
+      31,    19,     3,    34,     4,    34,    35,    19,     8,    40,
+      10,    11,    12,    13,    36,     4,    34,    39,    38,     8,
+      51,    10,    11,    12,    13,    37,    19,    19,    19,     0,
+      17,    79,    42,    20,    21,    38,    23,    31,    32,    39,
+      36,    19,    42,    91,    37,    37,    37,    78,    96,    36,
+      39,    73,    74,    42,    41,    42,    34,    22,    23,    14,
+      15,    16,    27,    28,    29,    30,    24,    25,    22,    23,
+       6,     7,    36,    42,    64,    65,    33,     9,    66,    67,
+      42,    34,     5,    18,    36,    34,     7,    32,    61,    63,
+      72
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -775,15 +815,15 @@ static const yytype_int8 yystos[] =
 {
        0,     3,    46,    38,     0,    47,    14,    15,    16,    48,
       49,    51,    42,    50,     4,     8,    10,    11,    12,    13,
-      38,    39,    42,    52,    53,    54,    55,    56,    57,    58,
-      59,    34,    35,    36,    58,    36,    42,    17,    20,    21,
-      23,    36,    41,    42,    60,    61,    62,    63,    65,    66,
-      67,    68,    51,    33,    42,    60,     9,    60,    34,    67,
-      67,    60,    19,    34,    18,    31,    32,    22,    23,    27,
-      28,    29,    30,    64,    24,    25,    39,    60,    37,    36,
-      37,    37,    61,    62,    63,    63,    66,    66,    65,    67,
-      67,    34,     5,    60,    58,    58,    37,     6,     7,    34,
-      58,     7
+      39,    42,    52,    53,    54,    55,    56,    57,    59,    34,
+      35,    36,    38,    58,    36,    42,    17,    20,    21,    23,
+      36,    41,    42,    60,    61,    62,    63,    65,    66,    67,
+      68,    33,    42,    60,    51,     9,    60,    34,    67,    67,
+      60,    19,    34,    18,    31,    32,    22,    23,    27,    28,
+      29,    30,    64,    24,    25,    60,    37,    39,    36,    37,
+      37,    61,    62,    63,    63,    66,    66,    65,    67,    67,
+      34,     5,    60,    58,    58,    37,     6,     7,    34,    58,
+       7
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -791,10 +831,10 @@ static const yytype_int8 yyr1[] =
 {
        0,    45,    46,    47,    47,    48,    49,    49,    49,    50,
       50,    51,    51,    52,    52,    52,    52,    52,    52,    52,
-      52,    53,    53,    54,    55,    56,    57,    58,    59,    60,
-      60,    61,    61,    62,    62,    62,    63,    63,    64,    64,
-      64,    64,    65,    65,    65,    66,    66,    66,    67,    67,
-      67,    68,    68,    68,    68,    68
+      53,    53,    54,    55,    56,    57,    58,    59,    60,    60,
+      61,    61,    62,    62,    62,    63,    63,    64,    64,    64,
+      64,    65,    65,    65,    66,    66,    66,    67,    67,    67,
+      68,    68,    68,    68,    68
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -802,10 +842,10 @@ static const yytype_int8 yyr2[] =
 {
        0,     2,     5,     0,     2,     3,     1,     1,     1,     3,
        1,     0,     2,     1,     1,     1,     1,     1,     1,     1,
-       1,     7,     9,     5,     7,     3,     3,     3,     4,     3,
-       1,     3,     1,     3,     3,     1,     3,     1,     1,     1,
-       1,     1,     3,     3,     1,     3,     3,     1,     2,     2,
-       1,     3,     1,     1,     1,     1
+       7,     9,     5,     7,     3,     3,     3,     4,     3,     1,
+       3,     1,     3,     3,     1,     3,     1,     1,     1,     1,
+       1,     3,     3,     1,     3,     3,     1,     2,     2,     1,
+       3,     1,     1,     1,     1
 };
 
 
@@ -1269,7 +1309,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: PROGRAM LI list-decl list-sent LD  */
-#line 178 "sintatic.y"
+#line 218 "sintatic.y"
                                           {
             if(inicial == NULL){
                 inicial = new struct Nodo;
@@ -1285,12 +1325,13 @@ yyreduce:
                 siguiente->hijos.push_back(inicial);
                 inicial = siguiente;
             }
+            printf("program\n");
         }
-#line 1290 "sintatic.tab.c"
+#line 1331 "sintatic.tab.c"
     break;
 
   case 4: /* list-decl: list-decl decl  */
-#line 195 "sintatic.y"
+#line 236 "sintatic.y"
                          {
             Nodo *siguiente = new struct Nodo;
             siguiente->nombre = "list-decl";
@@ -1301,11 +1342,11 @@ yyreduce:
             siguiente->hijos.push_back(inicial);
             inicial = siguiente;
         }
-#line 1305 "sintatic.tab.c"
+#line 1346 "sintatic.tab.c"
     break;
 
   case 5: /* decl: tipo list-id PYC  */
-#line 206 "sintatic.y"
+#line 247 "sintatic.y"
                          {
             Nodo *siguiente = new struct Nodo;
             siguiente->nombre = "decl";
@@ -1321,11 +1362,11 @@ yyreduce:
             siguiente->hijos.push_back(pyc);
             inicial = siguiente;
         }
-#line 1325 "sintatic.tab.c"
+#line 1366 "sintatic.tab.c"
     break;
 
   case 6: /* tipo: INT  */
-#line 222 "sintatic.y"
+#line 263 "sintatic.y"
             {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -1342,11 +1383,11 @@ yyreduce:
                     inicial = siguiente;
                 }
             }
-#line 1346 "sintatic.tab.c"
+#line 1387 "sintatic.tab.c"
     break;
 
   case 7: /* tipo: FLOAT  */
-#line 238 "sintatic.y"
+#line 279 "sintatic.y"
                 {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -1363,11 +1404,11 @@ yyreduce:
                     inicial = siguiente;
                 }
             }
-#line 1367 "sintatic.tab.c"
+#line 1408 "sintatic.tab.c"
     break;
 
   case 8: /* tipo: BOOL  */
-#line 254 "sintatic.y"
+#line 295 "sintatic.y"
                {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -1384,11 +1425,11 @@ yyreduce:
                     inicial = siguiente;
                 }
             }
-#line 1388 "sintatic.tab.c"
+#line 1429 "sintatic.tab.c"
     break;
 
   case 9: /* list-id: list-id COM IDENTIFICADOR  */
-#line 271 "sintatic.y"
+#line 312 "sintatic.y"
                                    {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "list-id, id";
@@ -1398,11 +1439,11 @@ yyreduce:
                 inicial->padre = siguiente;
                 inicial = siguiente;
             }
-#line 1402 "sintatic.tab.c"
+#line 1443 "sintatic.tab.c"
     break;
 
   case 10: /* list-id: IDENTIFICADOR  */
-#line 280 "sintatic.y"
+#line 321 "sintatic.y"
                         {
             if(inicial == NULL){
                 inicial = new struct Nodo;
@@ -1419,119 +1460,181 @@ yyreduce:
                 inicial = siguiente;
             }
         }
-#line 1423 "sintatic.tab.c"
+#line 1464 "sintatic.tab.c"
     break;
 
   case 12: /* list-sent: list-sent sent  */
-#line 297 "sintatic.y"
+#line 338 "sintatic.y"
                          {
                 Nodo *siguiente = new struct Nodo;
-                siguiente->nombre = "list-sent";
+                siguiente->nombre = "list-sent sent";
                 siguiente->valor = "";
                 siguiente->padre = NULL;
-                check(inicial, siguiente, "list-sent");
+                check(inicial, siguiente, "list-sent sent");
+                
                 siguiente->hijos.push_back(inicial);
                 inicial->padre = siguiente;
                 inicial = siguiente;
                 printf("list-sent sent\n");
             
             }
-#line 1440 "sintatic.tab.c"
+#line 1482 "sintatic.tab.c"
     break;
 
   case 13: /* sent: sent-if  */
-#line 310 "sintatic.y"
+#line 352 "sintatic.y"
                 {printf("sent-if\n");}
-#line 1446 "sintatic.tab.c"
+#line 1488 "sintatic.tab.c"
     break;
 
   case 14: /* sent: sent-while  */
-#line 311 "sintatic.y"
-                     {printf("sent-while\n");}
-#line 1452 "sintatic.tab.c"
-    break;
-
-  case 15: /* sent: sent-do  */
-#line 312 "sintatic.y"
-                  {printf("sent-do\n");}
-#line 1458 "sintatic.tab.c"
-    break;
-
-  case 16: /* sent: sent-read  */
-#line 313 "sintatic.y"
-                    {
-                Nodo *siguiente = new struct Nodo;
-                siguiente->nombre = "sent";
-                siguiente->valor = "";
-                siguiente->padre = NULL;
-                siguiente->hijos.push_back(inicial);
-                inicial->padre = siguiente;
-                inicial = siguiente;
-                printf("sent-read\n");
-            }
-#line 1473 "sintatic.tab.c"
-    break;
-
-  case 17: /* sent: sent-write  */
-#line 323 "sintatic.y"
+#line 353 "sintatic.y"
                      {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "sent";
-                siguiente->valor = "";
+                siguiente->valor = "sent-while";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-while\n");
+            }
+#line 1503 "sintatic.tab.c"
+    break;
+
+  case 15: /* sent: sent-do  */
+#line 363 "sintatic.y"
+                  {printf("sent-do\n");}
+#line 1509 "sintatic.tab.c"
+    break;
+
+  case 16: /* sent: sent-read  */
+#line 364 "sintatic.y"
+                    {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "sent-read";
                 siguiente->padre = NULL;
                 siguiente->hijos.push_back(inicial);
                 inicial->padre = siguiente;
                 inicial = siguiente;
                 printf("sent-read\n");
+            }
+#line 1524 "sintatic.tab.c"
+    break;
+
+  case 17: /* sent: sent-write  */
+#line 374 "sintatic.y"
+                     {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "sent-write";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
                 printf("sent-write\n");
             }
-#line 1489 "sintatic.tab.c"
+#line 1539 "sintatic.tab.c"
     break;
 
-  case 18: /* sent: bloque  */
-#line 334 "sintatic.y"
-                 {printf("bloque\n");}
-#line 1495 "sintatic.tab.c"
+  case 18: /* sent: sent-assign  */
+#line 384 "sintatic.y"
+                      {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent";
+                siguiente->valor = "sent-assign";
+                siguiente->padre = NULL;
+                siguiente->hijos.push_back(inicial);
+                inicial->padre = siguiente;
+                inicial = siguiente;
+                printf("sent-assign\n");
+            }
+#line 1554 "sintatic.tab.c"
     break;
 
-  case 19: /* sent: sent-assign  */
-#line 335 "sintatic.y"
-                      {printf("sent-assign\n");}
-#line 1501 "sintatic.tab.c"
-    break;
-
-  case 20: /* sent: BREAK  */
-#line 336 "sintatic.y"
+  case 19: /* sent: BREAK  */
+#line 394 "sintatic.y"
                 {printf("break\n");}
-#line 1507 "sintatic.tab.c"
+#line 1560 "sintatic.tab.c"
     break;
 
-  case 21: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
-#line 338 "sintatic.y"
+  case 20: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
+#line 396 "sintatic.y"
                                          {printf("if\n");}
-#line 1513 "sintatic.tab.c"
+#line 1566 "sintatic.tab.c"
     break;
 
-  case 22: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
-#line 339 "sintatic.y"
+  case 21: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
+#line 397 "sintatic.y"
                                                        {printf("if-else\n");}
-#line 1519 "sintatic.tab.c"
+#line 1572 "sintatic.tab.c"
     break;
 
-  case 23: /* sent-while: WHILE PI exp-bool PD bloque  */
-#line 341 "sintatic.y"
-                                    {printf("while\n");}
-#line 1525 "sintatic.tab.c"
+  case 22: /* sent-while: WHILE PI exp-bool PD bloque  */
+#line 399 "sintatic.y"
+                                    {
+            Nodo *siguiente = new struct Nodo;
+            siguiente->nombre = "while";
+            siguiente->valor = "";
+            siguiente->padre = NULL;
+            inicial->padre = siguiente;
+            printf("\n--Pre operacion--\n");
+            printNode(inicial, 0);
+            checkDiv(inicial, siguiente, "factor");
+            checkWhile(inicial, siguiente, "comb");
+            Nodo *exp_bool = new struct Nodo;
+            exp_bool->nombre = "exp-bool";
+            exp_bool->valor= "";
+            exp_bool->padre=siguiente;
+            if(siguiente->hijos.size()>1){
+               if(siguiente->hijos.at(0)->nombre == "comb" && siguiente->hijos.at(1)->nombre != "comb"){
+                    std::cout << "Hijo en 0 es comb\n";
+                    exp_bool->hijos.push_back(siguiente->hijos.at(0));
+                    siguiente->hijos.erase(siguiente->hijos.begin());
+                }else if(siguiente->hijos.at(0)->nombre != "comb" && siguiente->hijos.at(1)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(1));
+                    siguiente->hijos.erase(siguiente->hijos.begin()+1);
+                }else if(siguiente->hijos.at(0)->nombre == "comb" && siguiente->hijos.at(1)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(1));
+                    siguiente->hijos.erase(siguiente->hijos.begin()+1);
+                }
+            }else{
+                if(siguiente->hijos.at(0)->nombre == "comb"){
+                    exp_bool->hijos.push_back(siguiente->hijos.at(0));
+                    siguiente->hijos.erase(siguiente->hijos.begin());
+                }
+            }
+            siguiente->hijos.push_back(exp_bool);
+            //Crea su estructura
+            Nodo *pi = new struct Nodo;
+            pi->nombre = "pi";
+            pi->valor= "(";
+            pi->padre=inicial;
+            siguiente->hijos.push_back(pi);
+            //Crea el id como hijo
+            Nodo *pd = new struct Nodo;
+            pd->nombre = "pd";
+            pd->valor = ")";
+            pd->padre = inicial;
+            siguiente->hijos.push_back(pd);
+            siguiente->hijos.push_back(inicial);
+            inicial = siguiente;
+            printf("\n--Tras operacion--\n");
+            printNode(inicial, 0);
+            printf("while\n");
+        }
+#line 1628 "sintatic.tab.c"
     break;
 
-  case 24: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
-#line 343 "sintatic.y"
+  case 23: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
+#line 451 "sintatic.y"
                                            {printf("do\n");}
-#line 1531 "sintatic.tab.c"
+#line 1634 "sintatic.tab.c"
     break;
 
-  case 25: /* sent-read: READ IDENTIFICADOR PYC  */
-#line 345 "sintatic.y"
+  case 24: /* sent-read: READ IDENTIFICADOR PYC  */
+#line 453 "sintatic.y"
                                {
             if(inicial == NULL){
                 //Crea el nodo padre
@@ -1584,12 +1687,13 @@ yyreduce:
                 siguiente->hijos.push_back(pyc);
                 inicial = siguiente;
             }
+            printf("read\n");
         }
-#line 1589 "sintatic.tab.c"
+#line 1693 "sintatic.tab.c"
     break;
 
-  case 26: /* sent-write: WRITE exp-bool PYC  */
-#line 399 "sintatic.y"
+  case 25: /* sent-write: WRITE exp-bool PYC  */
+#line 508 "sintatic.y"
                            {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "sent-write";
@@ -1619,23 +1723,97 @@ yyreduce:
                 inicial = siguiente;
                 printf("write\n");
             }
-#line 1623 "sintatic.tab.c"
+#line 1727 "sintatic.tab.c"
     break;
 
-  case 27: /* bloque: LI list-sent LD  */
-#line 430 "sintatic.y"
-                        {printf("bloque\n");}
-#line 1629 "sintatic.tab.c"
+  case 26: /* bloque: LI list-sent LD  */
+#line 539 "sintatic.y"
+                        {
+                if(inicial == NULL){
+                    inicial = new struct Nodo;  
+                    inicial->nombre = "bloque";
+                    inicial->valor = "";
+                    inicial->padre = NULL;
+                    Nodo *li = new struct Nodo;
+                    li->nombre = "li";
+                    li->valor= "{";
+                    li->padre=inicial;
+                    inicial->hijos.push_back(li);
+                    //Assign
+                    Nodo *ld = new struct Nodo;
+                    ld->nombre = "ld";
+                    ld->valor= "}";
+                    ld->padre=inicial;
+                    inicial->hijos.push_back(ld);
+                }else{
+                    Nodo *siguiente = new struct Nodo;
+                    siguiente->nombre = "bloque";
+                    siguiente->valor = "";
+                    siguiente->padre = NULL;
+                    inicial->padre = siguiente;
+                    //Buscar el nodo!!
+                    siguiente->hijos.push_back(inicial);
+                    //Crea su estructura
+                    Nodo *li = new struct Nodo;
+                    li->nombre = "li";
+                    li->valor= "{";
+                    li->padre=siguiente;
+                    siguiente->hijos.push_back(li);
+                    //Assign
+                    Nodo *ld = new struct Nodo;
+                    ld->nombre = "ld";
+                    ld->valor= "}";
+                    ld->padre=siguiente;
+                    siguiente->hijos.push_back(ld);
+                    inicial = siguiente;
+                    
+                }
+                printf("bloque\n");
+            }
+#line 1774 "sintatic.tab.c"
     break;
 
-  case 28: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
-#line 432 "sintatic.y"
-                                        {printf("asignacion\n");}
-#line 1635 "sintatic.tab.c"
+  case 27: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
+#line 582 "sintatic.y"
+                                        {
+                Nodo *siguiente = new struct Nodo;
+                siguiente->nombre = "sent-assign";
+                siguiente->valor = "";
+                siguiente->padre = NULL;
+                inicial->padre = siguiente;
+                //Buscar el nodo!!
+                Nodo *exp_bool = new struct Nodo;
+                exp_bool->nombre = "exp-bool";
+                exp_bool->valor= "";
+                exp_bool->padre=siguiente;
+                exp_bool->hijos.push_back(inicial);
+                siguiente->hijos.push_back(exp_bool);
+                //Crea su estructura
+                Nodo *wirte = new struct Nodo;
+                wirte->nombre = "id";
+                wirte->valor= (yyvsp[-3].identificador);
+                wirte->padre=siguiente;
+                siguiente->hijos.push_back(wirte);
+                //Assign
+                Nodo *asign = new struct Nodo;
+                asign->nombre = "asign";
+                asign->valor= "=";
+                asign->padre=siguiente;
+                siguiente->hijos.push_back(asign);
+                //Crea el punto y coma como hijo
+                Nodo *pyc = new struct Nodo;
+                pyc->nombre = "pyc";
+                pyc->valor = ";";
+                pyc->padre = siguiente;
+                siguiente->hijos.push_back(pyc);
+                inicial = siguiente;
+                printf("asignacion\n");
+            }
+#line 1813 "sintatic.tab.c"
     break;
 
-  case 29: /* exp-bool: exp-bool OR comb  */
-#line 434 "sintatic.y"
+  case 28: /* exp-bool: exp-bool OR comb  */
+#line 617 "sintatic.y"
                           {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "exp-bool OR comb";
@@ -1643,7 +1821,7 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "comb");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea OR como hijo
                 Nodo *oi = new struct Nodo;
                 oi->nombre = "OR";
@@ -1654,11 +1832,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("or\n");
             }
-#line 1658 "sintatic.tab.c"
+#line 1836 "sintatic.tab.c"
     break;
 
-  case 30: /* exp-bool: comb  */
-#line 452 "sintatic.y"
+  case 29: /* exp-bool: comb  */
+#line 635 "sintatic.y"
                {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "comb";
@@ -1669,11 +1847,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("comb\n");
             }
-#line 1673 "sintatic.tab.c"
+#line 1851 "sintatic.tab.c"
     break;
 
-  case 31: /* comb: comb AND igualdad  */
-#line 463 "sintatic.y"
+  case 30: /* comb: comb AND igualdad  */
+#line 646 "sintatic.y"
                           {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "comb AND igualdad";
@@ -1681,7 +1859,7 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "igualdad");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *an = new struct Nodo;
                 an->nombre = "AND";
@@ -1692,11 +1870,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("and\n");
             }
-#line 1696 "sintatic.tab.c"
+#line 1874 "sintatic.tab.c"
     break;
 
-  case 32: /* comb: igualdad  */
-#line 481 "sintatic.y"
+  case 31: /* comb: igualdad  */
+#line 664 "sintatic.y"
                    {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "igualdad";
@@ -1707,19 +1885,19 @@ yyreduce:
                 inicial = siguiente;
                 printf("igualdad\n");
             }
-#line 1711 "sintatic.tab.c"
+#line 1889 "sintatic.tab.c"
     break;
 
-  case 33: /* igualdad: igualdad IGU rel  */
-#line 492 "sintatic.y"
+  case 32: /* igualdad: igualdad IGU rel  */
+#line 675 "sintatic.y"
                          {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "igualdad IGU rel";
                 siguiente->valor = "";
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
-                //Buscar el nodo!!
-                check(inicial, siguiente, "rel");
+                 //Buscar el nodo!!
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *igu = new struct Nodo;
                 igu->nombre = "IGU";
@@ -1730,11 +1908,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("igual igual\n");
             }
-#line 1734 "sintatic.tab.c"
+#line 1912 "sintatic.tab.c"
     break;
 
-  case 34: /* igualdad: igualdad DIS rel  */
-#line 510 "sintatic.y"
+  case 33: /* igualdad: igualdad DIS rel  */
+#line 693 "sintatic.y"
                            {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "igualdad DIS rel";
@@ -1742,7 +1920,7 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "rel");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *dis = new struct Nodo;
                 dis->nombre = "DIS";
@@ -1753,11 +1931,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("distinto\n");
             }
-#line 1757 "sintatic.tab.c"
+#line 1935 "sintatic.tab.c"
     break;
 
-  case 35: /* igualdad: rel  */
-#line 528 "sintatic.y"
+  case 34: /* igualdad: rel  */
+#line 711 "sintatic.y"
               {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "rel";
@@ -1768,37 +1946,36 @@ yyreduce:
                 inicial = siguiente;
                 printf("rel\n");
             }
-#line 1772 "sintatic.tab.c"
+#line 1950 "sintatic.tab.c"
     break;
 
-  case 36: /* rel: expr op-rel expr  */
-#line 539 "sintatic.y"
+  case 35: /* rel: expr op-rel expr  */
+#line 722 "sintatic.y"
                          {
-                
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr op-rel expr";
                 siguiente->valor = "";
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "op-rel");
+                checkDiv(inicial, siguiente, "factor");
                 if(siguiente->hijos.size() > 0){
-                    check(siguiente->hijos.at(0), siguiente, "term");
+                    std::cout << "operacion sig factor: " << siguiente->hijos.at(0)->nombre << "\n";
                     Nodo *oprel = siguiente->hijos.at(0);
-                    siguiente->hijos.at(0) = siguiente->hijos.at(1);
-                    siguiente->hijos.at(1) = oprel;
+                    siguiente->hijos.at(0) = siguiente->hijos.at(0)->hijos.at(0)->hijos.at(0);
+                    oprel->hijos.at(0)->hijos.erase(oprel->hijos.at(0)->hijos.begin());
+                    siguiente->hijos.push_back(oprel);
                 }
                 siguiente->hijos.push_back(inicial);
                 inicial = siguiente;
                 printf("operacion\n");
             }
-#line 1796 "sintatic.tab.c"
+#line 1974 "sintatic.tab.c"
     break;
 
-  case 37: /* rel: expr  */
-#line 558 "sintatic.y"
+  case 36: /* rel: expr  */
+#line 741 "sintatic.y"
                {
-                std::cout<<"hola\n";
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr";
                 siguiente->valor = "";
@@ -1808,11 +1985,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("expresion\n");
             }
-#line 1812 "sintatic.tab.c"
+#line 1989 "sintatic.tab.c"
     break;
 
-  case 38: /* op-rel: MEN  */
-#line 570 "sintatic.y"
+  case 37: /* op-rel: MEN  */
+#line 752 "sintatic.y"
             {
             Nodo *siguiente = new struct Nodo;
             siguiente->nombre = "MEN";
@@ -1829,12 +2006,13 @@ yyreduce:
             inicial->padre = op_rel;
             inicial = op_rel;
             printf("menor\n");
+            printf("op-rel\n");
         }
-#line 1834 "sintatic.tab.c"
+#line 2012 "sintatic.tab.c"
     break;
 
-  case 39: /* op-rel: MENIGL  */
-#line 587 "sintatic.y"
+  case 38: /* op-rel: MENIGL  */
+#line 770 "sintatic.y"
                  {
                 
                 Nodo *siguiente = new struct Nodo;
@@ -1852,12 +2030,13 @@ yyreduce:
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("menor igual\n");
+                printf("op-rel\n");
             }
-#line 1857 "sintatic.tab.c"
+#line 2036 "sintatic.tab.c"
     break;
 
-  case 40: /* op-rel: MAY  */
-#line 605 "sintatic.y"
+  case 39: /* op-rel: MAY  */
+#line 789 "sintatic.y"
               {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "MAY";
@@ -1874,12 +2053,13 @@ yyreduce:
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("mayor\n");
+                printf("op-rel\n");
             }
-#line 1879 "sintatic.tab.c"
+#line 2059 "sintatic.tab.c"
     break;
 
-  case 41: /* op-rel: MAYIGL  */
-#line 622 "sintatic.y"
+  case 40: /* op-rel: MAYIGL  */
+#line 807 "sintatic.y"
                  {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "MAYIGL";
@@ -1896,12 +2076,13 @@ yyreduce:
                 inicial->padre = op_rel;
                 inicial = op_rel;
                 printf("mayor igual\n");
+                printf("op-rel\n");
             }
-#line 1901 "sintatic.tab.c"
+#line 2082 "sintatic.tab.c"
     break;
 
-  case 42: /* expr: expr RES term  */
-#line 640 "sintatic.y"
+  case 41: /* expr: expr RES term  */
+#line 826 "sintatic.y"
                       {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr RES term";
@@ -1909,8 +2090,8 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "expr");
-                check(inicial, siguiente, "term");
+                //check(inicial, siguiente, "expr");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *res = new struct Nodo;
                 res->nombre = "RES";
@@ -1921,11 +2102,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("resta\n");
             }
-#line 1925 "sintatic.tab.c"
+#line 2106 "sintatic.tab.c"
     break;
 
-  case 43: /* expr: expr MAS term  */
-#line 659 "sintatic.y"
+  case 42: /* expr: expr MAS term  */
+#line 845 "sintatic.y"
                         {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "expr MAS term";
@@ -1933,8 +2114,8 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "expr");
-                check(inicial, siguiente, "term");
+                //check(inicial, siguiente, "expr");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MAS como hijo
                 Nodo *mas = new struct Nodo;
                 mas->nombre = "MAS";
@@ -1945,11 +2126,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("suma\n");
             }
-#line 1949 "sintatic.tab.c"
+#line 2130 "sintatic.tab.c"
     break;
 
-  case 44: /* expr: term  */
-#line 678 "sintatic.y"
+  case 43: /* expr: term  */
+#line 864 "sintatic.y"
                {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "term";
@@ -1960,11 +2141,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("term\n");
             }
-#line 1964 "sintatic.tab.c"
+#line 2145 "sintatic.tab.c"
     break;
 
-  case 45: /* term: term MUL unario  */
-#line 689 "sintatic.y"
+  case 44: /* term: term MUL unario  */
+#line 875 "sintatic.y"
                         {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "term MUL unario";
@@ -1972,8 +2153,7 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "term");
-                check(inicial, siguiente, "unario");
+                checkDiv(inicial, siguiente, "factor");
                 //Crea MUL como hijo
                 Nodo *mul = new struct Nodo;
                 mul->nombre = "MUL";
@@ -1985,11 +2165,11 @@ yyreduce:
                 printf("multiplicacion\n");
             
             }
-#line 1989 "sintatic.tab.c"
+#line 2169 "sintatic.tab.c"
     break;
 
-  case 46: /* term: term DIV unario  */
-#line 709 "sintatic.y"
+  case 45: /* term: term DIV unario  */
+#line 894 "sintatic.y"
                           {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "term DIV unario";
@@ -1997,9 +2177,7 @@ yyreduce:
                 siguiente->padre = NULL;
                 inicial->padre = siguiente;
                 //Buscar el nodo!!
-                check(inicial, siguiente, "term");
-                check(inicial, siguiente, "unario");
-                //Crea div como hijo
+                checkDiv(inicial, siguiente, "factor");
                 Nodo *div = new struct Nodo;
                 div->nombre = "DIV";
                 div->valor= "/";
@@ -2009,11 +2187,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("division\n");
             }
-#line 2013 "sintatic.tab.c"
+#line 2191 "sintatic.tab.c"
     break;
 
-  case 47: /* term: unario  */
-#line 728 "sintatic.y"
+  case 46: /* term: unario  */
+#line 911 "sintatic.y"
                  {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "unario";
@@ -2024,11 +2202,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("unario\n");
             }
-#line 2028 "sintatic.tab.c"
+#line 2206 "sintatic.tab.c"
     break;
 
-  case 48: /* unario: NOT unario  */
-#line 739 "sintatic.y"
+  case 47: /* unario: NOT unario  */
+#line 922 "sintatic.y"
                    {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "not unario";
@@ -2049,13 +2227,13 @@ yyreduce:
                 no->padre=siguiente;
                 siguiente->hijos.push_back(no);
                 inicial = siguiente;
-                printf("negacion\n");
+                printf("not unario\n");
             }
-#line 2055 "sintatic.tab.c"
+#line 2233 "sintatic.tab.c"
     break;
 
-  case 49: /* unario: RES unario  */
-#line 761 "sintatic.y"
+  case 48: /* unario: RES unario  */
+#line 944 "sintatic.y"
                      {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "-unario";
@@ -2076,13 +2254,13 @@ yyreduce:
                 res->padre=siguiente;
                 siguiente->hijos.push_back(res);
                 inicial = siguiente;
-                printf("negativo\n");
+                printf("res unario\n");
             }
-#line 2082 "sintatic.tab.c"
+#line 2260 "sintatic.tab.c"
     break;
 
-  case 50: /* unario: factor  */
-#line 783 "sintatic.y"
+  case 49: /* unario: factor  */
+#line 966 "sintatic.y"
                  {
                 Nodo *siguiente = new struct Nodo;
                 siguiente->nombre = "factor";
@@ -2093,11 +2271,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("factor\n");
             }
-#line 2097 "sintatic.tab.c"
+#line 2275 "sintatic.tab.c"
     break;
 
-  case 51: /* factor: PI exp-bool PD  */
-#line 794 "sintatic.y"
+  case 50: /* factor: PI exp-bool PD  */
+#line 977 "sintatic.y"
                        {
             //!Revisar
                 Nodo *siguiente = new struct Nodo;
@@ -2129,11 +2307,11 @@ yyreduce:
                 inicial = siguiente;
                 printf("(exp-bool)\n");
             }
-#line 2133 "sintatic.tab.c"
+#line 2311 "sintatic.tab.c"
     break;
 
-  case 52: /* factor: IDENTIFICADOR  */
-#line 825 "sintatic.y"
+  case 51: /* factor: IDENTIFICADOR  */
+#line 1008 "sintatic.y"
                         {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -2151,11 +2329,11 @@ yyreduce:
                 }
                 printf("id: %s\n",(yyvsp[0].identificador));
             }
-#line 2155 "sintatic.tab.c"
+#line 2333 "sintatic.tab.c"
     break;
 
-  case 53: /* factor: NUMERO  */
-#line 842 "sintatic.y"
+  case 52: /* factor: NUMERO  */
+#line 1025 "sintatic.y"
                  {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -2173,11 +2351,11 @@ yyreduce:
                 }
                 std::cout << "numero: " << std::to_string((yyvsp[0].numero)) << "\n";
             }
-#line 2177 "sintatic.tab.c"
+#line 2355 "sintatic.tab.c"
     break;
 
-  case 54: /* factor: TRUE  */
-#line 859 "sintatic.y"
+  case 53: /* factor: TRUE  */
+#line 1042 "sintatic.y"
                {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -2195,11 +2373,11 @@ yyreduce:
                 }
                 printf("true\n");
             }
-#line 2199 "sintatic.tab.c"
+#line 2377 "sintatic.tab.c"
     break;
 
-  case 55: /* factor: FALSE  */
-#line 876 "sintatic.y"
+  case 54: /* factor: FALSE  */
+#line 1059 "sintatic.y"
                 {
                 if(inicial == NULL){
                     inicial = new struct Nodo;
@@ -2217,11 +2395,11 @@ yyreduce:
                 }
                 printf("false\n");
             }
-#line 2221 "sintatic.tab.c"
+#line 2399 "sintatic.tab.c"
     break;
 
 
-#line 2225 "sintatic.tab.c"
+#line 2403 "sintatic.tab.c"
 
       default: break;
     }
@@ -2414,7 +2592,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 893 "sintatic.y"
+#line 1076 "sintatic.y"
 
 
 int yyerror(char *s){
@@ -2425,7 +2603,7 @@ int yyerror(char *s){
 void printNode(Nodo *init, int tabuladores){
     if(init != NULL){
         for(int i=0; i<tabuladores; i++){
-            std::cout<<"   ";
+            std::cout<<"  |";
         } 
         std::cout << init->nombre << ": " << init->valor << "\n";
         for(int i=0; i<init->hijos.size(); i++){
@@ -2436,6 +2614,7 @@ void printNode(Nodo *init, int tabuladores){
 
 int main(int argc, char **argv){
     yyparse();
+    std::cout << "\n\n---Arbol---\n\n";
     printNode(inicial,0);
     return 0;
 }

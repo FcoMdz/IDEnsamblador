@@ -17,6 +17,7 @@ program {
         }
         fi
         while(a==3 or x==y){
+			write hola;
             write a;
             a=a+1;
             x=a-y;

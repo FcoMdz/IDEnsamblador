@@ -1,15 +1,27 @@
 program{
     /*
-    int x,y,z;
     bool test, test2;
+    int x,y,z;
     read x;
-    write -x;
-    write x <= y;
-    write x != y;
-    write x and y;
-    write x or y;
-    write x + y;
-    write x * y;
+    write (x+y)+(x-y)*z>-j+50;
+    a=b+(x*y);
+    while(y){read b;}
+    while(x){}
+    while(x){
+        while(y){
+            while(z){
+                
+            }
+            read a;
+            write x;
+        }
+        read b;
+    }
     */
-    write x+(y<z+1);  
+   
+    do{
+
+    }until(x);
+    
+    
 }

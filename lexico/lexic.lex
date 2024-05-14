@@ -481,7 +481,14 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         countColumn += strlen(yytext);
     }
 . {
+    lexVec.push_back(Lexico());
+    lexVec[lexVec.size()-1].estilo = "Error";
+    lexVec[lexVec.size()-1].clave = "ERROR";
+    lexVec[lexVec.size()-1].lexema = yytext;
+    lexVec[lexVec.size()-1].columna = countColumn;
+    lexVec[lexVec.size()-1].fila = countLines;
     countColumn++;
+    return 0;
 }
 "-stop" {return 0;}
 %%

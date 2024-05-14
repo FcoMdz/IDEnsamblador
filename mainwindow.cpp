@@ -72,6 +72,9 @@ void formatText(QPlainTextEdit *editor, int initialCursor){
     cadenaFormat.setForeground(QColor("#F09200"));
     QTextCharFormat comentarioFormat;
     comentarioFormat.setForeground(QColor("#008000"));
+    QTextCharFormat errorFormat;
+    errorFormat.setUnderlineColor(QColor("#F53A41"));
+    errorFormat.setUnderlineStyle(QTextCharFormat::WaveUnderline);
     QTextCharFormat elseFormat;
     elseFormat.setForeground(QColor("#000000"));
     std::vector<Lexico> vec = analyzeText(editor->toPlainText().toStdString().c_str());
@@ -92,6 +95,8 @@ void formatText(QPlainTextEdit *editor, int initialCursor){
                 cursor.setCharFormat(cadenaFormat);
             }else if(token.estilo=="Comentario"){
                 cursor.setCharFormat(comentarioFormat);
+            }else if(token.estilo=="Error"){
+                cursor.setCharFormat(errorFormat);
             }else{
                 cursor.setCharFormat(elseFormat);
             }
