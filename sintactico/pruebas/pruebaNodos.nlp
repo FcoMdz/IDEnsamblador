@@ -1,5 +1,8 @@
 program{
     /*
+    
+    int x,y,z;
+    bool test, test2;
     bool test, test2;
     int x,y,z;
     read x;
@@ -17,11 +20,16 @@ program{
         }
         read b;
     }
+    z=;
+    while(x){
+        while(z){
+            
+        }
+    }
     */
-   
-    do{
-
-    }until(x);
-    
-    
+    while(x){
+        while(z){;
+            
+        }
+    }
 }

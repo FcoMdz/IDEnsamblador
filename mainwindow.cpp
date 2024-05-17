@@ -7,6 +7,7 @@
 #include <QTextEdit>
 #include <QPlainTextEdit>
 #include <QListWidget>
+#include <QStackedWidget>
 #include <QPushButton>
 #include <QDockWidget>
 #include <QScrollBar>
@@ -21,6 +22,7 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTimer>
+#include "sintatic.tab.c"
 #include "lex.yy.c"
 
 class CustomQPlainTextEdit : public QPlainTextEdit {
@@ -43,7 +45,7 @@ int dialogYesNo(QString message){
     return msgBox.exec();
 }
 
-void showLexicData(std::vector<Lexico> *vec, QTableWidget *table){
+void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *error){
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
     table->setRowCount(vec->size());
@@ -54,13 +56,54 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table){
         table->setItem(i,2, new QTableWidgetItem(QString::number(vec->at(i).fila)));
         table->setItem(i,3, new QTableWidgetItem(QString::number(vec->at(i).columna)));
     }
+    if(QString::fromStdString(vec->at(vec->size()-1).clave).compare("Error", Qt::CaseInsensitive) == 0){
+        error->append("Error léxico en linea: " + QString::number(vec->at(vec->size()-1).fila) + ", columna: " + QString::number(vec->at(vec->size()-1).columna));
+    }else{
+        error->append("Léxico completo sin problemas");
+    }
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
 }
 
-struct myInt{
-    int initialEditPosition;
-};
+bool showSintaticData(Nodo *init, QTextEdit *view, int tabuladores, QTextEdit *error){
+    //qDebug() << "iteracion: " << init->nombre;
+    if(init != NULL){
+        if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
+            if(init->hijos.size() > 0){
+                bool exito = showSintaticData(init->hijos.at(0), view,tabuladores, error);
+                if(exito){
+                    error->append("Sintáctico completo sin problemas");
+                }
+                return exito;
+            }
+        }else{
+            std::string agregar = "";
+            for(int i=0; i<tabuladores; i++){
+                agregar += "  |";
+            }
+            agregar += init->nombre;
+            agregar += ": ";
+            agregar += init->valor;
+            view->append(QString::fromStdString(agregar));
+            if(QString::fromStdString(init->nombre).compare("Error", Qt::CaseInsensitive) == 0){
+                return false;
+            }
+            for(int i=0; i<init->hijos.size(); i++){
+                bool res = showSintaticData(init->hijos.at(i), view,tabuladores+1, error);
+                if(!res){
+                    if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
+                        error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
+                    }else{
+                        error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor));
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    return true;
+}
 
 void formatText(QPlainTextEdit *editor, int initialCursor){
     //Estilos especificos para cada tipo de clave
@@ -229,26 +272,44 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *button3 = new QPushButton("Semántica");
     QPushButton *button4 = new QPushButton("Código intermedio");
 
+    // Crear el cuadro de texto para el análisis sintáctico
+    QTextEdit *syntacticText = new QTextEdit;
+    syntacticText->setFont(font);
+    syntacticText->setLineWrapMode(QTextEdit::NoWrap);
+    syntacticText->setReadOnly(true);
 
-
-    buttonLayout->addWidget(button1, 0, 0);
-    buttonLayout->addWidget(button2, 0, 1);
-    buttonLayout->addWidget(button3, 0, 2);
-    buttonLayout->addWidget(button4, 0, 3);
-
-    // Crear el cuadro de texto
-    //QTextEdit *editText = new QTextEdit;
-    //editText->setReadOnly(true);
+    //Crear tabla
     QTableWidget *resultsTable = new QTableWidget();
     resultsTable->setColumnCount(4);
     resultsTable->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
     resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
     resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     resultsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    QStackedWidget *stackedWidget = new QStackedWidget;
+    //Añadir widgets al stackwidget para poder moverse entre ventanas.
+    stackedWidget->addWidget(resultsTable);
+    stackedWidget->addWidget(syntacticText);
+
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
     buttonTextEditLayout->addLayout(buttonLayout);
-    buttonTextEditLayout->addWidget(resultsTable);
+    buttonTextEditLayout->addWidget(stackedWidget);
+
+    buttonLayout->addWidget(button1, 0, 0);
+    buttonLayout->addWidget(button2, 0, 1);
+    buttonLayout->addWidget(button3, 0, 2);
+    buttonLayout->addWidget(button4, 0, 3);
+
+
+    // Conectar botones a las funciones lambda para cambiar las vistas
+    QObject::connect(button1, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(0);
+    });
+    QObject::connect(button2, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(1);
+    });
+
 
 
     // Widget para contener los botones y el cuadro de texto
@@ -263,8 +324,9 @@ MainWindow::MainWindow(QWidget *parent) :
     buttonDockWidget->setMinimumHeight(static_cast<int>(0.8 * this->height()));
 
     // Convertir la ventana de texto en un dockWidget
-    QDockWidget *bottomDockWidget = new QDockWidget("Vista de Texto Abajo", this);
+    QDockWidget *bottomDockWidget = new QDockWidget("Salida", this);
     QTextEdit *textVistaAbajo = new QTextEdit;
+    textVistaAbajo->setFont(font);
     textVistaAbajo->setReadOnly(true);
     bottomDockWidget->setWidget(textVistaAbajo);
     addDockWidget(Qt::BottomDockWidgetArea, bottomDockWidget);
@@ -311,7 +373,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(action2, &QAction::triggered, this,[=](){
         if(fileName->isEmpty()){
-
             codeEditor->clear();
             return;
         }
@@ -322,10 +383,18 @@ MainWindow::MainWindow(QWidget *parent) :
                 QTextStream out(&file);
                 out << codeEditor->toPlainText();
                 file.close();
+                resultsTable->setRowCount(0);
+                textVistaAbajo->clear();
+                syntacticText->clear();
+                codeEditor->clear();
             }
+        }else{
+            resultsTable->setRowCount(0);
+            textVistaAbajo->clear();
+            syntacticText->clear();
+            codeEditor->clear();
         }
         fileName->assign("");
-        codeEditor->clear();
         QStringList partesRuta = fileName->split("/");
         this->setWindowTitle("IDEnsamblador");
         //qDebug() << fileName->toStdString().c_str();
@@ -404,11 +473,22 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *codAction2 = menuCodigo->addAction("Correr");
     QAction *codAction3 = menuCodigo->addAction("Depurar");
     std::vector<Lexico> *lex = new std::vector<Lexico>;
+    Nodo *sint = new struct Nodo;
 
     //Conecta los botones de la sección de depuración
-    connect(button1, &QPushButton::clicked, this, [=](){
-        showLexicData(lex, resultsTable);
+    /*connect(button1, &QPushButton::clicked, this, [=](){
+        textVistaAbajo->clear();
+        syntacticText->clear();
+        showSintaticData(sint, syntacticText,0,textVistaAbajo);
+        showLexicData(lex, resultsTable, textVistaAbajo);
     });
+
+    connect(button2, &QPushButton::clicked, this, [=](){
+        textVistaAbajo->clear();
+        syntacticText->clear();
+        showSintaticData(sint, syntacticText,0,textVistaAbajo);
+        showLexicData(lex, resultsTable, textVistaAbajo);
+    });*/
 
     QObject::connect(codAction1, &QAction::triggered, this,[=](){
         bool open = false;
@@ -467,11 +547,19 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             open = true;
         }
-        if(open){
+        if(open && !codeEditor->toPlainText().isEmpty()){
             lex->clear();
             std::vector<Lexico> vec = analyzeFile(fileName->toStdString().c_str());
+            activateRet();
+            textVistaAbajo->clear();
             lex->swap(vec);
-            showLexicData(lex, resultsTable);
+            showLexicData(lex, resultsTable, textVistaAbajo);
+            sint->nombre = "apuntador";
+            sint->hijos.clear();
+            sint->hijos.push_back(getSintactic(fileName->toStdString().c_str()));
+            syntacticText->clear();
+            showSintaticData(sint, syntacticText,0,textVistaAbajo);
+
         }
     });
 

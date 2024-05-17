@@ -2,7 +2,7 @@
 
 clear
 echo "Iniciando compilación"
-bison -dv sintatic.y
-flex -l lexic.l
-g++ sintatic.tab.c lex.yy.c -o sintactic.exe
+bison -d -o sintatic.tab.cpp sintatic.y 
+flex -o lex.yy.cpp lexic.l
+g++ sintatic.tab.cpp lex.yy.cpp -o sintatic.exe -lfl
 echo "Compilación terminada, comprueba errores"

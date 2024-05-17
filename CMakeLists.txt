@@ -19,6 +19,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        sintatic.tab.c
+        sintatic.tab.h
         lex.yy.c
         ${TS_FILES}
 )

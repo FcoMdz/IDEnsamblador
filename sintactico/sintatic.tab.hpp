@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_SINTATIC_TAB_H_INCLUDED
-# define YY_YY_SINTATIC_TAB_H_INCLUDED
+#ifndef YY_YY_SINTATIC_TAB_HPP_INCLUDED
+# define YY_YY_SINTATIC_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -104,51 +104,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 128 "sintatic.y"
+#line 29 "sintatic.y"
 
     float numero;
     char* cadena;
-    char* program;
-    char* i;
-    char* then;
-    char* els;
-    char* fi;
-    char* d;
-    char* until;
-    char* whil;
-    char* brea;
-    char* read;
-    char* write;
-    char* floa;
-    char* in;
-    char* boo;
-    char* no;
-    char* an;
-    char* o;
-    char* tru;
-    char* fals;
-    char* mas;
-    char* res;
-    char* mul;
-    char* div;
-    char* ele;
-    char* men;
-    char* menigl;
-    char* may;
-    char* mayigl;
-    char* igu;
-    char* dis;
-    char* asig;
-    char* pyc;
-    char* com;
-    char* pi;
-    char* pd;
-    char* li;
-    char* space;
-    char* ld;
-    char* identificador;
+    struct Nodo* nodo;
 
-#line 152 "sintatic.tab.h"
+#line 114 "sintatic.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -163,4 +125,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_SINTATIC_TAB_H_INCLUDED  */
+#endif /* !YY_YY_SINTATIC_TAB_HPP_INCLUDED  */
