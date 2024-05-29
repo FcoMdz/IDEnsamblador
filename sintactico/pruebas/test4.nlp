@@ -3,11 +3,11 @@ program {
 	float a, b;
 	bool c;
 	c = false;
-	x=5; // comentario 1
+	x=5;; // comentario 1
 	y=4; /* comentario 2 */
 	a=0.0;
 	b=3.0;
-	do {;
+	do {
 		if(x<y and y>=0) then{
 			c=true;
 		} else {

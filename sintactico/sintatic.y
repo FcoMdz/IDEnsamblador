@@ -1,15 +1,24 @@
 /*Declaraciones*/
+
 %{
     #include <stdio.h>
     #include <iostream>
     #include <vector>
     #include <string>
+    
+    extern int yylineno;
+    // Definiciones para el rastreo de ubicaciones
+    /*#define YYLTYPE_IS_DECLARED 1
+    typedef struct YYLTYPE {
+        int first_line;
+        int first_column;
+        int last_line;
+        int last_column;
+    } YYLTYPE;*/
 
     extern FILE *yyin;
-    extern int yylineno; // Línea actual de análisis
-    extern int yynerrs; // Número de errores sintácticos
     //extern int yyerrstatus = 0;
-    int yyerror(std::string s);
+    int yyerror(/*YYLTYPE *yylloc, */std::string s);
 
     typedef struct Nodo{
         std::string nombre;
@@ -17,14 +26,20 @@
         std::vector<Nodo*> hijos;
     } Nodo;
     Nodo *inicial = new struct Nodo;
-    int yylex();
+    int yylex(void);
     void printNode(Nodo *init, int tabuladores);
     Nodo* getSintactic(const char* filename);
     void freeNode(Nodo *init);
 
+    extern int yylineno;
+    extern int column;
+    extern char *lineptr;
+    #define YYERROR_VERBOSE 1
 %}
 
-%token PROGRAM IF THEN ELSE FI DO UNTIL WHILE BREAK READ WRITE FLOAT INT BOOL NOT AND OR TRUE FALSE MAS RES MUL DIV ELE MEN MENIGL MAY MAYIGL IGU DIS ASIG PYC COM PI PD LI LD CADENA NUMERO IDENTIFICADOR OTRO SPACE
+%locations
+
+%token PROGRAM IF THEN ELSE FI DO UNTIL WHILE BREAK READ WRITE FLOAT INT BOOL NOT AND OR TRUE FALSE MAS RES MUL DIV ELE MEN MENIGL MAY MAYIGL IGU DIS ASIG PYC COM PI PD LI LD CADENA NUMERO IDENTIFICADOR OTRO SPACE SALTOLINEA
 
 %union{
     float numero;
@@ -33,6 +48,7 @@
 }
 
 %type <cadena> CADENA
+%type <cadena> SALTOLINEA
 %type <cadena> PROGRAM
 %type <cadena> IF
 %type <cadena> THEN
@@ -99,7 +115,8 @@
 
 %%
     program: 
-        PROGRAM LI list-decl list-sent LD {
+        PROGRAM LI list-decl list-sent LD{
+            std::cout << "program\n";
             $$ = new struct Nodo;
             $$->nombre = "program";
             Nodo *prog = new struct Nodo;
@@ -117,14 +134,13 @@
             $$->hijos.push_back($4);
             $$->hijos.push_back(ld);
             inicial = $$;
-            
         }
-        |error '\n'
     list-decl:
         {
             $$ = NULL;
         }
         | list-decl decl {
+            std::cout << "list-decl decl\n";
             $$ = new struct Nodo;
             $$->nombre = "list-decl";
             $$->hijos.push_back($1);
@@ -132,7 +148,8 @@
             inicial = $$;
         }
     decl: 
-        tipo list-id PYC {
+        tipo list-id PYC{
+            std::cout << "tipo list-id;\n";
             $$ = new struct Nodo;
             $$->nombre = "decl";
             Nodo *pyc = new struct Nodo;
@@ -143,28 +160,46 @@
             $$->hijos.push_back(pyc);
             inicial = $$;
         }
-        |error '\n'
+        | tipo error{
+            std::cout << "Error decl - tipo error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "declaracion - tipo error";
+            inicial = $$;
+        }
     tipo: 
         INT {
+            std::cout << "int\n";
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
                 inicial = $$;
             }
         | FLOAT {
+            std::cout << "float\n";
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
                 inicial = $$;
             }
         | BOOL {
+            std::cout << "bool\n";
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
                 inicial = $$;
             }
+        | error {
+                std::cout << "Error tipo\n";
+                $$ = new struct Nodo;
+                $$->nombre = "Error sintactico";
+                $$->valor = "falta tipo";
+                inicial = $$;
+                yyerrok;
+        }
     list-id: 
         list-id COM IDENTIFICADOR  {
+                std::cout << "list-id, id: " << $3 << "\n";
                 $$ = new struct Nodo;
                 $$->nombre = "list-id";
                 Nodo *coma = new struct Nodo;
@@ -179,69 +214,99 @@
                 inicial = $$;
             }
         | IDENTIFICADOR {
+            std::cout << "id: " << $1 << "\n";
             $$ = new struct Nodo;
             $$->nombre = "id";
             $$->valor = $1;
             inicial = $$;
         }
+        | COM error{
+            std::cout << "Error id\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta id";
+            inicial = $$;
+        }
+        | error{
+            std::cout << "Error id\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta id";
+            inicial = $$;
+        }
+        
     list-sent: 
         {
             $$ = NULL;
         }
         | list-sent sent {
+            std::cout << "list-sent sent\n";
             $$ = new struct Nodo;
             $$->nombre = "list-sent";
             $$->hijos.push_back($1);
             $$->hijos.push_back($2);
             inicial = $$;
         }
-        |error '\n'
     sent: 
         sent-if {
+            std::cout << "sent-if\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | sent-while {
+            std::cout << "sent-while\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | sent-do {
+            std::cout << "sent-do\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | sent-read {
+            std::cout << "sent-read \n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | sent-write {
+            std::cout << "sent-write\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | sent-assign {
+            std::cout << "sent-assign\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
         | BREAK {
+            std::cout << "break\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent";
                 $$->valor = $1;
                 inicial = $$;
             }
-        |error '\n'
+        /*|error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "La sentencia no coincide con ninguna otra, revise la gramatica";
+            inicial = $$;
+        }*/
     sent-if: 
         IF PI exp-bool PD THEN bloque FI {
+            std::cout << "if\n";
             $$ = new struct Nodo;
             $$->nombre = "sent-if";
             Nodo *i = new struct Nodo;
@@ -267,8 +332,9 @@
             $$->hijos.push_back($6);
             $$->hijos.push_back(fi);
             inicial = $$;
-            }
+            }      
         | IF PI exp-bool PD THEN bloque ELSE bloque FI {
+            std::cout << "if-else\n";
             $$ = new struct Nodo;
             $$->nombre = "sent-if";
             Nodo *i = new struct Nodo;
@@ -300,8 +366,74 @@
             $$->hijos.push_back(fi);
             inicial = $$;
             }
+        | IF error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta condicion entre parentesis, then y el bloque y finalizacion";
+            inicial = $$;
+        }
+        | IF PI exp-bool PD error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta then, el bloque y finalizacion";
+            inicial = $$;
+        }
+        | IF error THEN error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta condicion, el bloque y finalizacion";
+            inicial = $$;
+        }
+        | IF PI exp-bool PD THEN error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta bloque y finalizacion";
+            inicial = $$;
+        }
+        | IF error FI{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta condicion y bloque ";
+            inicial = $$;
+        }
+        | IF PI exp-bool PD THEN bloque ELSE error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if-else falta bloque y finalizacion";
+            inicial = $$;
+        } 
+        | IF error ELSE error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if-else falta bloque if, bloque else y finalizacion";
+            inicial = $$;
+        }
+        | IF error ELSE bloque error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if-else falta bloque if, finalizacion";
+            inicial = $$;
+        } 
+        | IF PI exp-bool PD THEN bloque ELSE bloque error{
+            std::cout << "Error\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if-else falta finalizacion";
+            inicial = $$;
+        } 
+        
+        
     sent-while: 
         WHILE PI exp-bool PD bloque {
+            std::cout << "while\n";
             $$ = new struct Nodo;
             $$->nombre = "sent-while";
             Nodo *whil = new struct Nodo;
@@ -320,8 +452,31 @@
             $$->hijos.push_back($5);
             inicial = $$;
         }
+        | WHILE error{
+            std::cout << "Error while\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "while falta condicion entre parentesis y cuerpo";
+            inicial = $$;
+        }
+        | WHILE error bloque{
+            std::cout << "Error while\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "while falta expresion entre parentesis";
+            inicial = $$;
+        }
+        | WHILE PI exp-bool PD error{
+            std::cout << "Error while\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "while falta bloque";
+            inicial = $$;
+        }
+        
     sent-do:
         DO bloque UNTIL PI exp-bool PD PYC {
+            std::cout << "do\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent-do";
                 Nodo *d = new struct Nodo;
@@ -348,8 +503,130 @@
                 $$->hijos.push_back(pyc);
                 inicial = $$;
             }
+        | DO error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta cuerpo";
+            inicial = $$;
+        }
+        | DO bloque error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta until, condicion y punto y coma";
+            inicial = $$;
+        }
+        | DO UNTIL error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, condicion y punto y coma";
+            inicial = $$;
+        }
+        | DO PI exp-bool PD error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PYC{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y condicion";
+            inicial = $$;
+        }
+        | DO bloque UNTIL error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta condicion y punto y coma";
+            inicial = $$;
+        }
+        | DO bloque PI exp-bool PD error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta condicion y punto y coma";
+            inicial = $$;
+        }
+        | DO bloque PYC error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta condicion y punto y coma";
+            inicial = $$;
+        }
+        | DO UNTIL bloque error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do desorganizado";
+            inicial = $$;
+        }
+        | DO UNTIL PI exp-bool PD error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do desorganizado";
+            inicial = $$;
+        }
+        | DO UNTIL PYC{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do desorganizado";
+            inicial = $$;
+        }
+        | DO PI exp-bool PD bloque error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PI exp-bool PD UNTIL error{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PI exp-bool PD PYC{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PYC bloque{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PYC UNTIL{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        | DO PYC PI exp-bool PD{
+            std::cout << "Error do\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "do falta bloque, until y punto y coma";
+            inicial = $$;
+        }
+        
+
     sent-read: 
         READ IDENTIFICADOR PYC {
+            std::cout << "read\n";
             $$ = new struct Nodo;
             $$->nombre = "bloque";
             Nodo *read = new struct Nodo;
@@ -366,8 +643,31 @@
             $$->hijos.push_back(pyc);
             inicial = $$;
         }
+        | READ error{
+            std::cout << "Error read\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "read sentencia incompleta";
+            inicial = $$;
+        }
+        | READ IDENTIFICADOR error{
+            std::cout << "Error read\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta punto y coma en read";
+            inicial = $$;
+        }
+        | READ error PYC{
+            std::cout << "Error read\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta el id para leer";
+            inicial = $$;
+        }
+        
     sent-write: 
         WRITE exp-bool PYC {
+            std::cout << "write\n";
                 $$ = new struct Nodo;
                 $$->nombre = "bloque";
                 Nodo *write = new struct Nodo;
@@ -380,9 +680,18 @@
                 $$->hijos.push_back($2);
                 $$->hijos.push_back(pyc);
                 inicial = $$;
-            }        
+            }
+        | WRITE error{
+            std::cout << "Error write\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "write sentencia incompleta";
+            inicial = $$;
+        }
+        
     bloque: 
         LI list-sent LD {
+            std::cout << "bloque\n";
                 $$ = new struct Nodo;
                 $$->nombre = "bloque";
                 Nodo *li = new struct Nodo;
@@ -396,9 +705,10 @@
                 $$->hijos.push_back(ld);
                 inicial = $$;
             }
-        |error '\n'
+        
     sent-assign: 
         IDENTIFICADOR ASIG exp-bool PYC {
+            std::cout << "id=exp-bool;\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent-assign";
                 Nodo *id = new struct Nodo;
@@ -416,8 +726,32 @@
                 $$->hijos.push_back(pyc);
                 inicial = $$;
             }
+        
+        | IDENTIFICADOR error{
+            std::cout << "Error assign\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta la sentencia de asignacion";
+            inicial = $$;
+        }
+        | IDENTIFICADOR ASIG error{
+            std::cout << "Error assign\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta la expresion de asignación y un punto y coma";
+            inicial = $$;
+        }
+        | IDENTIFICADOR error PYC{
+            std::cout << "Error assign\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta la asignacion y la expresion";
+            inicial = $$;
+        }
+        
     exp-bool:
         exp-bool OR comb  {
+            std::cout << "or\n";
                 $$ = new struct Nodo;
                 $$->nombre = "exp-bool";
                 Nodo *o = new struct Nodo;
@@ -429,14 +763,16 @@
                 inicial = $$;
             }
         | comb {
+            std::cout << "comb\n";
                 $$ = new struct Nodo;
                 $$->nombre = "exp-bool";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
+        
     comb: 
         comb AND igualdad {
+            std::cout << "and\n";
                 $$ = new struct Nodo;
                 $$->nombre = "comb";
                 Nodo *an = new struct Nodo;
@@ -448,14 +784,16 @@
                 inicial = $$;
             }
         | igualdad {
+            std::cout << "igualdad\n";
                 $$ = new struct Nodo;
                 $$->nombre = "comb";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
+        
     igualdad: 
         igualdad IGU rel {
+            std::cout << "igu\n";
                 $$ = new struct Nodo;
                 $$->nombre = "igualdad";
                 Nodo *igu = new struct Nodo;
@@ -467,6 +805,7 @@
                 inicial = $$;
             }
         | igualdad DIS rel {
+            std::cout << "dis\n";
                 $$ = new struct Nodo;
                 $$->nombre = "igualdad";
                 Nodo *dis = new struct Nodo;
@@ -478,14 +817,16 @@
                 inicial = $$;
             }
         | rel {
+            std::cout << "rel\n";
                 $$ = new struct Nodo;
                 $$->nombre = "igualdad";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
+        
     rel: 
         expr op-rel expr {
+            std::cout << "expr op-rel expr\n";
                 $$ = new struct Nodo;
                 $$->nombre = "rel";
                 $$->hijos.push_back($1);
@@ -494,40 +835,51 @@
                 inicial = $$;
             }
         | expr {
+            std::cout << "expr\n";
                 $$ = new struct Nodo;
                 $$->nombre = "rel";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
     op-rel: 
         MEN {
+            std::cout << "men\n";
             $$ = new struct Nodo;
             $$->nombre = "men";
             $$->valor = $1;
             inicial = $$;
         }
         | MENIGL {
+            std::cout << "menigl\n";
                 $$ = new struct Nodo;
                 $$->nombre = "menigl";
                 $$->valor = $1;
                 inicial = $$;
             }
         | MAY {
+            std::cout << "may\n";
                 $$ = new struct Nodo;
                 $$->nombre = "may";
                 $$->valor = $1;
                 inicial = $$;
             }
         | MAYIGL {
+            std::cout << "mayigl\n";
                 $$ = new struct Nodo;
                 $$->nombre = "mayigl";
                 $$->valor = $1;
                 inicial = $$;
             }
-        |error '\n'
+        |error{
+            std::cout << "Error op-rel\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta op-rel";
+            inicial = $$;
+        }
     expr: 
         expr RES term {
+            std::cout << "res\n";
                 $$ = new struct Nodo;
                 $$->nombre = "expr";
                 Nodo *res = new struct Nodo;
@@ -539,6 +891,7 @@
                 inicial = $$;
             }
         | expr MAS term {
+            std::cout << "mas\n";
                 $$ = new struct Nodo;
                 $$->nombre = "expr";
                 Nodo *mas = new struct Nodo;
@@ -550,14 +903,16 @@
                 inicial = $$;
             }
         | term {
+            std::cout << "term\n";
                 $$ = new struct Nodo;
                 $$->nombre = "expr";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
+        
     term: 
         term MUL unario {
+            std::cout << "mul\n";
                 $$ = new struct Nodo;
                 $$->nombre = "term";
                 Nodo *mul = new struct Nodo;
@@ -570,6 +925,7 @@
             
             }
         | term DIV unario {
+            std::cout << "div\n";
                 $$ = new struct Nodo;
                 $$->nombre = "term";
                 Nodo *div = new struct Nodo;
@@ -581,14 +937,15 @@
                 inicial = $$;
             }
         | unario {
+            std::cout << "Unario\n";
                 $$ = new struct Nodo;
                 $$->nombre = "term";
                 $$->hijos.push_back($1);
                 inicial = $$;
             }
-        |error '\n'
     unario: 
         NOT unario {
+            std::cout << "Not unario\n";
                 $$ = new struct Nodo;
                 $$->nombre = "unario";
                 Nodo *no = new struct Nodo;
@@ -599,6 +956,7 @@
                 inicial = $$;
             }
         | RES unario {
+            std::cout << "RES unario\n";
                 $$ = new struct Nodo;
                 $$->nombre = "unario";
                 Nodo *res = new struct Nodo;
@@ -609,15 +967,16 @@
                 inicial = $$;
             }
         | factor {
+            std::cout << "Factor\n";
                 $$ = new struct Nodo;
                 $$->nombre = "unario";
                 $$->hijos.push_back($1);
                 inicial = $$;
-            }
-        |error '\n'
+            }        
     factor: 
         PI exp-bool PD {
             //!Revisar
+                std::cout << "(exp-bool)\n";
                 $$ = new struct Nodo;
                 $$->nombre = "factor";
                 Nodo *pi = new struct Nodo;
@@ -632,29 +991,40 @@
                 inicial = $$;
             }
         | IDENTIFICADOR {
+                std::cout << "id: "<< $1 << "\n";
                 $$ = new struct Nodo;
                 $$->nombre = "factor";
                 $$->valor = $1;
                 inicial = $$;
             }
         | NUMERO {
+                std::cout << "Numero: " << $1 <<  "\n";
                 $$ = new struct Nodo;
                 $$->nombre = "factor";
                 $$->valor = std::to_string($1);
                 inicial = $$;
             }
         | TRUE {
+                std::cout << "True\n";
                 $$ = new struct Nodo;
                 $$->nombre = "factor";
                 $$->valor = $1;
                 inicial = $$;
             }
         | FALSE {
+                std::cout << "False\n";
                 $$ = new struct Nodo;
                 $$->nombre = "factor";
                 $$->valor = $1;
                 inicial = $$;
             }
+        |error{
+            std::cout << "Error factor\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "falta factor";
+            inicial = $$;
+        }
 %%
 
 
@@ -697,11 +1067,14 @@ Nodo* getSintactic(const char* filename){
 }
 
 int yyerror(std::string s){
+    std::cout << "error: " << s << " in line " << yylineno << "\n";
+    /*std::cout << "Error sin definir\n";
     Nodo *error = new struct Nodo;
     error->nombre = "Error";
     error->valor = s;
-    inicial->hijos.push_back(error);
-    return 0;
+    inicial->hijos.push_back(error);*/
+    //std::cout << "Error en la línea " << @$.first_line << ", columna: " << @$.first_column;
+    return -1;
 }
 
 int main(int argc, char **argv){

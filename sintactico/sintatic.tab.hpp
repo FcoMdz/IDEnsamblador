@@ -95,7 +95,8 @@ extern int yydebug;
     NUMERO = 296,                  /* NUMERO  */
     IDENTIFICADOR = 297,           /* IDENTIFICADOR  */
     OTRO = 298,                    /* OTRO  */
-    SPACE = 299                    /* SPACE  */
+    SPACE = 299,                   /* SPACE  */
+    SALTOLINEA = 300               /* SALTOLINEA  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,13 +105,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 29 "sintatic.y"
+#line 44 "sintatic.y"
 
     float numero;
     char* cadena;
     struct Nodo* nodo;
 
-#line 114 "sintatic.tab.hpp"
+#line 115 "sintatic.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -118,9 +119,23 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
+
 
 extern YYSTYPE yylval;
-
+extern YYLTYPE yylloc;
 
 int yyparse (void);
 

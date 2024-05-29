@@ -2,7 +2,7 @@
 /*Variables*/
 %{
     #include <iostream>
-    #include "sintatic.tab.hpp"
+    #include "sintatic.tab.cpp"
     #include <vector>
     int yylex(void);
     void showError(char* other);
@@ -68,9 +68,11 @@
 
     }
 %}
-%option noyywrap
+
+%option noyywrap noinput nounput yylineno
 /*Especificaciones regex*/
-SPACE [ ]|[\t]|[\n]|[\r]
+SPACE [ ]|[\t]|[\r]
+SALTOLINEA [\n]+
 LETRA [a-z|A-Z]
 DIGITO [0-9]
 PROGRAM "program"
@@ -119,7 +121,10 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
 /*Reglas de detección*/
 /*"\n" {return 0;}*/
 %%
-"\n" {countLines++; countColumn=1;}
+{SALTOLINEA} {
+    countLines++; 
+    countColumn=1;
+}
 {SPACE} {
     countColumn++;
     //printf("Espacio\n");
