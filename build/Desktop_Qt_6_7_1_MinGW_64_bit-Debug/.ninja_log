@@ -1,0 +1,10 @@
+# ninja log v5
+42	1653	0	C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs	12481f7f67ded15b
+5	2111	7392145894499023	IDEnsamblador_autogen/timestamp	ebf8b5bb1ad90654
+5	2111	7392145894499023	IDEnsamblador_autogen/mocs_compilation.cpp	ebf8b5bb1ad90654
+5	2111	7392145894499023	C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/timestamp	ebf8b5bb1ad90654
+5	2111	7392145894499023	C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/mocs_compilation.cpp	ebf8b5bb1ad90654
+2113	5196	7392145927064075	CMakeFiles/IDEnsamblador.dir/IDEnsamblador_autogen/mocs_compilation.cpp.obj	503efbe6d1fc1290
+2139	5263	7392145927798440	CMakeFiles/IDEnsamblador.dir/main.cpp.obj	9524a753b227b23b
+2165	6987	7392145945028022	CMakeFiles/IDEnsamblador.dir/mainwindow.cpp.obj	1c76e714d56d3ac6
+6989	8015	7392145954301915	IDEnsamblador.exe	85205c54e6c40e95
