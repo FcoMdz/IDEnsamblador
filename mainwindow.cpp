@@ -22,7 +22,7 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTimer>
-#include "sintatic.tab.c"
+//#include "sintatic.tab.c"
 #include "lex.yy.c"
 
 class CustomQPlainTextEdit : public QPlainTextEdit {
@@ -49,16 +49,19 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
     table->setRowCount(vec->size());
+    bool checkError = false;
     for(int i = 0; i<vec->size(); i++){
         //qDebug() << vec->at(i).lexema;
+        if(QString::fromStdString(vec->at(i).clave).compare("Error", Qt::CaseInsensitive) == 0){
+            error->append("Error léxico en linea: " + QString::number(vec->at(i).fila) + ", columna: " + QString::number(vec->at(i).columna));
+            checkError = true;
+        }
         table->setItem(i,0, new QTableWidgetItem(QString::fromStdString(vec->at(i).clave)));
         table->setItem(i,1, new QTableWidgetItem(QString::fromStdString(vec->at(i).lexema)));
         table->setItem(i,2, new QTableWidgetItem(QString::number(vec->at(i).fila)));
         table->setItem(i,3, new QTableWidgetItem(QString::number(vec->at(i).columna)));
     }
-    if(QString::fromStdString(vec->at(vec->size()-1).clave).compare("Error", Qt::CaseInsensitive) == 0){
-        error->append("Error léxico en linea: " + QString::number(vec->at(vec->size()-1).fila) + ", columna: " + QString::number(vec->at(vec->size()-1).columna));
-    }else{
+    if(!checkError){
         error->append("Léxico completo sin problemas");
     }
     table->resizeColumnsToContents();
@@ -85,27 +88,31 @@ bool showSintaticData(Nodo *init, QTextEdit *view, int tabuladores, QTextEdit *e
             agregar += ": ";
             agregar += init->valor;
             view->append(QString::fromStdString(agregar));
-            if(QString::fromStdString(init->nombre).compare("Error", Qt::CaseInsensitive) == 0){
-                return false;
+            bool comprobado = true;
+            if(QString::fromStdString(init->nombre).compare("Error sintactico", Qt::CaseInsensitive) == 0){
+                error->append("Error sintáctico: " + QString::fromStdString(init->valor));
+                comprobado = false;
             }
             for(int i=0; i<init->hijos.size(); i++){
                 bool res = showSintaticData(init->hijos.at(i), view,tabuladores+1, error);
                 if(!res){
-                    if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
+                    /*if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
                         error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
                     }else{
                         error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor));
-                    }
-                    return false;
+                    }*/
+                    comprobado = false;
                 }
             }
-            return true;
+            return comprobado;
         }
     }
     return true;
 }
 
 void formatText(QPlainTextEdit *editor, int initialCursor){
+    //Estilo default
+
     //Estilos especificos para cada tipo de clave
     QTextCharFormat claveFormat;
     claveFormat.setForeground(QColor("#F53A41"));
@@ -119,7 +126,6 @@ void formatText(QPlainTextEdit *editor, int initialCursor){
     errorFormat.setUnderlineColor(QColor("#F53A41"));
     errorFormat.setUnderlineStyle(QTextCharFormat::WaveUnderline);
     QTextCharFormat elseFormat;
-    elseFormat.setForeground(QColor("#000000"));
     std::vector<Lexico> vec = analyzeText(editor->toPlainText().toStdString().c_str());
     QTextCursor cursor(editor->document());
     cursor.setPosition(initialCursor); //Evita que realicé lecutras o cambios de elementos pasados, da un mejor rendimiento
@@ -176,7 +182,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //Row counter
     CustomQPlainTextEdit *rowsCount = new CustomQPlainTextEdit;
     rowsCount->setReadOnly(true);
-    rowsCount->setStyleSheet("background-color: lightgray;");
     rowsCount->setFixedWidth(3 * fontMetrics.averageCharWidth());
     rowsCount->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     rowsCount->insertPlainText("1");

@@ -26,6 +26,21 @@ program{
         }
     }
     */
-    if then
+!
+	int x=10;
+	while(x){
+        while(y){
+            while(z){
+            }
+            read a;
+            write x;
+        }
+        read b;
+    }
     write x;
+	if(x>2) 
+		then x
+	while{}
+	hola
+    write y;
 }

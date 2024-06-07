@@ -3,175 +3,176 @@
 cmake_policy(SET CMP0009 NEW)
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.c")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.c")
 set(OLD_GLOB
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/lex.yy.c"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/sintatic.tab.c"
+  "C:/Users/gerar/Git/IDEnsamblador/lex.yy.c"
+  "C:/Users/gerar/Git/IDEnsamblador/sintatic.tab.c"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.c++")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.c++")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.cc")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.cc")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.ch")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.ch")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.cpp")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.cpp")
 set(OLD_GLOB
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/3.27.7/CompilerIdCXX/CMakeCXXCompilerId.cpp"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/lexico/testStructs.cpp"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/main.cpp"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/mainwindow.cpp"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/sintactico/lex.yy.cpp"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/sintactico/sintatic.tab.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/3.27.7/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/EWIEGA46WW/moc_mainwindow.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/mocs_compilation.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/lexico/testStructs.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/main.cpp"
+  "C:/Users/gerar/Git/IDEnsamblador/mainwindow.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.cxx")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.cxx")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.h")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.h")
 set(OLD_GLOB
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/mainwindow.h"
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/sintatic.tab.h"
+  "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/include/ui_mainwindow.h"
+  "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/moc_predefs.h"
+  "C:/Users/gerar/Git/IDEnsamblador/mainwindow.h"
+  "C:/Users/gerar/Git/IDEnsamblador/sintatic.tab.h"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.h++")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.h++")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.hh")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.hh")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.hpp")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.hpp")
 set(OLD_GLOB
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/sintactico/sintatic.tab.hpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.hxx")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.hxx")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.java")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.java")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.js")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.js")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.jui")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.jui")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.qml")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.qml")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.qrc")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.qrc")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.qs")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.qs")
 set(OLD_GLOB
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()
 
 # _directory_contents at C:/Qt/6.7.1/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake:55 (file)
-file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/warri/Documents/Compiladores/IDEnsamblador/*.ui")
+file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/gerar/Git/IDEnsamblador/*.ui")
 set(OLD_GLOB
-  "C:/Users/warri/Documents/Compiladores/IDEnsamblador/mainwindow.ui"
+  "C:/Users/gerar/Git/IDEnsamblador/mainwindow.ui"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
-  file(TOUCH_NOCREATE "C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
+  file(TOUCH_NOCREATE "C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/CMakeFiles/cmake.verify_globs")
 endif()

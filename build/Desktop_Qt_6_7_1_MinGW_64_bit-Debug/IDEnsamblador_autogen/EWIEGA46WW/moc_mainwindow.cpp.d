@@ -1,5 +1,5 @@
-C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/warri/Documents/Compiladores/IDEnsamblador/mainwindow.h \
-  C:/Users/warri/Documents/Compiladores/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/moc_predefs.h \
+C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/gerar/Git/IDEnsamblador/mainwindow.h \
+  C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/moc_predefs.h \
   C:/Qt/6.7.1/mingw_64/include/QtCore/q20functional.h \
   C:/Qt/6.7.1/mingw_64/include/QtCore/q20memory.h \
   C:/Qt/6.7.1/mingw_64/include/QtCore/q20type_traits.h \

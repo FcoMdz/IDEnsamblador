@@ -67,14 +67,26 @@
 
 
 /* First part of user prologue.  */
-#line 2 "sintatic.y"
+#line 3 "sintatic.y"
 
     #include <stdio.h>
     #include <iostream>
     #include <vector>
     #include <string>
+    std::string errorLine;
+    extern int yylineno;
+    // Definiciones para el rastreo de ubicaciones
+    /*#define YYLTYPE_IS_DECLARED 1
+    typedef struct YYLTYPE {
+        int first_line;
+        int first_column;
+        int last_line;
+        int last_column;
+    } YYLTYPE;*/
 
     extern FILE *yyin;
+    //extern int yyerrstatus = 0;
+    int yyerror(/*YYLTYPE *yylloc, */std::string s);
 
     typedef struct Nodo{
         std::string nombre;
@@ -82,13 +94,17 @@
         std::vector<Nodo*> hijos;
     } Nodo;
     Nodo *inicial = new struct Nodo;
-    int yylex();
-    int yyerror(char *s);
+    int yylex(void);
     void printNode(Nodo *init, int tabuladores);
     Nodo* getSintactic(const char* filename);
     void freeNode(Nodo *init);
 
-#line 92 "sintatic.tab.c"
+    extern int yylineno;
+    extern int column;
+    extern char *lineptr;
+    #define YYERROR_VERBOSE 1
+
+#line 108 "sintatic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -161,30 +177,31 @@ enum yysymbol_kind_t
   YYSYMBOL_IDENTIFICADOR = 42,             /* IDENTIFICADOR  */
   YYSYMBOL_OTRO = 43,                      /* OTRO  */
   YYSYMBOL_SPACE = 44,                     /* SPACE  */
-  YYSYMBOL_YYACCEPT = 45,                  /* $accept  */
-  YYSYMBOL_program = 46,                   /* program  */
-  YYSYMBOL_47_list_decl = 47,              /* list-decl  */
-  YYSYMBOL_decl = 48,                      /* decl  */
-  YYSYMBOL_tipo = 49,                      /* tipo  */
-  YYSYMBOL_50_list_id = 50,                /* list-id  */
-  YYSYMBOL_51_list_sent = 51,              /* list-sent  */
-  YYSYMBOL_sent = 52,                      /* sent  */
-  YYSYMBOL_53_sent_if = 53,                /* sent-if  */
-  YYSYMBOL_54_sent_while = 54,             /* sent-while  */
-  YYSYMBOL_55_sent_do = 55,                /* sent-do  */
-  YYSYMBOL_56_sent_read = 56,              /* sent-read  */
-  YYSYMBOL_57_sent_write = 57,             /* sent-write  */
-  YYSYMBOL_bloque = 58,                    /* bloque  */
-  YYSYMBOL_59_sent_assign = 59,            /* sent-assign  */
-  YYSYMBOL_60_exp_bool = 60,               /* exp-bool  */
-  YYSYMBOL_comb = 61,                      /* comb  */
-  YYSYMBOL_igualdad = 62,                  /* igualdad  */
-  YYSYMBOL_rel = 63,                       /* rel  */
-  YYSYMBOL_64_op_rel = 64,                 /* op-rel  */
-  YYSYMBOL_expr = 65,                      /* expr  */
-  YYSYMBOL_term = 66,                      /* term  */
-  YYSYMBOL_unario = 67,                    /* unario  */
-  YYSYMBOL_factor = 68                     /* factor  */
+  YYSYMBOL_SALTOLINEA = 45,                /* SALTOLINEA  */
+  YYSYMBOL_YYACCEPT = 46,                  /* $accept  */
+  YYSYMBOL_program = 47,                   /* program  */
+  YYSYMBOL_48_list_decl = 48,              /* list-decl  */
+  YYSYMBOL_decl = 49,                      /* decl  */
+  YYSYMBOL_tipo = 50,                      /* tipo  */
+  YYSYMBOL_51_list_id = 51,                /* list-id  */
+  YYSYMBOL_52_list_sent = 52,              /* list-sent  */
+  YYSYMBOL_sent = 53,                      /* sent  */
+  YYSYMBOL_54_sent_if = 54,                /* sent-if  */
+  YYSYMBOL_55_sent_while = 55,             /* sent-while  */
+  YYSYMBOL_56_sent_do = 56,                /* sent-do  */
+  YYSYMBOL_57_sent_read = 57,              /* sent-read  */
+  YYSYMBOL_58_sent_write = 58,             /* sent-write  */
+  YYSYMBOL_bloque = 59,                    /* bloque  */
+  YYSYMBOL_60_sent_assign = 60,            /* sent-assign  */
+  YYSYMBOL_61_exp_bool = 61,               /* exp-bool  */
+  YYSYMBOL_comb = 62,                      /* comb  */
+  YYSYMBOL_igualdad = 63,                  /* igualdad  */
+  YYSYMBOL_rel = 64,                       /* rel  */
+  YYSYMBOL_65_op_rel = 65,                 /* op-rel  */
+  YYSYMBOL_expr = 66,                      /* expr  */
+  YYSYMBOL_term = 67,                      /* term  */
+  YYSYMBOL_unario = 68,                    /* unario  */
+  YYSYMBOL_factor = 69                     /* factor  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -301,7 +318,7 @@ typedef int yytype_uint16;
 
 
 /* Stored state numbers (used for stacks). */
-typedef yytype_int8 yy_state_t;
+typedef yytype_uint8 yy_state_t;
 
 /* State numbers in computations.  */
 typedef int yy_state_fast_t;
@@ -451,13 +468,15 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-         || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+         || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL \
+             && defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
   yy_state_t yyss_alloc;
   YYSTYPE yyvs_alloc;
+  YYLTYPE yyls_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
@@ -466,8 +485,9 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (YYSIZEOF (yy_state_t) + YYSIZEOF (YYSTYPE)) \
-      + YYSTACK_GAP_MAXIMUM)
+     ((N) * (YYSIZEOF (yy_state_t) + YYSIZEOF (YYSTYPE) \
+             + YYSIZEOF (YYLTYPE)) \
+      + 2 * YYSTACK_GAP_MAXIMUM)
 
 # define YYCOPY_NEEDED 1
 
@@ -512,19 +532,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   90
+#define YYLAST   278
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  45
+#define YYNTOKENS  46
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  24
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  54
+#define YYNRULES  116
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  101
+#define YYNSTATES  215
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   299
+#define YYMAXUTOK   300
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -567,19 +587,26 @@ static const yytype_int8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    98,    98,   119,   122,   130,   142,   148,   154,   161,
-     175,   182,   185,   193,   199,   205,   211,   217,   223,   229,
-     236,   263,   296,   316,   344,   362,   378,   393,   412,   423,
-     430,   441,   448,   459,   470,   477,   485,   492,   498,   504,
-     510,   517,   528,   539,   546,   558,   569,   576,   586,   596,
-     603,   618,   624,   630,   636
+       0,   118,   118,   139,   142,   151,   163,   171,   178,   185,
+     192,   201,   216,   223,   230,   239,   242,   251,   258,   265,
+     272,   279,   286,   293,   308,   336,   369,   376,   383,   390,
+     397,   404,   411,   418,   425,   432,   439,   446,   453,   460,
+     467,   474,   481,   488,   495,   502,   509,   516,   523,   530,
+     537,   544,   551,   558,   565,   573,   593,   600,   607,   616,
+     644,   651,   658,   665,   672,   679,   686,   693,   700,   707,
+     714,   721,   728,   735,   742,   749,   756,   766,   784,   791,
+     798,   807,   822,   831,   848,   868,   875,   882,   891,   903,
+     912,   924,   933,   945,   957,   966,   975,   983,   990,   997,
+    1004,  1011,  1019,  1031,  1043,  1052,  1065,  1077,  1085,  1096,
+    1107,  1115,  1131,  1138,  1145,  1152,  1159
 };
 #endif
 
@@ -600,11 +627,11 @@ static const char *const yytname[] =
   "FLOAT", "INT", "BOOL", "NOT", "AND", "OR", "TRUE", "FALSE", "MAS",
   "RES", "MUL", "DIV", "ELE", "MEN", "MENIGL", "MAY", "MAYIGL", "IGU",
   "DIS", "ASIG", "PYC", "COM", "PI", "PD", "LI", "LD", "CADENA", "NUMERO",
-  "IDENTIFICADOR", "OTRO", "SPACE", "$accept", "program", "list-decl",
-  "decl", "tipo", "list-id", "list-sent", "sent", "sent-if", "sent-while",
-  "sent-do", "sent-read", "sent-write", "bloque", "sent-assign",
-  "exp-bool", "comb", "igualdad", "rel", "op-rel", "expr", "term",
-  "unario", "factor", YY_NULLPTR
+  "IDENTIFICADOR", "OTRO", "SPACE", "SALTOLINEA", "$accept", "program",
+  "list-decl", "decl", "tipo", "list-id", "list-sent", "sent", "sent-if",
+  "sent-while", "sent-do", "sent-read", "sent-write", "bloque",
+  "sent-assign", "exp-bool", "comb", "igualdad", "rel", "op-rel", "expr",
+  "term", "unario", "factor", YY_NULLPTR
 };
 
 static const char *
@@ -614,31 +641,42 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-49)
+#define YYPACT_NINF (-44)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-1)
+#define YYTABLE_NINF (-97)
 
 #define yytable_value_is_error(Yyn) \
   0
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-      -1,   -20,    29,   -49,   -49,    45,   -49,   -49,   -49,   -49,
-     -10,     0,   -49,   -29,     4,    -3,    36,   -49,    31,    13,
-     -49,    43,   -49,   -49,   -49,   -49,   -49,   -49,   -49,   -49,
-      38,    13,   -49,    68,    13,    47,    13,   -49,   -49,    13,
-      13,   -49,   -49,   -18,    65,     6,   -49,    35,    42,   -49,
-     -49,    13,   -49,   -12,    11,    48,     7,   -49,   -49,   -49,
-       8,    13,   -49,    13,    13,    13,    13,    13,   -49,   -49,
-     -49,   -49,    13,    13,    13,    22,    77,   -49,    13,    -3,
-     -49,    65,     6,   -49,   -49,    42,    42,    46,   -49,   -49,
-     -49,    -3,     9,   -49,    64,    51,    -3,   -49,   -49,    79,
-     -49
+      75,   -21,    94,   -44,   -44,    26,   -44,   -44,   -44,   -44,
+     -44,    14,   119,   139,    96,   -44,   174,    63,    24,    71,
+     -44,     3,    34,   -44,    11,   -44,   -44,   -44,   -44,   -44,
+     -44,   -44,   -44,   -44,    74,   197,    60,    97,   -44,    70,
+     161,    97,   -44,   154,   110,    97,   101,   102,   156,    97,
+     -44,   -44,    97,    97,   -44,   -44,   -11,   153,   209,   -44,
+     199,   220,   -44,   -44,   120,   136,   -44,     9,    12,   -44,
+     211,   127,    55,   -44,    50,   -44,   -44,    97,   185,   -44,
+      97,   -44,   103,   171,   -44,    90,   241,    97,   -44,   105,
+     -44,   -44,   -44,   -44,   -44,   143,    97,   -44,    97,    97,
+      97,   -44,    97,    97,   -44,   -44,   -44,   -44,    97,    97,
+      97,   -44,   181,    54,   -44,   219,   -44,    13,   110,   -44,
+     248,   210,   238,   168,   -44,   177,    81,   -44,   -44,    97,
+     -44,   182,    21,   -44,   153,   209,   -44,   -44,   220,   220,
+     224,   -44,   -44,   -44,   110,   -44,   -44,   249,   110,   110,
+      25,   110,    47,   255,   -44,   -44,   256,   -44,   257,   187,
+     258,   -44,   -44,   253,   110,   254,   242,   138,   231,    15,
+     -44,   206,   -44,   -44,   -44,   228,   -44,   -44,   259,   -44,
+     110,   -44,   110,   -44,   260,   110,    51,   -44,   110,   110,
+     110,    83,   -44,   -44,   261,   262,   -44,   263,   264,    17,
+     271,   272,   273,   -44,   274,   -44,   -44,   -44,   -44,   -44,
+     -44,   -44,   -44,   -44,   -44
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -646,103 +684,173 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     3,     1,    11,     7,     6,     8,     4,
-       0,     0,    10,     0,     0,     0,     0,    19,     0,     0,
-       2,     0,    12,    13,    14,    15,    16,    17,    18,     5,
-       0,     0,    11,     0,     0,     0,     0,    53,    54,     0,
-       0,    52,    51,     0,    29,    31,    34,    36,    43,    46,
-      49,     0,     9,     0,     0,     0,     0,    24,    47,    48,
-       0,     0,    25,     0,     0,     0,     0,     0,    37,    38,
-      39,    40,     0,     0,     0,     0,     0,    26,     0,     0,
-      50,    28,    30,    32,    33,    42,    41,    35,    44,    45,
-      27,     0,     0,    22,     0,     0,     0,    20,    23,     0,
-      21
+       0,     0,     0,     3,     1,     0,    10,     8,     7,     9,
+       4,     0,     0,     6,     0,    12,     0,     0,     0,     0,
+      23,     0,     0,     2,     0,    16,    17,    18,    19,    20,
+      21,    22,    13,     5,     0,    26,     0,     0,    60,     0,
+      64,     0,    15,     0,    56,     0,    78,     0,   116,     0,
+     114,   115,     0,     0,   113,   112,     0,    89,    91,    94,
+       0,   104,   107,   110,    85,     0,    11,     0,     0,    30,
+       0,   116,     0,   116,     0,    62,    70,     0,     0,    75,
+       0,    74,     0,     0,    61,     0,     0,     0,    57,     0,
+      80,    79,    77,   108,   109,     0,     0,    81,     0,     0,
+       0,   101,     0,     0,    97,    98,    99,   100,     0,     0,
+       0,    87,   116,     0,    28,     0,    32,     0,     0,    46,
+       0,     0,     0,     0,    68,     0,     0,    83,    65,     0,
+      67,     0,     0,   111,    88,    90,    92,    93,   103,   102,
+      95,   105,   106,    84,     0,    33,    45,     0,     0,    27,
+       0,    47,     0,     0,    76,    63,     0,    73,     0,     0,
+       0,    58,    55,     0,     0,     0,     0,    29,     0,     0,
+      48,     0,    69,    72,    71,     0,    66,    41,     0,    43,
+       0,    42,     0,    44,     0,     0,     0,    24,     0,     0,
+      49,     0,    59,    39,     0,     0,    40,     0,    31,     0,
+       0,     0,     0,    50,     0,    35,    36,    37,    38,    34,
+      25,    54,    52,    53,    51
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -49,   -49,   -49,   -49,   -49,   -49,    55,   -49,   -49,   -49,
-     -49,   -49,   -49,   -48,   -49,   -31,    27,    26,    10,   -49,
-      18,    12,   -22,   -49
+     -44,   -44,   -44,   -44,   -44,   -44,   221,   -44,   -44,   -44,
+     -44,   -44,   -44,   -39,   -44,   -34,   169,   166,   151,   -44,
+     170,   150,   -43,   -44
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     5,     9,    10,    13,    11,    22,    23,    24,
-      25,    26,    27,    33,    28,    43,    44,    45,    46,    72,
-      47,    48,    49,    50
+       0,     2,     5,    10,    11,    16,    12,    25,    26,    27,
+      28,    29,    30,    43,    31,    56,    57,    58,    59,   108,
+      60,    61,    62,    63
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule whose
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_int8 yytable[] =
+static const yytype_int16 yytable[] =
 {
-      53,    61,     1,    56,    14,    29,    30,    61,    15,    60,
-      16,    17,    18,    19,    58,    14,    62,    59,     3,    15,
-      75,    16,    17,    18,    19,    76,    61,    61,    61,     4,
-      36,    93,    12,    37,    38,    32,    39,    64,    65,    20,
-      31,    61,    21,    94,    79,    80,    95,    92,    99,    40,
-      77,    88,    89,    21,    41,    42,    90,    66,    67,     6,
-       7,     8,    68,    69,    70,    71,    73,    74,    66,    67,
-      96,    97,    34,    35,    83,    84,    51,    55,    85,    86,
-      52,    57,    91,    63,    78,    98,   100,    54,    81,    82,
-      87
+      78,    81,    72,    74,    46,    88,    93,    82,    96,    94,
+     114,    89,    64,   116,   145,    13,   188,     3,   209,    95,
+     146,   189,   161,    97,   210,    38,   167,     6,   115,   117,
+     -15,   113,   120,    39,   -15,    48,   -15,   -15,   -15,   -15,
+       7,     8,     9,   123,    65,    47,   125,    42,   170,    14,
+      42,    49,   198,   131,    50,    51,    15,    52,    40,    42,
+      41,    71,    42,    42,    35,   -15,   141,   142,   -15,    96,
+      53,    75,    44,    96,    96,    54,    55,    49,     1,   147,
+      50,    51,   155,    52,   203,    42,   122,   158,   143,    42,
+     156,   128,   121,   162,     4,   159,    53,    32,    73,    36,
+      37,    54,    55,    91,    76,   163,    77,    45,    42,   165,
+     166,   168,   169,   171,    49,   157,    66,    50,    51,    42,
+      52,    42,    96,    17,    96,   178,   129,    18,   184,    19,
+      20,    21,    22,    53,   119,    90,    92,   112,    54,    55,
+     126,   194,   132,   195,   182,   183,   197,   199,    42,   200,
+     201,   202,   204,    49,   111,    84,    50,    51,    23,    52,
+     -82,    24,    96,    85,   -82,    42,   -82,   -82,   -82,   -82,
+      79,    98,    53,   -14,   -14,    17,    42,    54,    55,    18,
+     133,    19,    20,    21,    22,   -86,   124,    96,    86,   -86,
+      87,   -86,   -86,   -86,   -86,   -82,    96,    80,   -82,    42,
+     101,    96,    67,    68,    69,   153,    96,   190,    33,    34,
+     127,   149,   191,    24,   154,   150,   118,   -96,   -96,   160,
+     -86,   102,   103,   -86,   175,   144,   104,   105,   106,   107,
+     -96,   -96,   185,   -96,    70,   -96,   -96,   186,   187,   151,
+      99,   100,   130,   152,   109,   110,   102,   103,   180,   181,
+     136,   137,   138,   139,   148,   164,   172,   173,   174,   176,
+     177,   179,   192,    83,   135,   134,   193,   196,   205,   206,
+     207,   208,   211,   212,   213,   214,     0,     0,   140
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-      31,    19,     3,    34,     4,    34,    35,    19,     8,    40,
-      10,    11,    12,    13,    36,     4,    34,    39,    38,     8,
-      51,    10,    11,    12,    13,    37,    19,    19,    19,     0,
-      17,    79,    42,    20,    21,    38,    23,    31,    32,    39,
-      36,    19,    42,    91,    37,    37,    37,    78,    96,    36,
-      39,    73,    74,    42,    41,    42,    34,    22,    23,    14,
-      15,    16,    27,    28,    29,    30,    24,    25,    22,    23,
-       6,     7,    36,    42,    64,    65,    33,     9,    66,    67,
-      42,    34,     5,    18,    36,    34,     7,    32,    61,    63,
-      72
+      39,    40,    36,    37,     1,    44,    49,    41,    19,    52,
+       1,    45,     1,     1,     1,     1,     1,    38,     1,    53,
+       7,     6,     1,    34,     7,     1,     1,     1,    67,    68,
+       4,    65,    71,     9,     8,     1,    10,    11,    12,    13,
+      14,    15,    16,    77,    33,    42,    80,    38,     1,    35,
+      38,    17,     1,    87,    20,    21,    42,    23,    34,    38,
+      36,     1,    38,    38,     1,    39,   109,   110,    42,    19,
+      36,     1,     1,    19,    19,    41,    42,    17,     3,   118,
+      20,    21,     1,    23,     1,    38,    36,   126,    34,    38,
+       9,     1,    37,   132,     0,   129,    36,     1,     1,    36,
+      37,    41,    42,     1,    34,   144,    36,    36,    38,   148,
+     149,   150,   151,   152,    17,    34,    42,    20,    21,    38,
+      23,    38,    19,     4,    19,   164,    36,     8,   167,    10,
+      11,    12,    13,    36,     7,    34,    34,     1,    41,    42,
+      37,   180,    37,   182,     6,     7,   185,   186,    38,   188,
+     189,   190,   191,    17,    34,     1,    20,    21,    39,    23,
+       4,    42,    19,     9,     8,    38,    10,    11,    12,    13,
+       9,    18,    36,    34,    35,     4,    38,    41,    42,     8,
+      37,    10,    11,    12,    13,     4,     1,    19,    34,     8,
+      36,    10,    11,    12,    13,    39,    19,    36,    42,    38,
+       1,    19,     5,     6,     7,    37,    19,     1,    34,    35,
+      39,     1,     6,    42,    37,     5,     5,    18,    19,    37,
+      39,    22,    23,    42,    37,     6,    27,    28,    29,    30,
+      31,    32,     1,    34,    37,    36,    37,     6,     7,     1,
+      31,    32,     1,     5,    24,    25,    22,    23,     6,     7,
+      99,   100,   102,   103,     6,     6,     1,     1,     1,     1,
+       7,     7,    34,    42,    98,    96,     7,     7,     7,     7,
+       7,     7,     1,     1,     1,     1,    -1,    -1,   108
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    46,    38,     0,    47,    14,    15,    16,    48,
-      49,    51,    42,    50,     4,     8,    10,    11,    12,    13,
-      39,    42,    52,    53,    54,    55,    56,    57,    59,    34,
-      35,    36,    38,    58,    36,    42,    17,    20,    21,    23,
-      36,    41,    42,    60,    61,    62,    63,    65,    66,    67,
-      68,    33,    42,    60,    51,     9,    60,    34,    67,    67,
-      60,    19,    34,    18,    31,    32,    22,    23,    27,    28,
-      29,    30,    64,    24,    25,    60,    37,    39,    36,    37,
-      37,    61,    62,    63,    63,    66,    66,    65,    67,    67,
-      34,     5,    60,    58,    58,    37,     6,     7,    34,    58,
-       7
+       0,     3,    47,    38,     0,    48,     1,    14,    15,    16,
+      49,    50,    52,     1,    35,    42,    51,     4,     8,    10,
+      11,    12,    13,    39,    42,    53,    54,    55,    56,    57,
+      58,    60,     1,    34,    35,     1,    36,    37,     1,     9,
+      34,    36,    38,    59,     1,    36,     1,    42,     1,    17,
+      20,    21,    23,    36,    41,    42,    61,    62,    63,    64,
+      66,    67,    68,    69,     1,    33,    42,     5,     6,     7,
+      37,     1,    61,     1,    61,     1,    34,    36,    59,     9,
+      36,    59,    61,    52,     1,     9,    34,    36,    59,    61,
+      34,     1,    34,    68,    68,    61,    19,    34,    18,    31,
+      32,     1,    22,    23,    27,    28,    29,    30,    65,    24,
+      25,    34,     1,    61,     1,    59,     1,    59,     5,     7,
+      59,    37,    36,    61,     1,    61,    37,    39,     1,    36,
+       1,    61,    37,    37,    62,    63,    64,    64,    67,    67,
+      66,    68,    68,    34,     6,     1,     7,    59,     6,     1,
+       5,     1,     5,    37,    37,     1,     9,    34,    59,    61,
+      37,     1,    59,    59,     6,    59,    59,     1,    59,    59,
+       1,    59,     1,     1,     1,    37,     1,     7,    59,     7,
+       6,     7,     6,     7,    59,     1,     6,     7,     1,     6,
+       1,     6,    34,     7,    59,    59,     7,    59,     1,    59,
+      59,    59,    59,     1,    59,     7,     7,     7,     7,     1,
+       7,     1,     1,     1,     1
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    45,    46,    47,    47,    48,    49,    49,    49,    50,
-      50,    51,    51,    52,    52,    52,    52,    52,    52,    52,
-      53,    53,    54,    55,    56,    57,    58,    59,    60,    60,
-      61,    61,    62,    62,    62,    63,    63,    64,    64,    64,
-      64,    65,    65,    65,    66,    66,    66,    67,    67,    67,
-      68,    68,    68,    68,    68
+       0,    46,    47,    48,    48,    49,    49,    50,    50,    50,
+      50,    51,    51,    51,    51,    52,    52,    53,    53,    53,
+      53,    53,    53,    53,    54,    54,    54,    54,    54,    54,
+      54,    54,    54,    54,    54,    54,    54,    54,    54,    54,
+      54,    54,    54,    54,    54,    54,    54,    54,    54,    54,
+      54,    54,    54,    54,    54,    55,    55,    55,    55,    56,
+      56,    56,    56,    56,    56,    56,    56,    56,    56,    56,
+      56,    56,    56,    56,    56,    56,    56,    57,    57,    57,
+      57,    58,    58,    59,    60,    60,    60,    60,    61,    61,
+      62,    62,    63,    63,    63,    64,    64,    65,    65,    65,
+      65,    65,    66,    66,    66,    67,    67,    67,    68,    68,
+      68,    69,    69,    69,    69,    69,    69
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     5,     0,     2,     3,     1,     1,     1,     3,
-       1,     0,     2,     1,     1,     1,     1,     1,     1,     1,
-       7,     9,     5,     7,     3,     3,     3,     4,     3,     1,
+       0,     2,     5,     0,     2,     3,     2,     1,     1,     1,
+       1,     3,     1,     2,     1,     0,     2,     1,     1,     1,
+       1,     1,     1,     1,     7,     9,     2,     5,     4,     6,
+       3,     8,     4,     5,     9,     9,     9,     9,     9,     8,
+       8,     7,     7,     7,     7,     5,     4,     5,     6,     7,
+       8,     9,     9,     9,     9,     5,     2,     3,     5,     7,
+       2,     3,     3,     5,     2,     4,     6,     4,     4,     6,
+       3,     6,     6,     5,     3,     3,     5,     3,     2,     3,
+       3,     3,     2,     3,     4,     2,     3,     3,     3,     1,
        3,     1,     3,     3,     1,     3,     1,     1,     1,     1,
-       1,     3,     3,     1,     3,     3,     1,     2,     2,     1,
-       3,     1,     1,     1,     1
+       1,     1,     3,     3,     1,     3,     3,     1,     2,     2,
+       1,     3,     1,     1,     1,     1,     1
 };
 
 
@@ -780,6 +888,32 @@ enum { YYENOMEM = -2 };
    Use YYerror or YYUNDEF. */
 #define YYERRCODE YYUNDEF
 
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
+    do                                                                  \
+      if (N)                                                            \
+        {                                                               \
+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
+        }                                                               \
+      else                                                              \
+        {                                                               \
+          (Current).first_line   = (Current).last_line   =              \
+            YYRHSLOC (Rhs, 0).last_line;                                \
+          (Current).first_column = (Current).last_column =              \
+            YYRHSLOC (Rhs, 0).last_column;                              \
+        }                                                               \
+    while (0)
+#endif
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+
 
 /* Enable debugging if requested.  */
 #if YYDEBUG
@@ -796,6 +930,63 @@ do {                                            \
 } while (0)
 
 
+/* YYLOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
+# ifndef YYLOCATION_PRINT
+
+#  if defined YY_LOCATION_PRINT
+
+   /* Temporary convenience wrapper in case some people defined the
+      undocumented and private YY_LOCATION_PRINT macros.  */
+#   define YYLOCATION_PRINT(File, Loc)  YY_LOCATION_PRINT(File, *(Loc))
+
+#  elif defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+
+/* Print *YYLOCP on YYO.  Private, do not rely on its existence. */
+
+YY_ATTRIBUTE_UNUSED
+static int
+yy_location_print_ (FILE *yyo, YYLTYPE const * const yylocp)
+{
+  int res = 0;
+  int end_col = 0 != yylocp->last_column ? yylocp->last_column - 1 : 0;
+  if (0 <= yylocp->first_line)
+    {
+      res += YYFPRINTF (yyo, "%d", yylocp->first_line);
+      if (0 <= yylocp->first_column)
+        res += YYFPRINTF (yyo, ".%d", yylocp->first_column);
+    }
+  if (0 <= yylocp->last_line)
+    {
+      if (yylocp->first_line < yylocp->last_line)
+        {
+          res += YYFPRINTF (yyo, "-%d", yylocp->last_line);
+          if (0 <= end_col)
+            res += YYFPRINTF (yyo, ".%d", end_col);
+        }
+      else if (0 <= end_col && yylocp->first_column < end_col)
+        res += YYFPRINTF (yyo, "-%d", end_col);
+    }
+  return res;
+}
+
+#   define YYLOCATION_PRINT  yy_location_print_
+
+    /* Temporary convenience wrapper in case some people defined the
+       undocumented and private YY_LOCATION_PRINT macros.  */
+#   define YY_LOCATION_PRINT(File, Loc)  YYLOCATION_PRINT(File, &(Loc))
+
+#  else
+
+#   define YYLOCATION_PRINT(File, Loc) ((void) 0)
+    /* Temporary convenience wrapper in case some people defined the
+       undocumented and private YY_LOCATION_PRINT macros.  */
+#   define YY_LOCATION_PRINT  YYLOCATION_PRINT
+
+#  endif
+# endif /* !defined YYLOCATION_PRINT */
 
 
 # define YY_SYMBOL_PRINT(Title, Kind, Value, Location)                    \
@@ -804,7 +995,7 @@ do {                                                                      \
     {                                                                     \
       YYFPRINTF (stderr, "%s ", Title);                                   \
       yy_symbol_print (stderr,                                            \
-                  Kind, Value); \
+                  Kind, Value, Location); \
       YYFPRINTF (stderr, "\n");                                           \
     }                                                                     \
 } while (0)
@@ -816,10 +1007,11 @@ do {                                                                      \
 
 static void
 yy_symbol_value_print (FILE *yyo,
-                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep)
+                       yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
 {
   FILE *yyoutput = yyo;
   YY_USE (yyoutput);
+  YY_USE (yylocationp);
   if (!yyvaluep)
     return;
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
@@ -834,12 +1026,14 @@ yy_symbol_value_print (FILE *yyo,
 
 static void
 yy_symbol_print (FILE *yyo,
-                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep)
+                 yysymbol_kind_t yykind, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
 {
   YYFPRINTF (yyo, "%s %s (",
              yykind < YYNTOKENS ? "token" : "nterm", yysymbol_name (yykind));
 
-  yy_symbol_value_print (yyo, yykind, yyvaluep);
+  YYLOCATION_PRINT (yyo, yylocationp);
+  YYFPRINTF (yyo, ": ");
+  yy_symbol_value_print (yyo, yykind, yyvaluep, yylocationp);
   YYFPRINTF (yyo, ")");
 }
 
@@ -872,7 +1066,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
+yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp,
                  int yyrule)
 {
   int yylno = yyrline[yyrule];
@@ -886,7 +1080,8 @@ yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr,
                        YY_ACCESSING_SYMBOL (+yyssp[yyi + 1 - yynrhs]),
-                       &yyvsp[(yyi + 1) - (yynrhs)]);
+                       &yyvsp[(yyi + 1) - (yynrhs)],
+                       &(yylsp[(yyi + 1) - (yynrhs)]));
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -894,7 +1089,7 @@ yy_reduce_print (yy_state_t *yyssp, YYSTYPE *yyvsp,
 # define YY_REDUCE_PRINT(Rule)          \
 do {                                    \
   if (yydebug)                          \
-    yy_reduce_print (yyssp, yyvsp, Rule); \
+    yy_reduce_print (yyssp, yyvsp, yylsp, Rule); \
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -935,9 +1130,10 @@ int yydebug;
 
 static void
 yydestruct (const char *yymsg,
-            yysymbol_kind_t yykind, YYSTYPE *yyvaluep)
+            yysymbol_kind_t yykind, YYSTYPE *yyvaluep, YYLTYPE *yylocationp)
 {
   YY_USE (yyvaluep);
+  YY_USE (yylocationp);
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yykind, yyvaluep, yylocationp);
@@ -953,6 +1149,12 @@ int yychar;
 
 /* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
+/* Location data for the lookahead symbol.  */
+YYLTYPE yylloc
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+  = { 1, 1, 1, 1 }
+# endif
+;
 /* Number of syntax errors so far.  */
 int yynerrs;
 
@@ -986,6 +1188,11 @@ yyparse (void)
     YYSTYPE *yyvs = yyvsa;
     YYSTYPE *yyvsp = yyvs;
 
+    /* The location stack: array, bottom, top.  */
+    YYLTYPE yylsa[YYINITDEPTH];
+    YYLTYPE *yyls = yylsa;
+    YYLTYPE *yylsp = yyls;
+
   int yyn;
   /* The return value of yyparse.  */
   int yyresult;
@@ -994,10 +1201,14 @@ yyparse (void)
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
+  YYLTYPE yyloc;
+
+  /* The locations where the error started and ended.  */
+  YYLTYPE yyerror_range[3];
 
 
 
-#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
+#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N), yylsp -= (N))
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
@@ -1007,6 +1218,7 @@ yyparse (void)
 
   yychar = YYEMPTY; /* Cause a token to be read.  */
 
+  yylsp[0] = yylloc;
   goto yysetstate;
 
 
@@ -1045,6 +1257,7 @@ yysetstate:
            memory.  */
         yy_state_t *yyss1 = yyss;
         YYSTYPE *yyvs1 = yyvs;
+        YYLTYPE *yyls1 = yyls;
 
         /* Each stack pointer address is followed by the size of the
            data in use in that stack, in bytes.  This used to be a
@@ -1053,9 +1266,11 @@ yysetstate:
         yyoverflow (YY_("memory exhausted"),
                     &yyss1, yysize * YYSIZEOF (*yyssp),
                     &yyvs1, yysize * YYSIZEOF (*yyvsp),
+                    &yyls1, yysize * YYSIZEOF (*yylsp),
                     &yystacksize);
         yyss = yyss1;
         yyvs = yyvs1;
+        yyls = yyls1;
       }
 # else /* defined YYSTACK_RELOCATE */
       /* Extend the stack our own way.  */
@@ -1074,6 +1289,7 @@ yysetstate:
           YYNOMEM;
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+        YYSTACK_RELOCATE (yyls_alloc, yyls);
 #  undef YYSTACK_RELOCATE
         if (yyss1 != yyssa)
           YYSTACK_FREE (yyss1);
@@ -1082,6 +1298,7 @@ yysetstate:
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
+      yylsp = yyls + yysize - 1;
 
       YY_IGNORE_USELESS_CAST_BEGIN
       YYDPRINTF ((stderr, "Stack size increased to %ld\n",
@@ -1135,6 +1352,7 @@ yybackup:
          loop in error recovery. */
       yychar = YYUNDEF;
       yytoken = YYSYMBOL_YYerror;
+      yyerror_range[1] = yylloc;
       goto yyerrlab1;
     }
   else
@@ -1168,6 +1386,7 @@ yybackup:
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
+  *++yylsp = yylloc;
 
   /* Discard the shifted token.  */
   yychar = YYEMPTY;
@@ -1201,13 +1420,16 @@ yyreduce:
      GCC warning that YYVAL may be used uninitialized.  */
   yyval = yyvsp[1-yylen];
 
-
+  /* Default location. */
+  YYLLOC_DEFAULT (yyloc, (yylsp - yylen), yylen);
+  yyerror_range[1] = yyloc;
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
   case 2: /* program: PROGRAM LI list-decl list-sent LD  */
-#line 98 "sintatic.y"
-                                          {
+#line 118 "sintatic.y"
+                                         {
+            std::cout << "program\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "program";
             Nodo *prog = new struct Nodo;
@@ -1225,34 +1447,35 @@ yyreduce:
             (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
             (yyval.nodo)->hijos.push_back(ld);
             inicial = (yyval.nodo);
-            
         }
-#line 1231 "sintatic.tab.c"
+#line 1452 "sintatic.tab.c"
     break;
 
   case 3: /* list-decl: %empty  */
-#line 119 "sintatic.y"
+#line 139 "sintatic.y"
         {
             (yyval.nodo) = NULL;
         }
-#line 1239 "sintatic.tab.c"
+#line 1460 "sintatic.tab.c"
     break;
 
   case 4: /* list-decl: list-decl decl  */
-#line 122 "sintatic.y"
+#line 142 "sintatic.y"
                          {
+            std::cout << "list-decl decl\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "list-decl";
             (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
             (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
             inicial = (yyval.nodo);
         }
-#line 1251 "sintatic.tab.c"
+#line 1473 "sintatic.tab.c"
     break;
 
   case 5: /* decl: tipo list-id PYC  */
-#line 130 "sintatic.y"
-                         {
+#line 151 "sintatic.y"
+                        {
+            std::cout << "tipo list-id;\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "decl";
             Nodo *pyc = new struct Nodo;
@@ -1263,45 +1486,74 @@ yyreduce:
             (yyval.nodo)->hijos.push_back(pyc);
             inicial = (yyval.nodo);
         }
-#line 1267 "sintatic.tab.c"
+#line 1490 "sintatic.tab.c"
     break;
 
-  case 6: /* tipo: INT  */
-#line 142 "sintatic.y"
+  case 6: /* decl: tipo error  */
+#line 163 "sintatic.y"
+                    {
+            std::cout << "Error decl - tipo error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "declaracion - tipo error, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1502 "sintatic.tab.c"
+    break;
+
+  case 7: /* tipo: INT  */
+#line 171 "sintatic.y"
             {
+            std::cout << "int\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "tipo";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1278 "sintatic.tab.c"
+#line 1514 "sintatic.tab.c"
     break;
 
-  case 7: /* tipo: FLOAT  */
-#line 148 "sintatic.y"
+  case 8: /* tipo: FLOAT  */
+#line 178 "sintatic.y"
                 {
+            std::cout << "float\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "tipo";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1289 "sintatic.tab.c"
+#line 1526 "sintatic.tab.c"
     break;
 
-  case 8: /* tipo: BOOL  */
-#line 154 "sintatic.y"
+  case 9: /* tipo: BOOL  */
+#line 185 "sintatic.y"
                {
+            std::cout << "bool\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "tipo";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1300 "sintatic.tab.c"
+#line 1538 "sintatic.tab.c"
     break;
 
-  case 9: /* list-id: list-id COM IDENTIFICADOR  */
-#line 161 "sintatic.y"
+  case 10: /* tipo: error  */
+#line 192 "sintatic.y"
+                {
+                std::cout << "Error tipo\n";
+                (yyval.nodo) = new struct Nodo;
+                (yyval.nodo)->nombre = "Error sintactico";
+                (yyval.nodo)->valor = "falta tipo, linea: " + errorLine;
+                inicial = (yyval.nodo);
+                yyerrok;
+        }
+#line 1551 "sintatic.tab.c"
+    break;
+
+  case 11: /* list-id: list-id COM IDENTIFICADOR  */
+#line 201 "sintatic.y"
                                    {
+                std::cout << "list-id, id: " << (yyvsp[0].cadena) << "\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "list-id";
                 Nodo *coma = new struct Nodo;
@@ -1315,120 +1567,154 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(id);
                 inicial = (yyval.nodo);
             }
-#line 1319 "sintatic.tab.c"
+#line 1571 "sintatic.tab.c"
     break;
 
-  case 10: /* list-id: IDENTIFICADOR  */
-#line 175 "sintatic.y"
+  case 12: /* list-id: IDENTIFICADOR  */
+#line 216 "sintatic.y"
                         {
+            std::cout << "id: " << (yyvsp[0].cadena) << "\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "id";
             (yyval.nodo)->valor = (yyvsp[0].cadena);
             inicial = (yyval.nodo);
         }
-#line 1330 "sintatic.tab.c"
+#line 1583 "sintatic.tab.c"
     break;
 
-  case 11: /* list-sent: %empty  */
-#line 182 "sintatic.y"
+  case 13: /* list-id: COM error  */
+#line 223 "sintatic.y"
+                   {
+            std::cout << "Error id\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta id, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1595 "sintatic.tab.c"
+    break;
+
+  case 14: /* list-id: error  */
+#line 230 "sintatic.y"
+               {
+            std::cout << "Error id\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta id, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1607 "sintatic.tab.c"
+    break;
+
+  case 15: /* list-sent: %empty  */
+#line 239 "sintatic.y"
         {
             (yyval.nodo) = NULL;
         }
-#line 1338 "sintatic.tab.c"
+#line 1615 "sintatic.tab.c"
     break;
 
-  case 12: /* list-sent: list-sent sent  */
-#line 185 "sintatic.y"
+  case 16: /* list-sent: list-sent sent  */
+#line 242 "sintatic.y"
                          {
+            std::cout << "list-sent sent\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "list-sent";
             (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
             (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
             inicial = (yyval.nodo);
         }
-#line 1350 "sintatic.tab.c"
+#line 1628 "sintatic.tab.c"
     break;
 
-  case 13: /* sent: sent-if  */
-#line 193 "sintatic.y"
+  case 17: /* sent: sent-if  */
+#line 251 "sintatic.y"
                 {
+            std::cout << "sent-if\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1361 "sintatic.tab.c"
+#line 1640 "sintatic.tab.c"
     break;
 
-  case 14: /* sent: sent-while  */
-#line 199 "sintatic.y"
+  case 18: /* sent: sent-while  */
+#line 258 "sintatic.y"
                      {
+            std::cout << "sent-while\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1372 "sintatic.tab.c"
+#line 1652 "sintatic.tab.c"
     break;
 
-  case 15: /* sent: sent-do  */
-#line 205 "sintatic.y"
+  case 19: /* sent: sent-do  */
+#line 265 "sintatic.y"
                   {
+            std::cout << "sent-do\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1383 "sintatic.tab.c"
+#line 1664 "sintatic.tab.c"
     break;
 
-  case 16: /* sent: sent-read  */
-#line 211 "sintatic.y"
+  case 20: /* sent: sent-read  */
+#line 272 "sintatic.y"
                     {
+            std::cout << "sent-read \n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1394 "sintatic.tab.c"
+#line 1676 "sintatic.tab.c"
     break;
 
-  case 17: /* sent: sent-write  */
-#line 217 "sintatic.y"
+  case 21: /* sent: sent-write  */
+#line 279 "sintatic.y"
                      {
+            std::cout << "sent-write\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1405 "sintatic.tab.c"
+#line 1688 "sintatic.tab.c"
     break;
 
-  case 18: /* sent: sent-assign  */
-#line 223 "sintatic.y"
+  case 22: /* sent: sent-assign  */
+#line 286 "sintatic.y"
                       {
+            std::cout << "sent-assign\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1416 "sintatic.tab.c"
+#line 1700 "sintatic.tab.c"
     break;
 
-  case 19: /* sent: BREAK  */
-#line 229 "sintatic.y"
+  case 23: /* sent: BREAK  */
+#line 293 "sintatic.y"
                 {
+            std::cout << "break\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1427 "sintatic.tab.c"
+#line 1712 "sintatic.tab.c"
     break;
 
-  case 20: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
-#line 236 "sintatic.y"
+  case 24: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
+#line 308 "sintatic.y"
                                          {
+            std::cout << "if\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "sent-if";
             Nodo *i = new struct Nodo;
@@ -1455,12 +1741,13 @@ yyreduce:
             (yyval.nodo)->hijos.push_back(fi);
             inicial = (yyval.nodo);
             }
-#line 1459 "sintatic.tab.c"
+#line 1745 "sintatic.tab.c"
     break;
 
-  case 21: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
-#line 263 "sintatic.y"
+  case 25: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
+#line 336 "sintatic.y"
                                                        {
+            std::cout << "if-else\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "sent-if";
             Nodo *i = new struct Nodo;
@@ -1492,12 +1779,361 @@ yyreduce:
             (yyval.nodo)->hijos.push_back(fi);
             inicial = (yyval.nodo);
             }
-#line 1496 "sintatic.tab.c"
+#line 1783 "sintatic.tab.c"
     break;
 
-  case 22: /* sent-while: WHILE PI exp-bool PD bloque  */
-#line 296 "sintatic.y"
+  case 26: /* sent-if: IF error  */
+#line 369 "sintatic.y"
+                  {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta condicion entre parentesis, then y el bloque y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1795 "sintatic.tab.c"
+    break;
+
+  case 27: /* sent-if: IF PI exp-bool PD error  */
+#line 376 "sintatic.y"
+                                 {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta then, el bloque y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1807 "sintatic.tab.c"
+    break;
+
+  case 28: /* sent-if: IF error THEN error  */
+#line 383 "sintatic.y"
+                             {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta condicion, el bloque y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1819 "sintatic.tab.c"
+    break;
+
+  case 29: /* sent-if: IF PI exp-bool PD THEN error  */
+#line 390 "sintatic.y"
+                                      {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1831 "sintatic.tab.c"
+    break;
+
+  case 30: /* sent-if: IF error FI  */
+#line 397 "sintatic.y"
+                     {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta condicion y bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1843 "sintatic.tab.c"
+    break;
+
+  case 31: /* sent-if: IF PI exp-bool PD THEN bloque ELSE error  */
+#line 404 "sintatic.y"
+                                                  {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if-else falta bloque y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1855 "sintatic.tab.c"
+    break;
+
+  case 32: /* sent-if: IF error ELSE error  */
+#line 411 "sintatic.y"
+                             {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if-else falta bloque if, bloque else y finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1867 "sintatic.tab.c"
+    break;
+
+  case 33: /* sent-if: IF error ELSE bloque error  */
+#line 418 "sintatic.y"
                                     {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if-else falta bloque if, finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1879 "sintatic.tab.c"
+    break;
+
+  case 34: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque error  */
+#line 425 "sintatic.y"
+                                                         {
+            std::cout << "Error\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if-else falta finalizacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1891 "sintatic.tab.c"
+    break;
+
+  case 35: /* sent-if: IF PI exp-bool PD error bloque ELSE bloque FI  */
+#line 432 "sintatic.y"
+                                                        {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta THEN, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1903 "sintatic.tab.c"
+    break;
+
+  case 36: /* sent-if: IF PI exp-bool PD THEN error ELSE bloque FI  */
+#line 439 "sintatic.y"
+                                                      {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque siguiente, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1915 "sintatic.tab.c"
+    break;
+
+  case 37: /* sent-if: IF PI exp-bool PD THEN bloque error bloque FI  */
+#line 446 "sintatic.y"
+                                                        {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta sentencia else, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1927 "sintatic.tab.c"
+    break;
+
+  case 38: /* sent-if: IF PI exp-bool PD THEN bloque ELSE error FI  */
+#line 453 "sintatic.y"
+                                                      {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque después de else, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1939 "sintatic.tab.c"
+    break;
+
+  case 39: /* sent-if: IF error PD THEN bloque ELSE bloque FI  */
+#line 460 "sintatic.y"
+                                                 {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta paréntesis de inicio y expresión boleana, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1951 "sintatic.tab.c"
+    break;
+
+  case 40: /* sent-if: IF PI exp-bool PD THEN error bloque FI  */
+#line 467 "sintatic.y"
+                                                 {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta paréntesis de termino y THEN, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1963 "sintatic.tab.c"
+    break;
+
+  case 41: /* sent-if: IF error THEN bloque ELSE bloque FI  */
+#line 474 "sintatic.y"
+                                              {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta paréntesis de inicio, termino y expresión, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1975 "sintatic.tab.c"
+    break;
+
+  case 42: /* sent-if: IF PI exp-bool PD error bloque FI  */
+#line 481 "sintatic.y"
+                                            {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta THEN, ELSE y bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1987 "sintatic.tab.c"
+    break;
+
+  case 43: /* sent-if: IF PI error bloque ELSE bloque FI  */
+#line 488 "sintatic.y"
+                                            {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta expresión boleana, THEN, ELSE y bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 1999 "sintatic.tab.c"
+    break;
+
+  case 44: /* sent-if: IF PI exp-bool PD THEN error FI  */
+#line 495 "sintatic.y"
+                                          {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2011 "sintatic.tab.c"
+    break;
+
+  case 45: /* sent-if: IF error ELSE bloque FI  */
+#line 502 "sintatic.y"
+                                  {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2023 "sintatic.tab.c"
+    break;
+
+  case 46: /* sent-if: IF PI error FI  */
+#line 509 "sintatic.y"
+                         {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta Exoresión, Parentesis derecho, THEN, bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2035 "sintatic.tab.c"
+    break;
+
+  case 47: /* sent-if: IF PD exp-bool PI error  */
+#line 516 "sintatic.y"
+                                 {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta THEN, bloque, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2047 "sintatic.tab.c"
+    break;
+
+  case 48: /* sent-if: IF PD exp-bool PI THEN error  */
+#line 523 "sintatic.y"
+                                      {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2059 "sintatic.tab.c"
+    break;
+
+  case 49: /* sent-if: IF PD exp-bool PI THEN bloque error  */
+#line 530 "sintatic.y"
+                                             {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2071 "sintatic.tab.c"
+    break;
+
+  case 50: /* sent-if: IF PD exp-bool PI THEN bloque ELSE error  */
+#line 537 "sintatic.y"
+                                                  {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta bloque, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2083 "sintatic.tab.c"
+    break;
+
+  case 51: /* sent-if: IF PD exp-bool PI THEN bloque ELSE bloque error  */
+#line 544 "sintatic.y"
+                                                         {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2095 "sintatic.tab.c"
+    break;
+
+  case 52: /* sent-if: IF PD exp-bool PI error bloque ELSE bloque error  */
+#line 551 "sintatic.y"
+                                                          {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta, THEN, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2107 "sintatic.tab.c"
+    break;
+
+  case 53: /* sent-if: IF PD exp-bool PI THEN bloque error bloque error  */
+#line 558 "sintatic.y"
+                                                          {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta, ELSE, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2119 "sintatic.tab.c"
+    break;
+
+  case 54: /* sent-if: IF PD exp-bool PI error bloque error bloque error  */
+#line 565 "sintatic.y"
+                                                           {
+            std::cout << "Error if\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "if falta, THEN, ELSE, FI, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2131 "sintatic.tab.c"
+    break;
+
+  case 55: /* sent-while: WHILE PI exp-bool PD bloque  */
+#line 573 "sintatic.y"
+                                    {
+            std::cout << "while\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "sent-while";
             Nodo *whil = new struct Nodo;
@@ -1516,12 +2152,49 @@ yyreduce:
             (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
             inicial = (yyval.nodo);
         }
-#line 1520 "sintatic.tab.c"
+#line 2156 "sintatic.tab.c"
     break;
 
-  case 23: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
-#line 316 "sintatic.y"
+  case 56: /* sent-while: WHILE error  */
+#line 593 "sintatic.y"
+                     {
+            std::cout << "Error while\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "while falta condicion entre parentesis y cuerpo, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2168 "sintatic.tab.c"
+    break;
+
+  case 57: /* sent-while: WHILE error bloque  */
+#line 600 "sintatic.y"
+                            {
+            std::cout << "Error while\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "while falta expresion entre parentesis, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2180 "sintatic.tab.c"
+    break;
+
+  case 58: /* sent-while: WHILE PI exp-bool PD error  */
+#line 607 "sintatic.y"
+                                    {
+            std::cout << "Error while\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "while falta bloque, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2192 "sintatic.tab.c"
+    break;
+
+  case 59: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
+#line 616 "sintatic.y"
                                            {
+            std::cout << "do\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent-do";
                 Nodo *d = new struct Nodo;
@@ -1548,12 +2221,217 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(pyc);
                 inicial = (yyval.nodo);
             }
-#line 1552 "sintatic.tab.c"
+#line 2225 "sintatic.tab.c"
     break;
 
-  case 24: /* sent-read: READ IDENTIFICADOR PYC  */
-#line 344 "sintatic.y"
+  case 60: /* sent-do: DO error  */
+#line 644 "sintatic.y"
+                  {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta cuerpo, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2237 "sintatic.tab.c"
+    break;
+
+  case 61: /* sent-do: DO bloque error  */
+#line 651 "sintatic.y"
+                         {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta until, condicion y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2249 "sintatic.tab.c"
+    break;
+
+  case 62: /* sent-do: DO UNTIL error  */
+#line 658 "sintatic.y"
+                        {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, condicion y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2261 "sintatic.tab.c"
+    break;
+
+  case 63: /* sent-do: DO PI exp-bool PD error  */
+#line 665 "sintatic.y"
+                                 {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2273 "sintatic.tab.c"
+    break;
+
+  case 64: /* sent-do: DO PYC  */
+#line 672 "sintatic.y"
+                {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y condicion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2285 "sintatic.tab.c"
+    break;
+
+  case 65: /* sent-do: DO bloque UNTIL error  */
+#line 679 "sintatic.y"
                                {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2297 "sintatic.tab.c"
+    break;
+
+  case 66: /* sent-do: DO bloque PI exp-bool PD error  */
+#line 686 "sintatic.y"
+                                        {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2309 "sintatic.tab.c"
+    break;
+
+  case 67: /* sent-do: DO bloque PYC error  */
+#line 693 "sintatic.y"
+                             {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2321 "sintatic.tab.c"
+    break;
+
+  case 68: /* sent-do: DO UNTIL bloque error  */
+#line 700 "sintatic.y"
+                               {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do desorganizado, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2333 "sintatic.tab.c"
+    break;
+
+  case 69: /* sent-do: DO UNTIL PI exp-bool PD error  */
+#line 707 "sintatic.y"
+                                       {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do desorganizado, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2345 "sintatic.tab.c"
+    break;
+
+  case 70: /* sent-do: DO UNTIL PYC  */
+#line 714 "sintatic.y"
+                      {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do desorganizado, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2357 "sintatic.tab.c"
+    break;
+
+  case 71: /* sent-do: DO PI exp-bool PD bloque error  */
+#line 721 "sintatic.y"
+                                        {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2369 "sintatic.tab.c"
+    break;
+
+  case 72: /* sent-do: DO PI exp-bool PD UNTIL error  */
+#line 728 "sintatic.y"
+                                       {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2381 "sintatic.tab.c"
+    break;
+
+  case 73: /* sent-do: DO PI exp-bool PD PYC  */
+#line 735 "sintatic.y"
+                               {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2393 "sintatic.tab.c"
+    break;
+
+  case 74: /* sent-do: DO PYC bloque  */
+#line 742 "sintatic.y"
+                       {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2405 "sintatic.tab.c"
+    break;
+
+  case 75: /* sent-do: DO PYC UNTIL  */
+#line 749 "sintatic.y"
+                      {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2417 "sintatic.tab.c"
+    break;
+
+  case 76: /* sent-do: DO PYC PI exp-bool PD  */
+#line 756 "sintatic.y"
+                               {
+            std::cout << "Error do\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2429 "sintatic.tab.c"
+    break;
+
+  case 77: /* sent-read: READ IDENTIFICADOR PYC  */
+#line 766 "sintatic.y"
+                               {
+            std::cout << "read\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "bloque";
             Nodo *read = new struct Nodo;
@@ -1570,12 +2448,49 @@ yyreduce:
             (yyval.nodo)->hijos.push_back(pyc);
             inicial = (yyval.nodo);
         }
-#line 1574 "sintatic.tab.c"
+#line 2452 "sintatic.tab.c"
     break;
 
-  case 25: /* sent-write: WRITE exp-bool PYC  */
-#line 362 "sintatic.y"
+  case 78: /* sent-read: READ error  */
+#line 784 "sintatic.y"
+                    {
+            std::cout << "Error read\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "read sentencia incompleta, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2464 "sintatic.tab.c"
+    break;
+
+  case 79: /* sent-read: READ IDENTIFICADOR error  */
+#line 791 "sintatic.y"
+                                  {
+            std::cout << "Error read\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta punto y coma en read, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2476 "sintatic.tab.c"
+    break;
+
+  case 80: /* sent-read: READ error PYC  */
+#line 798 "sintatic.y"
+                        {
+            std::cout << "Error read\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta el id para leer, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2488 "sintatic.tab.c"
+    break;
+
+  case 81: /* sent-write: WRITE exp-bool PYC  */
+#line 807 "sintatic.y"
                            {
+            std::cout << "write\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "bloque";
                 Nodo *write = new struct Nodo;
@@ -1589,12 +2504,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(pyc);
                 inicial = (yyval.nodo);
             }
-#line 1593 "sintatic.tab.c"
+#line 2508 "sintatic.tab.c"
     break;
 
-  case 26: /* bloque: LI list-sent LD  */
-#line 378 "sintatic.y"
+  case 82: /* sent-write: WRITE error  */
+#line 822 "sintatic.y"
+                     {
+            std::cout << "Error write\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "write sentencia incompleta, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2520 "sintatic.tab.c"
+    break;
+
+  case 83: /* bloque: LI list-sent LD  */
+#line 831 "sintatic.y"
                         {
+            std::cout << "bloque\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "bloque";
                 Nodo *li = new struct Nodo;
@@ -1608,12 +2536,13 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(ld);
                 inicial = (yyval.nodo);
             }
-#line 1612 "sintatic.tab.c"
+#line 2540 "sintatic.tab.c"
     break;
 
-  case 27: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
-#line 393 "sintatic.y"
+  case 84: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
+#line 848 "sintatic.y"
                                         {
+            std::cout << "id=exp-bool;\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "sent-assign";
                 Nodo *id = new struct Nodo;
@@ -1631,12 +2560,49 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(pyc);
                 inicial = (yyval.nodo);
             }
-#line 1635 "sintatic.tab.c"
+#line 2564 "sintatic.tab.c"
     break;
 
-  case 28: /* exp-bool: exp-bool OR comb  */
-#line 412 "sintatic.y"
+  case 85: /* sent-assign: IDENTIFICADOR error  */
+#line 868 "sintatic.y"
+                             {
+            std::cout << "Error assign\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta la sentencia de asignacion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2576 "sintatic.tab.c"
+    break;
+
+  case 86: /* sent-assign: IDENTIFICADOR ASIG error  */
+#line 875 "sintatic.y"
+                                  {
+            std::cout << "Error assign\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta la expresion de asignación y un punto y coma, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2588 "sintatic.tab.c"
+    break;
+
+  case 87: /* sent-assign: IDENTIFICADOR error PYC  */
+#line 882 "sintatic.y"
+                                 {
+            std::cout << "Error assign\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta la asignacion y la expresion, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2600 "sintatic.tab.c"
+    break;
+
+  case 88: /* exp-bool: exp-bool OR comb  */
+#line 891 "sintatic.y"
                           {
+            std::cout << "or\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "exp-bool";
                 Nodo *o = new struct Nodo;
@@ -1647,23 +2613,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1651 "sintatic.tab.c"
+#line 2617 "sintatic.tab.c"
     break;
 
-  case 29: /* exp-bool: comb  */
-#line 423 "sintatic.y"
+  case 89: /* exp-bool: comb  */
+#line 903 "sintatic.y"
                {
+            std::cout << "comb\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "exp-bool";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1662 "sintatic.tab.c"
+#line 2629 "sintatic.tab.c"
     break;
 
-  case 30: /* comb: comb AND igualdad  */
-#line 430 "sintatic.y"
+  case 90: /* comb: comb AND igualdad  */
+#line 912 "sintatic.y"
                           {
+            std::cout << "and\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "comb";
                 Nodo *an = new struct Nodo;
@@ -1674,23 +2642,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1678 "sintatic.tab.c"
+#line 2646 "sintatic.tab.c"
     break;
 
-  case 31: /* comb: igualdad  */
-#line 441 "sintatic.y"
+  case 91: /* comb: igualdad  */
+#line 924 "sintatic.y"
                    {
+            std::cout << "igualdad\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "comb";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1689 "sintatic.tab.c"
+#line 2658 "sintatic.tab.c"
     break;
 
-  case 32: /* igualdad: igualdad IGU rel  */
-#line 448 "sintatic.y"
+  case 92: /* igualdad: igualdad IGU rel  */
+#line 933 "sintatic.y"
                          {
+            std::cout << "igu\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "igualdad";
                 Nodo *igu = new struct Nodo;
@@ -1701,12 +2671,13 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1705 "sintatic.tab.c"
+#line 2675 "sintatic.tab.c"
     break;
 
-  case 33: /* igualdad: igualdad DIS rel  */
-#line 459 "sintatic.y"
+  case 93: /* igualdad: igualdad DIS rel  */
+#line 945 "sintatic.y"
                            {
+            std::cout << "dis\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "igualdad";
                 Nodo *dis = new struct Nodo;
@@ -1717,23 +2688,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1721 "sintatic.tab.c"
+#line 2692 "sintatic.tab.c"
     break;
 
-  case 34: /* igualdad: rel  */
-#line 470 "sintatic.y"
+  case 94: /* igualdad: rel  */
+#line 957 "sintatic.y"
               {
+            std::cout << "rel\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "igualdad";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1732 "sintatic.tab.c"
+#line 2704 "sintatic.tab.c"
     break;
 
-  case 35: /* rel: expr op-rel expr  */
-#line 477 "sintatic.y"
+  case 95: /* rel: expr op-rel expr  */
+#line 966 "sintatic.y"
                          {
+            std::cout << "expr op-rel expr\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "rel";
                 (yyval.nodo)->hijos.push_back((yyvsp[-2].nodo));
@@ -1741,67 +2714,85 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1745 "sintatic.tab.c"
+#line 2718 "sintatic.tab.c"
     break;
 
-  case 36: /* rel: expr  */
-#line 485 "sintatic.y"
+  case 96: /* rel: expr  */
+#line 975 "sintatic.y"
                {
+            std::cout << "expr\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "rel";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1756 "sintatic.tab.c"
+#line 2730 "sintatic.tab.c"
     break;
 
-  case 37: /* op-rel: MEN  */
-#line 492 "sintatic.y"
+  case 97: /* op-rel: MEN  */
+#line 983 "sintatic.y"
             {
+            std::cout << "men\n";
             (yyval.nodo) = new struct Nodo;
             (yyval.nodo)->nombre = "men";
             (yyval.nodo)->valor = (yyvsp[0].cadena);
             inicial = (yyval.nodo);
         }
-#line 1767 "sintatic.tab.c"
+#line 2742 "sintatic.tab.c"
     break;
 
-  case 38: /* op-rel: MENIGL  */
-#line 498 "sintatic.y"
+  case 98: /* op-rel: MENIGL  */
+#line 990 "sintatic.y"
                  {
+            std::cout << "menigl\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "menigl";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1778 "sintatic.tab.c"
+#line 2754 "sintatic.tab.c"
     break;
 
-  case 39: /* op-rel: MAY  */
-#line 504 "sintatic.y"
+  case 99: /* op-rel: MAY  */
+#line 997 "sintatic.y"
               {
+            std::cout << "may\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "may";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1789 "sintatic.tab.c"
+#line 2766 "sintatic.tab.c"
     break;
 
-  case 40: /* op-rel: MAYIGL  */
-#line 510 "sintatic.y"
+  case 100: /* op-rel: MAYIGL  */
+#line 1004 "sintatic.y"
                  {
+            std::cout << "mayigl\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "mayigl";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1800 "sintatic.tab.c"
+#line 2778 "sintatic.tab.c"
     break;
 
-  case 41: /* expr: expr RES term  */
-#line 517 "sintatic.y"
+  case 101: /* op-rel: error  */
+#line 1011 "sintatic.y"
+              {
+            std::cout << "Error op-rel\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta op-rel, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 2790 "sintatic.tab.c"
+    break;
+
+  case 102: /* expr: expr RES term  */
+#line 1019 "sintatic.y"
                       {
+            std::cout << "res\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "expr";
                 Nodo *res = new struct Nodo;
@@ -1812,12 +2803,13 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1816 "sintatic.tab.c"
+#line 2807 "sintatic.tab.c"
     break;
 
-  case 42: /* expr: expr MAS term  */
-#line 528 "sintatic.y"
+  case 103: /* expr: expr MAS term  */
+#line 1031 "sintatic.y"
                         {
+            std::cout << "mas\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "expr";
                 Nodo *mas = new struct Nodo;
@@ -1828,23 +2820,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1832 "sintatic.tab.c"
+#line 2824 "sintatic.tab.c"
     break;
 
-  case 43: /* expr: term  */
-#line 539 "sintatic.y"
+  case 104: /* expr: term  */
+#line 1043 "sintatic.y"
                {
+            std::cout << "term\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "expr";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1843 "sintatic.tab.c"
+#line 2836 "sintatic.tab.c"
     break;
 
-  case 44: /* term: term MUL unario  */
-#line 546 "sintatic.y"
+  case 105: /* term: term MUL unario  */
+#line 1052 "sintatic.y"
                         {
+            std::cout << "mul\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "term";
                 Nodo *mul = new struct Nodo;
@@ -1856,12 +2850,13 @@ yyreduce:
                 inicial = (yyval.nodo);
             
             }
-#line 1860 "sintatic.tab.c"
+#line 2854 "sintatic.tab.c"
     break;
 
-  case 45: /* term: term DIV unario  */
-#line 558 "sintatic.y"
+  case 106: /* term: term DIV unario  */
+#line 1065 "sintatic.y"
                           {
+            std::cout << "div\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "term";
                 Nodo *div = new struct Nodo;
@@ -1872,23 +2867,25 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1876 "sintatic.tab.c"
+#line 2871 "sintatic.tab.c"
     break;
 
-  case 46: /* term: unario  */
-#line 569 "sintatic.y"
+  case 107: /* term: unario  */
+#line 1077 "sintatic.y"
                  {
+            std::cout << "Unario\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "term";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1887 "sintatic.tab.c"
+#line 2883 "sintatic.tab.c"
     break;
 
-  case 47: /* unario: NOT unario  */
-#line 576 "sintatic.y"
+  case 108: /* unario: NOT unario  */
+#line 1085 "sintatic.y"
                    {
+            std::cout << "Not unario\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "unario";
                 Nodo *no = new struct Nodo;
@@ -1898,12 +2895,13 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1902 "sintatic.tab.c"
+#line 2899 "sintatic.tab.c"
     break;
 
-  case 48: /* unario: RES unario  */
-#line 586 "sintatic.y"
+  case 109: /* unario: RES unario  */
+#line 1096 "sintatic.y"
                      {
+            std::cout << "RES unario\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "unario";
                 Nodo *res = new struct Nodo;
@@ -1913,24 +2911,26 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1917 "sintatic.tab.c"
+#line 2915 "sintatic.tab.c"
     break;
 
-  case 49: /* unario: factor  */
-#line 596 "sintatic.y"
+  case 110: /* unario: factor  */
+#line 1107 "sintatic.y"
                  {
+            std::cout << "Factor\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "unario";
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 inicial = (yyval.nodo);
             }
-#line 1928 "sintatic.tab.c"
+#line 2927 "sintatic.tab.c"
     break;
 
-  case 50: /* factor: PI exp-bool PD  */
-#line 603 "sintatic.y"
+  case 111: /* factor: PI exp-bool PD  */
+#line 1115 "sintatic.y"
                        {
             //!Revisar
+                std::cout << "(exp-bool)\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "factor";
                 Nodo *pi = new struct Nodo;
@@ -1944,55 +2944,71 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back(pd);
                 inicial = (yyval.nodo);
             }
-#line 1948 "sintatic.tab.c"
+#line 2948 "sintatic.tab.c"
     break;
 
-  case 51: /* factor: IDENTIFICADOR  */
-#line 618 "sintatic.y"
+  case 112: /* factor: IDENTIFICADOR  */
+#line 1131 "sintatic.y"
                         {
+                std::cout << "id: "<< (yyvsp[0].cadena) << "\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "factor";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1959 "sintatic.tab.c"
+#line 2960 "sintatic.tab.c"
     break;
 
-  case 52: /* factor: NUMERO  */
-#line 624 "sintatic.y"
+  case 113: /* factor: NUMERO  */
+#line 1138 "sintatic.y"
                  {
+                std::cout << "Numero: " << (yyvsp[0].numero) <<  "\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "factor";
                 (yyval.nodo)->valor = std::to_string((yyvsp[0].numero));
                 inicial = (yyval.nodo);
             }
-#line 1970 "sintatic.tab.c"
+#line 2972 "sintatic.tab.c"
     break;
 
-  case 53: /* factor: TRUE  */
-#line 630 "sintatic.y"
+  case 114: /* factor: TRUE  */
+#line 1145 "sintatic.y"
                {
+                std::cout << "True\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "factor";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1981 "sintatic.tab.c"
+#line 2984 "sintatic.tab.c"
     break;
 
-  case 54: /* factor: FALSE  */
-#line 636 "sintatic.y"
+  case 115: /* factor: FALSE  */
+#line 1152 "sintatic.y"
                 {
+                std::cout << "False\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "factor";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 inicial = (yyval.nodo);
             }
-#line 1992 "sintatic.tab.c"
+#line 2996 "sintatic.tab.c"
+    break;
+
+  case 116: /* factor: error  */
+#line 1159 "sintatic.y"
+              {
+            std::cout << "Error factor\n";
+            (yyval.nodo) = new struct Nodo;
+            (yyval.nodo)->nombre = "Error sintactico";
+            (yyval.nodo)->valor = "falta factor, linea: " + errorLine;
+            inicial = (yyval.nodo);
+        }
+#line 3008 "sintatic.tab.c"
     break;
 
 
-#line 1996 "sintatic.tab.c"
+#line 3012 "sintatic.tab.c"
 
       default: break;
     }
@@ -2013,6 +3029,7 @@ yyreduce:
   yylen = 0;
 
   *++yyvsp = yyval;
+  *++yylsp = yyloc;
 
   /* Now 'shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -2042,6 +3059,7 @@ yyerrlab:
       yyerror (YY_("syntax error"));
     }
 
+  yyerror_range[1] = yylloc;
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
@@ -2056,7 +3074,7 @@ yyerrlab:
       else
         {
           yydestruct ("Error: discarding",
-                      yytoken, &yylval);
+                      yytoken, &yylval, &yylloc);
           yychar = YYEMPTY;
         }
     }
@@ -2110,9 +3128,9 @@ yyerrlab1:
       if (yyssp == yyss)
         YYABORT;
 
-
+      yyerror_range[1] = *yylsp;
       yydestruct ("Error: popping",
-                  YY_ACCESSING_SYMBOL (yystate), yyvsp);
+                  YY_ACCESSING_SYMBOL (yystate), yyvsp, yylsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -2122,6 +3140,9 @@ yyerrlab1:
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 
+  yyerror_range[2] = yylloc;
+  ++yylsp;
+  YYLLOC_DEFAULT (*yylsp, yyerror_range, 2);
 
   /* Shift the error token.  */
   YY_SYMBOL_PRINT ("Shifting", YY_ACCESSING_SYMBOL (yyn), yyvsp, yylsp);
@@ -2165,7 +3186,7 @@ yyreturnlab:
          user semantic actions for why this is necessary.  */
       yytoken = YYTRANSLATE (yychar);
       yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval);
+                  yytoken, &yylval, &yylloc);
     }
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYABORT or YYACCEPT.  */
@@ -2174,7 +3195,7 @@ yyreturnlab:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-                  YY_ACCESSING_SYMBOL (+*yyssp), yyvsp);
+                  YY_ACCESSING_SYMBOL (+*yyssp), yyvsp, yylsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -2185,15 +3206,9 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 642 "sintatic.y"
+#line 1166 "sintatic.y"
 
 
-int yyerror(char *s){
-    Nodo *error = new struct Nodo;
-    error->nombre = "Error";
-    error->valor = s;
-    inicial->hijos.push_back(error);
-}
 
 
 void printNode(Nodo *init, int tabuladores){
@@ -2230,10 +3245,31 @@ Nodo* getSintactic(const char* filename){
     yyin = file;
     yyparse();
     fclose(file);
+    yylineno = 1;
     return inicial;
 }
 
+int yyerror(std::string s){
+    std::cout << "error: " << s << " in line " << yylineno << "\n";
+    errorLine = std::to_string(yylineno-1);
+    /*std::cout << "Error sin definir\n";
+    Nodo *error = new struct Nodo;
+    error->nombre = "Error";
+    error->valor = s;
+    inicial->hijos.push_back(error);*/
+    //std::cout << "Error en la línea " << @$.first_line << ", columna: " << @$.first_column;
+    return -1;
+}
+
 /*int main(int argc, char **argv){
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        Nodo *error = new struct Nodo;
+        error->nombre = "Error";
+        error->valor = "No se pudo abrir el archivo";
+        inicial = error;
+    }
+    yyin = file;
     yyparse();
     std::cout << "\n---Arbol---\n\n";
     printNode(inicial,0);

@@ -5,7 +5,7 @@
     #include <iostream>
     #include <vector>
     #include <string>
-    
+    std::string errorLine;
     extern int yylineno;
     // Definiciones para el rastreo de ubicaciones
     /*#define YYLTYPE_IS_DECLARED 1
@@ -164,7 +164,7 @@
             std::cout << "Error decl - tipo error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "declaracion - tipo error";
+            $$->valor = "declaracion - tipo error, linea: " + errorLine;
             inicial = $$;
         }
     tipo: 
@@ -193,7 +193,7 @@
                 std::cout << "Error tipo\n";
                 $$ = new struct Nodo;
                 $$->nombre = "Error sintactico";
-                $$->valor = "falta tipo";
+                $$->valor = "falta tipo, linea: " + errorLine;
                 inicial = $$;
                 yyerrok;
         }
@@ -224,14 +224,14 @@
             std::cout << "Error id\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta id";
+            $$->valor = "falta id, linea: " + errorLine;
             inicial = $$;
         }
         | error{
             std::cout << "Error id\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta id";
+            $$->valor = "falta id, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -370,203 +370,203 @@
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta condicion entre parentesis, then y el bloque y finalizacion";
+            $$->valor = "if falta condicion entre parentesis, then y el bloque y finalizacion, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta then, el bloque y finalizacion";
+            $$->valor = "if falta then, el bloque y finalizacion, linea: " + errorLine;
             inicial = $$;
         }
         | IF error THEN error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta condicion, el bloque y finalizacion";
+            $$->valor = "if falta condicion, el bloque y finalizacion, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque y finalizacion";
+            $$->valor = "if falta bloque y finalizacion, linea: " + errorLine;
             inicial = $$;
         }
         | IF error FI{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta condicion y bloque ";
+            $$->valor = "if falta condicion y bloque, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN bloque ELSE error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if-else falta bloque y finalizacion";
+            $$->valor = "if-else falta bloque y finalizacion, linea: " + errorLine;
             inicial = $$;
         } 
         | IF error ELSE error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if-else falta bloque if, bloque else y finalizacion";
+            $$->valor = "if-else falta bloque if, bloque else y finalizacion, linea: " + errorLine;
             inicial = $$;
         }
         | IF error ELSE bloque error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if-else falta bloque if, finalizacion";
+            $$->valor = "if-else falta bloque if, finalizacion, linea: " + errorLine;
             inicial = $$;
         } 
         | IF PI exp-bool PD THEN bloque ELSE bloque error{
             std::cout << "Error\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if-else falta finalizacion";
+            $$->valor = "if-else falta finalizacion, linea: " + errorLine;
             inicial = $$;
         } 
         | IF PI exp-bool PD error bloque ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta THEN";
+            $$->valor = "if falta THEN, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque siguiente";
+            $$->valor = "if falta bloque siguiente, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN bloque error bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta sentencia else";
+            $$->valor = "if falta sentencia else, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN bloque ELSE error FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque después de else";
+            $$->valor = "if falta bloque después de else, linea: " + errorLine;
             inicial = $$;
         }
         | IF error PD THEN bloque ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta paréntesis de inicio y expresión boleana";
+            $$->valor = "if falta paréntesis de inicio y expresión boleana, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta paréntesis de termino y THEN";
+            $$->valor = "if falta paréntesis de termino y THEN, linea: " + errorLine;
             inicial = $$;
         }
         | IF error THEN bloque ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta paréntesis de inicio, termino y expresión ";
+            $$->valor = "if falta paréntesis de inicio, termino y expresión, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD error bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta THEN, ELSE y bloque";
+            $$->valor = "if falta THEN, ELSE y bloque, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI error bloque ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta expresión boleana, THEN, ELSE y bloque";
+            $$->valor = "if falta expresión boleana, THEN, ELSE y bloque, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque";
+            $$->valor = "if falta bloque, linea: " + errorLine;
             inicial = $$;
         }
         | IF error ELSE bloque FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque";
+            $$->valor = "if falta bloque, linea: " + errorLine;
             inicial = $$;
         }
         | IF PI error FI {
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta Exoresión, Parentesis derecho, THEN, bloque";
+            $$->valor = "if falta Exoresión, Parentesis derecho, THEN, bloque, linea: " + errorLine;
             inicial = $$;
         }  
         | IF PD exp-bool PI error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta THEN, bloque, FI";
+            $$->valor = "if falta THEN, bloque, FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque, FI";
+            $$->valor = "if falta bloque, FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta FI";
+            $$->valor = "if falta FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque ELSE error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta bloque, FI";
+            $$->valor = "if falta bloque, FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque ELSE bloque error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta FI";
+            $$->valor = "if falta FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI error bloque ELSE bloque error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta, THEN, FI";
+            $$->valor = "if falta, THEN, FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque error bloque error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta, ELSE, FI";
+            $$->valor = "if falta, ELSE, FI, linea: " + errorLine;
             inicial = $$;
         }
         | IF PD exp-bool PI error bloque error bloque error{
             std::cout << "Error if\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "if falta, THEN, ELSE, FI";
+            $$->valor = "if falta, THEN, ELSE, FI, linea: " + errorLine;
             inicial = $$;
         }
     sent-while: 
@@ -594,21 +594,21 @@
             std::cout << "Error while\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "while falta condicion entre parentesis y cuerpo";
+            $$->valor = "while falta condicion entre parentesis y cuerpo, linea: " + errorLine;
             inicial = $$;
         }
         | WHILE error bloque{
             std::cout << "Error while\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "while falta expresion entre parentesis";
+            $$->valor = "while falta expresion entre parentesis, linea: " + errorLine;
             inicial = $$;
         }
         | WHILE PI exp-bool PD error{
             std::cout << "Error while\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "while falta bloque";
+            $$->valor = "while falta bloque, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -645,119 +645,119 @@
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta cuerpo";
+            $$->valor = "do falta cuerpo, linea: " + errorLine;
             inicial = $$;
         }
         | DO bloque error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta until, condicion y punto y coma";
+            $$->valor = "do falta until, condicion y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO UNTIL error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, condicion y punto y coma";
+            $$->valor = "do falta bloque, condicion y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PI exp-bool PD error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PYC{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y condicion";
+            $$->valor = "do falta bloque, until y condicion, linea: " + errorLine;
             inicial = $$;
         }
         | DO bloque UNTIL error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta condicion y punto y coma";
+            $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO bloque PI exp-bool PD error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta condicion y punto y coma";
+            $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO bloque PYC error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta condicion y punto y coma";
+            $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO UNTIL bloque error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do desorganizado";
+            $$->valor = "do desorganizado, linea: " + errorLine;
             inicial = $$;
         }
         | DO UNTIL PI exp-bool PD error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do desorganizado";
+            $$->valor = "do desorganizado, linea: " + errorLine;
             inicial = $$;
         }
         | DO UNTIL PYC{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do desorganizado";
+            $$->valor = "do desorganizado, linea: " + errorLine;
             inicial = $$;
         }
         | DO PI exp-bool PD bloque error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PI exp-bool PD UNTIL error{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PI exp-bool PD PYC{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PYC bloque{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PYC UNTIL{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | DO PYC PI exp-bool PD{
             std::cout << "Error do\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "do falta bloque, until y punto y coma";
+            $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -785,21 +785,21 @@
             std::cout << "Error read\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "read sentencia incompleta";
+            $$->valor = "read sentencia incompleta, linea: " + errorLine;
             inicial = $$;
         }
         | READ IDENTIFICADOR error{
             std::cout << "Error read\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta punto y coma en read";
+            $$->valor = "falta punto y coma en read, linea: " + errorLine;
             inicial = $$;
         }
         | READ error PYC{
             std::cout << "Error read\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta el id para leer";
+            $$->valor = "falta el id para leer, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -823,7 +823,7 @@
             std::cout << "Error write\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "write sentencia incompleta";
+            $$->valor = "write sentencia incompleta, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -869,21 +869,21 @@
             std::cout << "Error assign\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta la sentencia de asignacion";
+            $$->valor = "falta la sentencia de asignacion, linea: " + errorLine;
             inicial = $$;
         }
         | IDENTIFICADOR ASIG error{
             std::cout << "Error assign\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta la expresion de asignación y un punto y coma";
+            $$->valor = "falta la expresion de asignación y un punto y coma, linea: " + errorLine;
             inicial = $$;
         }
         | IDENTIFICADOR error PYC{
             std::cout << "Error assign\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta la asignacion y la expresion";
+            $$->valor = "falta la asignacion y la expresion, linea: " + errorLine;
             inicial = $$;
         }
         
@@ -1012,7 +1012,7 @@
             std::cout << "Error op-rel\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta op-rel";
+            $$->valor = "falta op-rel, linea: " + errorLine;
             inicial = $$;
         }
     expr: 
@@ -1160,7 +1160,7 @@
             std::cout << "Error factor\n";
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
-            $$->valor = "falta factor";
+            $$->valor = "falta factor, linea: " + errorLine;
             inicial = $$;
         }
 %%
@@ -1201,11 +1201,13 @@ Nodo* getSintactic(const char* filename){
     yyin = file;
     yyparse();
     fclose(file);
+    yylineno = 1;
     return inicial;
 }
 
 int yyerror(std::string s){
     std::cout << "error: " << s << " in line " << yylineno << "\n";
+    errorLine = std::to_string(yylineno-1);
     /*std::cout << "Error sin definir\n";
     Nodo *error = new struct Nodo;
     error->nombre = "Error";
@@ -1215,9 +1217,17 @@ int yyerror(std::string s){
     return -1;
 }
 
-int main(int argc, char **argv){
+/*int main(int argc, char **argv){
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        Nodo *error = new struct Nodo;
+        error->nombre = "Error";
+        error->valor = "No se pudo abrir el archivo";
+        inicial = error;
+    }
+    yyin = file;
     yyparse();
     std::cout << "\n---Arbol---\n\n";
     printNode(inicial,0);
     return 0;
-}
+}*/

@@ -2,8 +2,9 @@
 /*Variables*/
 %{
     #include <iostream>
-    #include "sintatic.tab.cpp"
+    #include "sintatic.tab.c"
     #include <vector>
+    #include <algorithm>
     int yylex(void);
     void showError(char* other);
     void yyrestart(FILE *);
@@ -45,6 +46,7 @@
         yyrestart(file); 
         yylex();
         fclose(file);
+        yylineno = 1;
         return lexVec;
     }
 
@@ -61,6 +63,7 @@
         text_index = 0;
         yy_scan_string(input_text);
         yylex();
+        yylineno = 1;
         return lexVec;
     }
 
@@ -593,6 +596,9 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
+        for(int i=0; i < strlen(yytext); i++){
+            if(yytext[i] == '\n')countLines += 1;
+        }
         //printf("lex: comentario\n");
     }
 {NUMERO} {
@@ -627,7 +633,7 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
     lexVec[lexVec.size()-1].columna = countColumn;
     lexVec[lexVec.size()-1].fila = countLines;
      //printf("lex: %s\n",yytext);
-    return 0;
+    //if(ret) return 0;
 }
 %%
 
