@@ -221,6 +221,62 @@ IF error exp-bool error THEN bloque ELSE bloque error {
 	$$->valor = "if falta Parentesis izquierdo, Parentesis derecho, FI";
 	inicial = $$;
 }
+IF PD exp-bool PI error{
+	std::cout << "Error if\n";
+	$$ = new struct Nodo;
+	$$->nombre = "Error sintactico";
+	$$->valor = "if falta THEN, bloque, FI";
+	inicial = $$;
+}
+IF PD exp-bool PI THEN error{
+	std::cout << "Error if\n";
+	$$ = new struct Nodo;
+	$$->nombre = "Error sintactico";
+	$$->valor = "if falta THEN, bloque, FI";
+	inicial = $$;
+}
+IF PD exp-bool PI THEN bloque error{
+	std::cout << "Error if\n";
+	$$ = new struct Nodo;
+	$$->nombre = "Error sintactico";
+	$$->valor = "if falta THEN, bloque, FI";
+	inicial = $$;
+}
+IF PD exp-bool PI THEN bloque ELSE error{
+	std::cout << "Error if\n";
+	$$ = new struct Nodo;
+	$$->nombre = "Error sintactico";
+	$$->valor = "if falta THEN, bloque, FI";
+	inicial = $$;
+}
+IF PD exp-bool PI THEN bloque ELSE bloque error{
+	std::cout << "Error if\n";
+	$$ = new struct Nodo;
+	$$->nombre = "Error sintactico";
+	$$->valor = "if falta THEN, bloque, FI";
+	inicial = $$;
+}
+     IF PD exp-bool PI error bloque ELSE bloque error{
+            std::cout << "Error if\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta, THEN, FI";
+            inicial = $$;
+        }
+     IF PD exp-bool PI THEN bloque error bloque error{
+            std::cout << "Error if\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta, ELSE, FI";
+            inicial = $$;
+        }
+        IF PD exp-bool PI error bloque error bloque error{
+            std::cout << "Error if\n";
+            $$ = new struct Nodo;
+            $$->nombre = "Error sintactico";
+            $$->valor = "if falta, THEN, ELSE, FI";
+            inicial = $$;
+        }
 /* Marcó error
 | IF PI exp-bool PD THEN bloque ELSE bloque error {
             std::cout << "Error if\n";
