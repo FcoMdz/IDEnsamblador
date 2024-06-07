@@ -352,8 +352,8 @@ C:/Users/gerar/Git/IDEnsamblador/mainwindow.h
  mdp:C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h
  mdp:C:/Users/gerar/Git/IDEnsamblador/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/IDEnsamblador_autogen/moc_predefs.h
  mdp:C:/Users/gerar/Git/IDEnsamblador/mainwindow.h
-C:/Users/gerar/Git/IDEnsamblador/lex.yy.c
 C:/Users/gerar/Git/IDEnsamblador/sintatic.tab.h
+C:/Users/gerar/Git/IDEnsamblador/lex.yy.c
 C:/Users/gerar/Git/IDEnsamblador/main.cpp
 C:/Users/gerar/Git/IDEnsamblador/mainwindow.cpp
  uic:./ui_mainwindow.h

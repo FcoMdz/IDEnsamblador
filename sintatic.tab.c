@@ -3251,7 +3251,7 @@ Nodo* getSintactic(const char* filename){
 
 int yyerror(std::string s){
     std::cout << "error: " << s << " in line " << yylineno << "\n";
-    errorLine = std::to_string(yylineno-1);
+    errorLine = std::to_string(yylineno);
     /*std::cout << "Error sin definir\n";
     Nodo *error = new struct Nodo;
     error->nombre = "Error";
