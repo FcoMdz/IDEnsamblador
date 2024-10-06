@@ -22,6 +22,8 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTimer>
+#include <QTreeView>
+#include <QStandardItemModel>
 //#include "sintatic.tab.c"
 #include "lex.yy.c"
 
@@ -68,39 +70,80 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
     table->resizeRowsToContents();
 }
 
-bool showSintaticData(Nodo *init, QTextEdit *view, int tabuladores, QTextEdit *error){
-    //qDebug() << "iteracion: " << init->nombre;
+bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
+
     if(init != NULL){
+        //qDebug() << "iteracion: " << init->nombre;
         if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
             if(init->hijos.size() > 0){
-                bool exito = showSintaticData(init->hijos.at(0), view,tabuladores, error);
+                bool exito = showSintaticData(init->hijos.at(0), error, view);
                 if(exito){
                     error->append("Sintáctico completo sin problemas");
                 }
                 return exito;
             }
         }else{
-            std::string agregar = "";
-            for(int i=0; i<tabuladores; i++){
-                agregar += "  |";
-            }
-            agregar += init->nombre;
-            agregar += ": ";
-            agregar += init->valor;
-            view->append(QString::fromStdString(agregar));
+
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
+
+            view->appendRow(node);
+
             bool comprobado = true;
             if(QString::fromStdString(init->nombre).compare("Error sintactico", Qt::CaseInsensitive) == 0){
+
                 error->append("Error sintáctico: " + QString::fromStdString(init->valor));
                 comprobado = false;
             }
             for(int i=0; i<init->hijos.size(); i++){
-                bool res = showSintaticData(init->hijos.at(i), view,tabuladores+1, error);
+
+                bool res = showSintaticData(init->hijos.at(i), error, node);
                 if(!res){
-                    /*if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
-                        error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
-                    }else{
-                        error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor));
-                    }*/
+                    //if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
+                    //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
+                    //}else{
+                    //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor));
+                    //}
+                    comprobado = false;
+                }
+            }
+            return comprobado;
+        }
+    }
+    return true;
+}
+
+bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) {
+    if(init != NULL){
+        //qDebug() << "iteracion: " << init->nombre;
+        if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
+            if(init->hijos.size() > 0){
+                bool exito = showSemanticData(init->hijos.at(0), error, view);
+                if(exito){
+                    error->append("Semántico completo sin problemas");
+                }
+                return exito;
+            }
+        }else{
+
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
+
+            view->appendRow(node);
+
+            bool comprobado = true;
+            if(QString::fromStdString(init->nombre).compare("Error sintactico", Qt::CaseInsensitive) == 0){
+
+                error->append("Error sintáctico: " + QString::fromStdString(init->valor));
+                comprobado = false;
+            }
+            for(int i=0; i<init->hijos.size(); i++){
+
+                bool res = showSemanticData(init->hijos.at(i), error, node);
+                if(!res){
+                    //if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
+                    //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
+                    //}else{
+                    //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor));
+                    //}
                     comprobado = false;
                 }
             }
@@ -278,10 +321,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *button4 = new QPushButton("Código intermedio");
 
     // Crear el cuadro de texto para el análisis sintáctico
-    QTextEdit *syntacticText = new QTextEdit;
-    syntacticText->setFont(font);
-    syntacticText->setLineWrapMode(QTextEdit::NoWrap);
-    syntacticText->setReadOnly(true);
+    QTreeView *syntacticTreeView = new QTreeView;
+    syntacticTreeView->setFont(font);
+    syntacticTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // Crear el cuadro de texto para el análisis semántico
+    QTreeView *semanticTreeView = new QTreeView;
+    semanticTreeView->setFont(font);
+    semanticTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     //Crear tabla
     QTableWidget *resultsTable = new QTableWidget();
@@ -294,7 +341,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QStackedWidget *stackedWidget = new QStackedWidget;
     //Añadir widgets al stackwidget para poder moverse entre ventanas.
     stackedWidget->addWidget(resultsTable);
-    stackedWidget->addWidget(syntacticText);
+    stackedWidget->addWidget(syntacticTreeView);
+    stackedWidget->addWidget(semanticTreeView);
 
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
@@ -314,7 +362,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(button2, &QPushButton::clicked, [stackedWidget]() {
         stackedWidget->setCurrentIndex(1);
     });
-
+    QObject::connect(button3, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(2);
+    });
 
 
     // Widget para contener los botones y el cuadro de texto
@@ -390,13 +440,19 @@ MainWindow::MainWindow(QWidget *parent) :
                 file.close();
                 resultsTable->setRowCount(0);
                 textVistaAbajo->clear();
-                syntacticText->clear();
+                QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
+                if (modelSyntactic) {
+                    modelSyntactic->clear();
+                }
                 codeEditor->clear();
             }
         }else{
             resultsTable->setRowCount(0);
             textVistaAbajo->clear();
-            syntacticText->clear();
+            QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
+            if (modelSyntactic) {
+                modelSyntactic->clear();
+            }
             codeEditor->clear();
         }
         fileName->assign("");
@@ -562,8 +618,28 @@ MainWindow::MainWindow(QWidget *parent) :
             sint->nombre = "apuntador";
             sint->hijos.clear();
             sint->hijos.push_back(getSintactic(fileName->toStdString().c_str()));
-            syntacticText->clear();
-            showSintaticData(sint, syntacticText,0,textVistaAbajo);
+
+            QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
+            if (modelSyntactic) {
+                modelSyntactic->clear();
+            }
+            QStandardItemModel *modelSyn = new QStandardItemModel;
+            QStandardItem *rootSyntatic = modelSyn->invisibleRootItem();
+            showSintaticData(sint, textVistaAbajo, rootSyntatic);
+            syntacticTreeView->setModel(modelSyn);
+            syntacticTreeView->show();
+            syntacticTreeView->expandAll();
+
+            QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
+            if (modelSemantic) {
+                modelSemantic->clear();
+            }
+            QStandardItemModel *modelSem = new QStandardItemModel;
+            QStandardItem *rootSem = modelSem->invisibleRootItem();
+            showSemanticData(sint, textVistaAbajo, rootSem);
+            semanticTreeView->setModel(modelSem);
+            semanticTreeView->show();
+            semanticTreeView->expandAll();
 
         }
     });
