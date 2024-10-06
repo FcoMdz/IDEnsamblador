@@ -24,6 +24,7 @@
         std::string nombre;
         std::string valor;
         std::vector<Nodo*> hijos;
+        std::string anotacion;
     } Nodo;
     Nodo *inicial = new struct Nodo;
     int yylex(void);
@@ -119,20 +120,8 @@
             std::cout << "program\n";
             $$ = new struct Nodo;
             $$->nombre = "program";
-            Nodo *prog = new struct Nodo;
-            prog->nombre = "program";
-            prog->valor = "program";
-            Nodo *li = new struct Nodo;
-            li->nombre = "li";
-            li->valor = "{";
-            Nodo *ld = new struct Nodo;
-            ld->nombre = "ld";
-            ld->valor = "}";
-            $$->hijos.push_back(prog);
-            $$->hijos.push_back(li);
             $$->hijos.push_back($3);
             $$->hijos.push_back($4);
-            $$->hijos.push_back(ld);
             inicial = $$;
         }
     list-decl:
@@ -152,12 +141,8 @@
             std::cout << "tipo list-id;\n";
             $$ = new struct Nodo;
             $$->nombre = "decl";
-            Nodo *pyc = new struct Nodo;
-            pyc->nombre = "pyc";
-            pyc->valor = ";";
             $$->hijos.push_back($1);
             $$->hijos.push_back($2);
-            $$->hijos.push_back(pyc);
             inicial = $$;
         }
         | tipo error{
@@ -202,15 +187,8 @@
                 std::cout << "list-id, id: " << $3 << "\n";
                 $$ = new struct Nodo;
                 $$->nombre = "list-id";
-                Nodo *coma = new struct Nodo;
-                coma->nombre = "coma";
-                coma->valor = ",";
-                Nodo *id = new struct Nodo;
-                id->nombre = "id";
-                id->valor = $3;
+                $$->valor = $3;
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(coma);
-                $$->hijos.push_back(id);
                 inicial = $$;
             }
         | IDENTIFICADOR {
@@ -250,51 +228,38 @@
     sent: 
         sent-if {
             std::cout << "sent-if\n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | sent-while {
             std::cout << "sent-while\n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | sent-do {
             std::cout << "sent-do\n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | sent-read {
             std::cout << "sent-read \n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | sent-write {
             std::cout << "sent-write\n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | sent-assign {
             std::cout << "sent-assign\n";
-                $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         | BREAK {
             std::cout << "break\n";
                 $$ = new struct Nodo;
-                $$->nombre = "sent";
-                $$->valor = $1;
+                $$->nombre = "break";
                 inicial = $$;
             }
         /*| error{
@@ -309,61 +274,17 @@
             std::cout << "if\n";
             $$ = new struct Nodo;
             $$->nombre = "sent-if";
-            Nodo *i = new struct Nodo;
-            i->nombre = "if";
-            i->valor = "if";
-            Nodo *pi = new struct Nodo;
-            pi->nombre = "pi";
-            pi->valor = "(";
-            Nodo *pd = new struct Nodo;
-            pd->nombre = "pd";
-            pd->valor = ")";
-            Nodo *the = new struct Nodo;
-            the->nombre = "then";
-            the->valor = "then";
-            Nodo *fi = new struct Nodo;
-            fi->nombre = "fi";
-            fi->valor = "fi";
-            $$->hijos.push_back(i);
-            $$->hijos.push_back(pi);
             $$->hijos.push_back($3);
-            $$->hijos.push_back(pd);
-            $$->hijos.push_back(the);
             $$->hijos.push_back($6);
-            $$->hijos.push_back(fi);
             inicial = $$;
             }      
         | IF PI exp-bool PD THEN bloque ELSE bloque FI {
             std::cout << "if-else\n";
             $$ = new struct Nodo;
-            $$->nombre = "sent-if";
-            Nodo *i = new struct Nodo;
-            i->nombre = "if";
-            i->valor = "if";
-            Nodo *pi = new struct Nodo;
-            pi->nombre = "pi";
-            pi->valor = "(";
-            Nodo *pd = new struct Nodo;
-            pd->nombre = "pd";
-            pd->valor = ")";
-            Nodo *the = new struct Nodo;
-            the->nombre = "then";
-            the->valor = "then";
-            Nodo *els = new struct Nodo;
-            els->nombre = "else";
-            els->valor = "else";
-            Nodo *fi = new struct Nodo;
-            fi->nombre = "fi";
-            fi->valor = "fi";
-            $$->hijos.push_back(i);
-            $$->hijos.push_back(pi);
+            $$->nombre = "sent-if-else";
             $$->hijos.push_back($3);
-            $$->hijos.push_back(pd);
-            $$->hijos.push_back(the);
             $$->hijos.push_back($6);
-            $$->hijos.push_back(els);
             $$->hijos.push_back($8);
-            $$->hijos.push_back(fi);
             inicial = $$;
             }
         | IF error{
@@ -574,19 +495,7 @@
             std::cout << "while\n";
             $$ = new struct Nodo;
             $$->nombre = "sent-while";
-            Nodo *whil = new struct Nodo;
-            whil->nombre = "while";
-            whil->valor = "while";
-            Nodo *pi = new struct Nodo;
-            pi->nombre = "pi";
-            pi->valor = "(";
-            Nodo *pd = new struct Nodo;
-            pd->nombre = "pd";
-            pd->valor = ")";
-            $$->hijos.push_back(whil);
-            $$->hijos.push_back(pi);
             $$->hijos.push_back($3);
-            $$->hijos.push_back(pd);
             $$->hijos.push_back($5);
             inicial = $$;
         }
@@ -617,28 +526,8 @@
             std::cout << "do\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent-do";
-                Nodo *d = new struct Nodo;
-                d->nombre = "do";
-                d->valor = "do";
-                Nodo *unti = new struct Nodo;
-                unti->nombre = "until";
-                unti->valor = "until";
-                Nodo *pi = new struct Nodo;
-                pi->nombre = "pi";
-                pi->valor = "(";
-                Nodo *pd = new struct Nodo;
-                pd->nombre = "pd";
-                pd->valor = ")";
-                Nodo *pyc = new struct Nodo;
-                pyc->nombre = "pyc";
-                pyc->valor = ";";
-                $$->hijos.push_back(d);
                 $$->hijos.push_back($2);
-                $$->hijos.push_back(unti);
-                $$->hijos.push_back(pi);
                 $$->hijos.push_back($5);
-                $$->hijos.push_back(pd);
-                $$->hijos.push_back(pyc);
                 inicial = $$;
             }
         | DO error{
@@ -766,19 +655,8 @@
         READ IDENTIFICADOR PYC {
             std::cout << "read\n";
             $$ = new struct Nodo;
-            $$->nombre = "bloque";
-            Nodo *read = new struct Nodo;
-            read->nombre = "read";
-            read->valor = "read";
-            Nodo *id = new struct Nodo;
-            id->nombre = "id";
-            id->valor = $2;
-            Nodo *pyc = new struct Nodo;
-            pyc->nombre = "pyc";
-            pyc->valor = ";";
-            $$->hijos.push_back(read);
-            $$->hijos.push_back(id);
-            $$->hijos.push_back(pyc);
+            $$->nombre = "read";
+            $$->valor = $2;
             inicial = $$;
         }
         | READ error{
@@ -807,16 +685,8 @@
         WRITE exp-bool PYC {
             std::cout << "write\n";
                 $$ = new struct Nodo;
-                $$->nombre = "bloque";
-                Nodo *write = new struct Nodo;
-                write->nombre = "write";
-                write->valor = "write";
-                Nodo *pyc = new struct Nodo;
-                pyc->nombre = "pyc";
-                pyc->valor = ";";
-                $$->hijos.push_back(write);
+                $$->nombre = "write";
                 $$->hijos.push_back($2);
-                $$->hijos.push_back(pyc);
                 inicial = $$;
             }
         | WRITE error{
@@ -832,15 +702,7 @@
             std::cout << "bloque\n";
                 $$ = new struct Nodo;
                 $$->nombre = "bloque";
-                Nodo *li = new struct Nodo;
-                li->nombre = "li";
-                li->valor = "{";
-                Nodo *ld = new struct Nodo;
-                ld->nombre = "ld";
-                ld->valor = "}";
-                $$->hijos.push_back(li);
                 $$->hijos.push_back($2);
-                $$->hijos.push_back(ld);
                 inicial = $$;
             }
         
@@ -852,16 +714,8 @@
                 Nodo *id = new struct Nodo;
                 id->nombre = "id";
                 id->valor = $1;
-                Nodo *asig = new struct Nodo;
-                asig->nombre = "asig";
-                asig->valor = "=";
-                Nodo *pyc = new struct Nodo;
-                pyc->nombre = "pyc";
-                pyc->valor = ";";
                 $$->hijos.push_back(id);
-                $$->hijos.push_back(asig);
                 $$->hijos.push_back($3);
-                $$->hijos.push_back(pyc);
                 inicial = $$;
             }
         
@@ -891,20 +745,14 @@
         exp-bool OR comb  {
             std::cout << "or\n";
                 $$ = new struct Nodo;
-                $$->nombre = "exp-bool";
-                Nodo *o = new struct Nodo;
-                o->nombre = "or";
-                o->valor = "or";
+                $$->nombre = "or";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(o);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | comb {
             std::cout << "comb\n";
-                $$ = new struct Nodo;
-                $$->nombre = "exp-bool";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         
@@ -912,20 +760,14 @@
         comb AND igualdad {
             std::cout << "and\n";
                 $$ = new struct Nodo;
-                $$->nombre = "comb";
-                Nodo *an = new struct Nodo;
-                an->nombre = "and";
-                an->valor = "and";
+                $$->nombre = "and";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(an);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | igualdad {
             std::cout << "igualdad\n";
-                $$ = new struct Nodo;
-                $$->nombre = "comb";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         
@@ -934,31 +776,21 @@
             std::cout << "igu\n";
                 $$ = new struct Nodo;
                 $$->nombre = "igualdad";
-                Nodo *igu = new struct Nodo;
-                igu->nombre = "igu";
-                igu->valor = "==";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(igu);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | igualdad DIS rel {
             std::cout << "dis\n";
                 $$ = new struct Nodo;
-                $$->nombre = "igualdad";
-                Nodo *dis = new struct Nodo;
-                dis->nombre = "dis";
-                dis->valor = "!=";
+                $$->nombre = "distinto";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(dis);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | rel {
             std::cout << "rel\n";
-                $$ = new struct Nodo;
-                $$->nombre = "igualdad";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         
@@ -966,7 +798,7 @@
         expr op-rel expr {
             std::cout << "expr op-rel expr\n";
                 $$ = new struct Nodo;
-                $$->nombre = "rel";
+                $$->nombre = "op-rel";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($2);
                 $$->hijos.push_back($3);
@@ -974,9 +806,7 @@
             }
         | expr {
             std::cout << "expr\n";
-                $$ = new struct Nodo;
-                $$->nombre = "rel";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
     op-rel: 
@@ -1019,32 +849,22 @@
         expr RES term {
             std::cout << "res\n";
                 $$ = new struct Nodo;
-                $$->nombre = "expr";
-                Nodo *res = new struct Nodo;
-                res->nombre = "res";
-                res->valor = "-";
+                $$->nombre = "resta";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(res);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | expr MAS term {
             std::cout << "mas\n";
                 $$ = new struct Nodo;
-                $$->nombre = "expr";
-                Nodo *mas = new struct Nodo;
-                mas->nombre = "mas";
-                mas->valor = "+";
+                $$->nombre = "suma";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(mas);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | term {
             std::cout << "term\n";
-                $$ = new struct Nodo;
-                $$->nombre = "expr";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
         
@@ -1052,12 +872,8 @@
         term MUL unario {
             std::cout << "mul\n";
                 $$ = new struct Nodo;
-                $$->nombre = "term";
-                Nodo *mul = new struct Nodo;
-                mul->nombre = "mul";
-                mul->valor = "*";
+                $$->nombre = "multiplicacion";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(mul);
                 $$->hijos.push_back($3);
                 inicial = $$;
             
@@ -1065,50 +881,34 @@
         | term DIV unario {
             std::cout << "div\n";
                 $$ = new struct Nodo;
-                $$->nombre = "term";
-                Nodo *div = new struct Nodo;
-                div->nombre = "div";
-                div->valor = "/";
+                $$->nombre = "division";
                 $$->hijos.push_back($1);
-                $$->hijos.push_back(div);
                 $$->hijos.push_back($3);
                 inicial = $$;
             }
         | unario {
             std::cout << "Unario\n";
-                $$ = new struct Nodo;
-                $$->nombre = "term";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }
     unario: 
         NOT unario {
             std::cout << "Not unario\n";
                 $$ = new struct Nodo;
-                $$->nombre = "unario";
-                Nodo *no = new struct Nodo;
-                no->nombre = "not";
-                no->valor = "not";
-                $$->hijos.push_back(no);
+                $$->nombre = "negacion";
                 $$->hijos.push_back($2);
                 inicial = $$;
             }
         | RES unario {
             std::cout << "RES unario\n";
                 $$ = new struct Nodo;
-                $$->nombre = "unario";
-                Nodo *res = new struct Nodo;
-                res->nombre = "res";
-                res->valor = "-";
-                $$->hijos.push_back(res);
+                $$->nombre = "menos";
                 $$->hijos.push_back($2);
                 inicial = $$;
             }
         | factor {
             std::cout << "Factor\n";
-                $$ = new struct Nodo;
-                $$->nombre = "unario";
-                $$->hijos.push_back($1);
+                $$ = $1;
                 inicial = $$;
             }        
     factor: 
@@ -1116,43 +916,35 @@
             //!Revisar
                 std::cout << "(exp-bool)\n";
                 $$ = new struct Nodo;
-                $$->nombre = "factor";
-                Nodo *pi = new struct Nodo;
-                pi->nombre = "pi";
-                pi->valor = "(";
-                Nodo *pd = new struct Nodo;
-                pd->nombre = "pd";
-                pd->valor = ")";
-                $$->hijos.push_back(pi);
+                $$->nombre = "(exp-bool)";
                 $$->hijos.push_back($2);
-                $$->hijos.push_back(pd);
                 inicial = $$;
             }
         | IDENTIFICADOR {
                 std::cout << "id: "<< $1 << "\n";
                 $$ = new struct Nodo;
-                $$->nombre = "factor";
+                $$->nombre = "identificador";
                 $$->valor = $1;
                 inicial = $$;
             }
         | NUMERO {
                 std::cout << "Numero: " << $1 <<  "\n";
                 $$ = new struct Nodo;
-                $$->nombre = "factor";
+                $$->nombre = "numero";
                 $$->valor = std::to_string($1);
                 inicial = $$;
             }
         | TRUE {
                 std::cout << "True\n";
                 $$ = new struct Nodo;
-                $$->nombre = "factor";
+                $$->nombre = "true";
                 $$->valor = $1;
                 inicial = $$;
             }
         | FALSE {
                 std::cout << "False\n";
                 $$ = new struct Nodo;
-                $$->nombre = "factor";
+                $$->nombre = "false";
                 $$->valor = $1;
                 inicial = $$;
             }
