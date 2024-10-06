@@ -712,7 +712,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "sent-assign";
                 Nodo *id = new struct Nodo;
-                id->nombre = "id";
+                id->nombre = "identificador";
                 id->valor = $1;
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
