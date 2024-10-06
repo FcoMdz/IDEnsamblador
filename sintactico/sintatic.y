@@ -194,7 +194,7 @@
         | IDENTIFICADOR {
             std::cout << "id: " << $1 << "\n";
             $$ = new struct Nodo;
-            $$->nombre = "id";
+            $$->nombre = "identificador";
             $$->valor = $1;
             inicial = $$;
         }

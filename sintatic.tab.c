@@ -1553,7 +1553,7 @@ yyreduce:
                         {
             std::cout << "id: " << (yyvsp[0].cadena) << "\n";
             (yyval.nodo) = new struct Nodo;
-            (yyval.nodo)->nombre = "id";
+            (yyval.nodo)->nombre = "identificador";
             (yyval.nodo)->valor = (yyvsp[0].cadena);
             inicial = (yyval.nodo);
         }
