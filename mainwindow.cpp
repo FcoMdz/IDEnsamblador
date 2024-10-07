@@ -74,6 +74,7 @@ typedef struct LineListRec {
 typedef struct BucketListRec {
     std::string name;
     LineList lines;
+    std::string tipo;
     int memloc;
     struct BucketListRec * next;
 } * BucketList;
@@ -81,7 +82,8 @@ typedef struct BucketListRec {
 
 static BucketList hashTable[SIZE];
 
-void st_insert(const std::string& name, int lineno, int loc) {
+void st_insert(const std::string& name,const std::string& tipo, int lineno, int loc) {
+
     int h = hash(name);
     BucketList l = hashTable[h];
 
@@ -91,9 +93,10 @@ void st_insert(const std::string& name, int lineno, int loc) {
 
     if (l == NULL) { // Si la variable no está en la tabla, la insertamos
         currentMemLoc++;
-        l = (BucketList) malloc(sizeof(struct BucketListRec));
+        l = (BucketList) calloc(1, sizeof(struct BucketListRec));
         l->name = name;  // Guardamos la variable como std::string
-        l->lines = (LineList) malloc(sizeof(struct LineListRec));
+        l->tipo = tipo;
+        l->lines = (LineList) calloc(1, sizeof(struct LineListRec));
         l->lines->lineno = lineno;
         l->memloc = loc;
         l->lines->next = NULL;
@@ -143,13 +146,13 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
     table->resizeRowsToContents();
 }
 void printSymTabToView(QTextEdit *view) {
-    view->append("Variable Name      Location   Line Numbers");
-    view->append("----------------  --------   -------------");
+    view->append("Variable Name     type    Location   Line Numbers");
+    view->append("---------------- -------  --------   -------------");
     for (int i = 0; i < SIZE; ++i) {
         if (hashTable[i] != NULL) {
             BucketList l = hashTable[i];
             while (l != NULL) {
-                QString output = QString("%1\t%2\t").arg(QString::fromStdString(l->name)).arg(l->memloc);
+                QString output = QString("%1\t\t%3\t%2\t\t").arg(QString::fromStdString(l->name)).arg(l->memloc).arg(QString::fromStdString(l->tipo));
                 LineList t = l->lines;
                 while (t != NULL) {
                     output.append(QString::number(t->lineno) + " ");
@@ -244,24 +247,27 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
     }
     return true;
 }
-void procesarTablaHash(Nodo *init) {
+void procesarTablaHash(Nodo *init, std::string var_tipo = "") {
     if (init == NULL) return;
-
-    if (QString::fromStdString(init->nombre).compare("identificador", Qt::CaseInsensitive) == 0) {
-        std::string var_name = init->valor;   // Nombre de la variable
+    if (QString::fromStdString(init->nombre).compare("decl", Qt::CaseInsensitive) == 0) {
+        var_tipo = init->hijos.at(0)->valor;
+    }
+    if (QString::fromStdString(init->nombre).compare("list-id", Qt::CaseInsensitive) == 0
+        || QString::fromStdString(init->nombre).compare("identificador", Qt::CaseInsensitive) == 0) {
+        std::string var_name = init->valor;   // Nombre de la
         int lineno = init->noLinea;;  // Asume que puedes obtener el número de línea
         int memloc = getNextMemLocation();  // Genera ubicación en memoria
 
         char* var_name_mutable = toMutableCharArray(var_name);
         // Insertar en la tabla hash
-        st_insert(var_name_mutable, lineno, memloc);
+        st_insert(var_name_mutable,var_tipo, lineno, memloc);
 
         delete[] var_name_mutable;  // Liberar memoria
     }
 
     // Recorrer los hijos del nodo
     for (int i = 0; i < init->hijos.size(); i++) {
-        procesarTablaHash(init->hijos.at(i));
+        procesarTablaHash(init->hijos.at(i),var_tipo);
     }
 }
 
