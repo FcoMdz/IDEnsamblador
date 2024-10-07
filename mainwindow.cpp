@@ -49,7 +49,7 @@ protected:
 #define SHIFT 32
 
 /* the hash function */
-static int hash(const std::string& key) {
+static int hash(const std::string &key) {
     int temp = 0;
     int i = 0;
     while (i < key.length()) {
@@ -90,6 +90,7 @@ void st_insert(const std::string& name, int lineno, int loc) {
     }
 
     if (l == NULL) { // Si la variable no está en la tabla, la insertamos
+        currentMemLoc++;
         l = (BucketList) malloc(sizeof(struct BucketListRec));
         l->name = name;  // Guardamos la variable como std::string
         l->lines = (LineList) malloc(sizeof(struct LineListRec));
@@ -109,7 +110,7 @@ void st_insert(const std::string& name, int lineno, int loc) {
 
 
 int getNextMemLocation() {
-    return currentMemLoc++;  // Incrementa y devuelve la ubicación de memoria actual
+    return currentMemLoc;  // Incrementa y devuelve la ubicación de memoria actual
 }
 char* toMutableCharArray(const std::string& str) {
     char* mutableStr = new char[str.size() + 1];  // Crear un array dinámico
@@ -175,7 +176,7 @@ bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
 
             view->appendRow(node);
 
@@ -216,7 +217,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
 
             view->appendRow(node);
 

@@ -785,12 +785,13 @@
             std::cout << "id=exp-bool;\n";
                 $$ = new struct Nodo;
                 $$->nombre = "sent-assign";
+                $$->noLinea = yylineno;
                 Nodo *id = new struct Nodo;
                 id->nombre = "identificador";
                 id->valor = $1[0];
+                id->noLinea = yylineno;
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
-                $$->noLinea = yylineno;
                 inicial = $$;
             }
         
@@ -1064,7 +1065,7 @@ void printNode(Nodo *init, int tabuladores){
         for(int i=0; i<tabuladores; i++){
             std::cout<<"  |";
         } 
-        std::cout << init->nombre << ": " << init->valor << "\n";
+        std::cout << init->nombre << ": " << init->valor << ", " << init->noLinea << "\n";
         for(int i=0; i<init->hijos.size(); i++){
             printNode(init->hijos.at(i),tabuladores+1);
         }
@@ -1090,7 +1091,6 @@ Nodo* getSintactic(const char* filename){
         error->valor = "No se pudo abrir el archivo";
         inicial = error;
     }
-    yylineno = 1;
     yyin = file;
     yyparse();
     fclose(file);
