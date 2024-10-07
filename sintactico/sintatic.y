@@ -1036,7 +1036,7 @@
         | TRUE {
                 std::cout << "True\n";
                 $$ = new struct Nodo;
-                $$->nombre = "true";
+                $$->nombre = "booleano";
                 $$->valor = $1;
                 $$->noLinea = yylineno;
                 inicial = $$;
@@ -1044,7 +1044,7 @@
         | FALSE {
                 std::cout << "False\n";
                 $$ = new struct Nodo;
-                $$->nombre = "false";
+                $$->nombre = "booleano";
                 $$->valor = $1;
                 $$->noLinea = yylineno;
                 inicial = $$;

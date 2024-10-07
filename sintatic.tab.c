@@ -2867,7 +2867,7 @@ yyreduce:
                {
                 std::cout << "True\n";
                 (yyval.nodo) = new struct Nodo;
-                (yyval.nodo)->nombre = "true";
+                (yyval.nodo)->nombre = "booleano";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
@@ -2880,7 +2880,7 @@ yyreduce:
                 {
                 std::cout << "False\n";
                 (yyval.nodo) = new struct Nodo;
-                (yyval.nodo)->nombre = "false";
+                (yyval.nodo)->nombre = "booleano";
                 (yyval.nodo)->valor = (yyvsp[0].cadena);
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);

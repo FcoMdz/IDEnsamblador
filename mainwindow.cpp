@@ -133,7 +133,6 @@ char* toMutableCharArray(const std::string& str) {
     return mutableStr;
 }
 
-
 void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *error){
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
@@ -156,20 +155,26 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
 }
-void printSymTabToView(QTextEdit *view) {
-    view->append("Variable Name     type    Location   Line Numbers");
-    view->append("---------------- -------  --------   -------------");
+void printSymTabToView(QTableWidget *table) {
+    table->setColumnCount(4);
+    table->setHorizontalHeaderLabels(QStringList() << "Variable name" << "Type" << "Location" << "Line Numbers");
+    table->setRowCount(SIZE);
+    bool checkError = false;
     for (int i = 0; i < SIZE; ++i) {
         if (hashTable[i] != NULL) {
             BucketList l = hashTable[i];
             while (l != NULL) {
-                QString output = QString("%1\t\t%3\t%2\t\t").arg(QString::fromStdString(l->name)).arg(l->memloc).arg(QString::fromStdString(l->tipo));
+                table->setItem(i,0, new QTableWidgetItem(QString::fromStdString(l->name)));
+                table->setItem(i,1, new QTableWidgetItem(QString::fromStdString(l->tipo)));
+                QString output = QString("%1").arg(l->memloc);
+                table->setItem(i,2, new QTableWidgetItem(output));
+                QString aux = "";
                 LineList t = l->lines;
                 while (t != NULL) {
-                    output.append(QString::number(t->lineno) + " ");
+                    aux.append(QString::number(t->lineno) + " ");
                     t = t->next;
                 }
-                view->append(output);
+                table->setItem(i,3, new QTableWidgetItem(aux));
                 l = l->next;
             }
         }
@@ -228,7 +233,7 @@ BucketList getVariable(std::string name){
     return l;
 }
 
-float eval(Nodo *init, QTextEdit *error) {
+std::string eval(Nodo *init, QTextEdit *error) {
     if (init != NULL) {
         // Si es un nodo de operación
         if (init->nombre == "suma" || init->nombre == "resta" ||
@@ -236,10 +241,25 @@ float eval(Nodo *init, QTextEdit *error) {
 
             if (init->hijos.size() >= 2) {
                 // Evaluamos recursivamente los hijos
-                float leftValue = eval(init->hijos.at(0), error);  // Hijo izquierdo
-                float rightValue = eval(init->hijos.at(1), error);  // Hijo derecho
+                std::string leftString = eval(init->hijos.at(0), error);
+                std::string rightString = eval(init->hijos.at(1), error);
+                float leftValue = 0;
+                float rightValue = 0;
+                if(leftString == "true" || leftString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y numero, linea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+                if(rightString == "true" || rightString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y numero, linea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+                if(leftString != ""){
+                    leftValue = std::stof(leftString);  // Hijo izquierdo
+                }
+                if(rightString != ""){
+                     rightValue = std::stof(rightString);  // Hijo derecho
+                }
                 float result = 0;
-
                 // Realizamos la operación correspondiente
                 if (init->nombre == "suma") {
                     result = leftValue + rightValue;
@@ -257,12 +277,12 @@ float eval(Nodo *init, QTextEdit *error) {
 
                 // Guardamos el resultado en el nodo y lo devolvemos
                 init->anotacion = std::to_string(result);
-                return result;
+                return std::to_string(result);
             }
         } else if (init->nombre == "numero") {
             try {
                 // Convertimos el valor del nodo de string a float
-                return std::stof(init->valor);
+                return init->valor;
             } catch (const std::invalid_argument&) {
                 error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
                 return 0;
@@ -272,7 +292,7 @@ float eval(Nodo *init, QTextEdit *error) {
                 BucketList l = getVariable(init->valor);
                 if(l!=NULL){
                     if(l->tipo == "int" || l->tipo == "float"){
-                        return std::stof(l->value);
+                        return l->value;
                     }else{
                         init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
                         error->append("Error semántico, la variable " + QString::fromStdString(init->valor) + " no es compatible con la operación, línea: " + QString::number(init->noLinea));
@@ -289,13 +309,13 @@ float eval(Nodo *init, QTextEdit *error) {
             }
         }else if(init->nombre == "booleano"){
             if(init->valor == "true"){
-                return 1;
+                return "true";
             }else{
-                return 0;
+                return "false";
             }
         }
     }
-    return 0;
+    return "";
 }
 
 bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem *view) {
@@ -330,7 +350,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
 
             //Agregar casos para operacioens especificas
             if(init->anotacion == ""){
-                float result = 0;
+                std::string result = "";
                 //Caso 0 identificador
                 if (init->nombre == "identificador") {
                     // Obtener el valor evaluado con la función eval
@@ -347,10 +367,20 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     result = eval(init->hijos.at(1), error);
                     BucketList l = getVariable(init->hijos.at(0)->valor);
                     if(l!=NULL){
-                        l->value = std::to_string(result);
-                        init->anotacion = std::to_string(result);
+                        //Revisar el tipo de variable
+                        if(l->tipo != "bool" && (result == "false" || result == "true")){
+                            init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
+                            error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
+                        }else if(l->tipo == "int" && std::stof(result) != std::stoi(result)){
+                            init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
+                            error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
+                        }else{
+                            l->value = result;
+                            init->anotacion = result;
+                        }
                     }else{
                         init->anotacion = "Error semántico, no existe la declaración de la variable " + init->hijos.at(0)->valor;
+                        error->append("Error semántico, no existe la declaración de la variable "  + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
                     }
                 }
                 //Caso 2 operaciones
@@ -359,7 +389,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     || init->nombre == "numero") {
                     // Obtener el valor evaluado con la función eval
                     result = eval(init, error);
-                    init->anotacion = std::to_string(result);
+                    init->anotacion = result;
 
                 }
             }
@@ -368,7 +398,16 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
 
             //Agregar a la vista junto a las anotaciones
 
-            node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
+            if(init->nombre == "identificador" || init->nombre == "list-id"){
+                BucketList l = getVariable(init->valor);
+                if(l!=NULL){
+                    node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " .type(" + QString::fromStdString(l->tipo) + ") .value(" + QString::fromStdString(init->anotacion) + ")" );
+                }
+            }else{
+                node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
+            }
+
+
             view->appendRow(node);
 
 
@@ -576,6 +615,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *button1 = new QPushButton("Léxico");
     QPushButton *button2 = new QPushButton("Sintáctico");
     QPushButton *button3 = new QPushButton("Semántica");
+    QPushButton *button5 = new QPushButton("Tabla de síbomolos");
     QPushButton *button4 = new QPushButton("Código intermedio");
 
     // Crear el cuadro de texto para el análisis sintáctico
@@ -587,20 +627,28 @@ MainWindow::MainWindow(QWidget *parent) :
     QTreeView *semanticTreeView = new QTreeView;
     semanticTreeView->setFont(font);
     semanticTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
+    //Crear tabla para la tabla de símbolos
+    QTableWidget *hashTableView = new QTableWidget();
+    hashTableView->setColumnCount(4);
+    hashTableView->setHorizontalHeaderLabels(QStringList() << "Variable name" << "Type" << "Location" << "Line Numbers");
+    hashTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    hashTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    hashTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     //Crear tabla
     QTableWidget *resultsTable = new QTableWidget();
-    resultsTable->setColumnCount(4);
+    resultsTable->setColumnCount(5);
     resultsTable->setHorizontalHeaderLabels(QStringList() << "Clave" << "Lexema" << "Fila" << "Columna");
     resultsTable->setSelectionMode(QAbstractItemView::SingleSelection);
     resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     resultsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
 
     QStackedWidget *stackedWidget = new QStackedWidget;
     //Añadir widgets al stackwidget para poder moverse entre ventanas.
     stackedWidget->addWidget(resultsTable);
     stackedWidget->addWidget(syntacticTreeView);
     stackedWidget->addWidget(semanticTreeView);
+    stackedWidget->addWidget(hashTableView);
 
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
@@ -610,7 +658,8 @@ MainWindow::MainWindow(QWidget *parent) :
     buttonLayout->addWidget(button1, 0, 0);
     buttonLayout->addWidget(button2, 0, 1);
     buttonLayout->addWidget(button3, 0, 2);
-    buttonLayout->addWidget(button4, 0, 3);
+    buttonLayout->addWidget(button5, 0, 3);
+    buttonLayout->addWidget(button4, 0, 4);
 
 
     // Conectar botones a las funciones lambda para cambiar las vistas
@@ -622,6 +671,9 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     QObject::connect(button3, &QPushButton::clicked, [stackedWidget]() {
         stackedWidget->setCurrentIndex(2);
+    });
+    QObject::connect(button5, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(3);
     });
 
 
@@ -894,7 +946,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
             }
             bool correct = procesarTablaHash(sint, textVistaAbajo);
-            printSymTabToView(textVistaAbajo);
+            printSymTabToView(hashTableView);
             QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
             if (modelSemantic) {
                 modelSemantic->clear();
