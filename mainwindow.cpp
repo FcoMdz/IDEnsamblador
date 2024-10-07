@@ -76,13 +76,14 @@ typedef struct BucketListRec {
     LineList lines;
     std::string tipo;
     int memloc;
+    std::string value;
     struct BucketListRec * next;
 } * BucketList;
 
 
 static BucketList hashTable[SIZE];
 
-void st_insert(const std::string& name,const std::string& tipo, int lineno, int loc) {
+bool st_insert(const std::string& name,const std::string& tipo, int lineno, int loc) {
 
     int h = hash(name);
     BucketList l = hashTable[h];
@@ -99,16 +100,21 @@ void st_insert(const std::string& name,const std::string& tipo, int lineno, int 
         l->lines = (LineList) calloc(1, sizeof(struct LineListRec));
         l->lines->lineno = lineno;
         l->memloc = loc;
+        l->value = "0";
         l->lines->next = NULL;
         l->next = hashTable[h];
         hashTable[h] = l;
     } else { // Si ya existe, solo actualizamos los números de línea
+        if(l->tipo != tipo && tipo != ""){
+            return false;
+        }
         LineList t = l->lines;
         while (t->next != NULL) t = t->next;
         t->next = (LineList) malloc(sizeof(struct LineListRec));
         t->next->lineno = lineno;
         t->next->next = NULL;
     }
+    return true;
 }
 
 
@@ -207,32 +213,106 @@ bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
     return true;
 }
 
-bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) {
+BucketList getVariable(std::string name){
+    int h = hash(name);
+    BucketList l = hashTable[h];
+
+    while ((l != NULL) && (l->name != name)) {  // Ahora usamos la comparación directa con std::string
+        l = l->next;
+    }
+    return l;
+}
+
+float eval(Nodo *init, QTextEdit *error) {
+    if (init != NULL) {
+        // Si es un nodo de operación
+        if (init->nombre == "suma" || init->nombre == "resta" ||
+            init->nombre == "multiplicacion" || init->nombre == "division" ) {
+
+            if (init->hijos.size() >= 2) {
+                // Evaluamos recursivamente los hijos
+                float leftValue = eval(init->hijos.at(0), error);  // Hijo izquierdo
+                float rightValue = eval(init->hijos.at(1), error);  // Hijo derecho
+                float result = 0;
+
+                // Realizamos la operación correspondiente
+                if (init->nombre == "suma") {
+                    result = leftValue + rightValue;
+                } else if (init->nombre == "resta") {
+                    result = leftValue - rightValue;
+                } else if (init->nombre == "multiplicacion") {
+                    result = leftValue * rightValue;
+                } else if (init->nombre == "division") {
+                    if (rightValue == 0) {
+                        error->append("Error: División por cero");
+                        return 0;
+                    }
+                    result = leftValue / rightValue;
+                }
+
+                // Guardamos el resultado en el nodo y lo devolvemos
+                init->anotacion = std::to_string(result);
+                return result;
+            }
+        } else if (init->nombre == "numero") {
+            try {
+                // Convertimos el valor del nodo de string a float
+                return std::stof(init->valor);
+            } catch (const std::invalid_argument&) {
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return 0;
+            }
+        } else if(init->nombre == "identificador"){
+            try{
+                BucketList l = getVariable(init->valor);
+                if(l!=NULL){
+                    if(l->tipo == "int" || l->tipo == "float"){
+                        return std::stof(l->value);
+                    }else{
+                        init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
+                        error->append("Error semántico, la variable " + QString::fromStdString(init->valor) + " no es compatible con la operación, línea: " + QString::number(init->noLinea));
+                        return 0;
+                    }
+                }else{
+                    init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
+                    error->append("Error semántico, no existe la declaración de la variable " + QString::fromStdString(init->valor));
+                    return 0;
+                }
+            }catch(const std::invalid_argument&){
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return 0;
+            }
+        }else if(init->nombre == "booleano"){
+            if(init->valor == "true"){
+                return 1;
+            }else{
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+
+bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem *view) {
     if(init != NULL){
         //qDebug() << "iteracion: " << init->nombre;
         if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
             if(init->hijos.size() > 0){
-                bool exito = showSemanticData(init->hijos.at(0), error, view);
-                if(exito){
+                bool exito = showSemanticData(init->hijos.at(0), error, correct, view);
+                if(exito && correct){
                     error->append("Semántico completo sin problemas");
                 }
                 return exito;
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
 
-            view->appendRow(node);
 
             bool comprobado = true;
-            if(QString::fromStdString(init->nombre).compare("Error sintactico", Qt::CaseInsensitive) == 0){
-
-                error->append("Error sintáctico: " + QString::fromStdString(init->valor));
-                comprobado = false;
-            }
+            QStandardItem *node = new QStandardItem();
             for(int i=0; i<init->hijos.size(); i++){
 
-                bool res = showSemanticData(init->hijos.at(i), error, node);
+                bool res = showSemanticData(init->hijos.at(i), error, correct, node);
                 if(!res){
                     //if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
                     //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
@@ -242,16 +322,64 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
                     comprobado = false;
                 }
             }
+
+            //Agregar casos para operacioens especificas
+            if(init->anotacion == ""){
+                float result = 0;
+                //Caso 0 identificador
+                if (init->nombre == "identificador") {
+                    // Obtener el valor evaluado con la función eval
+                    BucketList l = getVariable(init->valor);
+                    if(l!=NULL){
+                        init->anotacion = l->value;
+                    }else{
+                        init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
+                    }
+                }
+                //Caso 1 asignaciones
+                if (init->nombre == "sent-assign") {
+                    // Obtener el valor evaluado con la función eval
+                    result = eval(init->hijos.at(1), error);
+                    BucketList l = getVariable(init->hijos.at(0)->valor);
+                    if(l!=NULL){
+                        l->value = std::to_string(result);
+                        init->anotacion = std::to_string(result);
+                    }else{
+                        init->anotacion = "Error semántico, no existe la declaración de la variable " + init->hijos.at(0)->valor;
+                    }
+                }
+                //Caso 2 operaciones
+                if (init->nombre == "suma" || init->nombre == "resta" ||
+                    init->nombre == "multiplicacion" || init->nombre == "division"
+                    || init->nombre == "numero") {
+                    // Obtener el valor evaluado con la función eval
+                    result = eval(init, error);
+                    init->anotacion = std::to_string(result);
+
+                }
+            }
+
+
+
+            //Agregar a la vista junto a las anotaciones
+
+            node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
+            view->appendRow(node);
+
+
+
             return comprobado;
         }
     }
     return true;
 }
-void procesarTablaHash(Nodo *init, std::string var_tipo = "") {
-    if (init == NULL) return;
+
+bool procesarTablaHash(Nodo *init, QTextEdit *error, std::string var_tipo = "") {
+    if (init == NULL) return true;
     if (QString::fromStdString(init->nombre).compare("decl", Qt::CaseInsensitive) == 0) {
         var_tipo = init->hijos.at(0)->valor;
     }
+     bool correct = true;
     if (QString::fromStdString(init->nombre).compare("list-id", Qt::CaseInsensitive) == 0
         || QString::fromStdString(init->nombre).compare("identificador", Qt::CaseInsensitive) == 0) {
         std::string var_name = init->valor;   // Nombre de la
@@ -260,15 +388,22 @@ void procesarTablaHash(Nodo *init, std::string var_tipo = "") {
 
         char* var_name_mutable = toMutableCharArray(var_name);
         // Insertar en la tabla hash
-        st_insert(var_name_mutable,var_tipo, lineno, memloc);
 
+        if(!st_insert(var_name_mutable,var_tipo, lineno, memloc) && var_tipo != "s"){
+            error->append("Error semántico: Se declaró la variable \"" + QString::fromStdString(std::string(var_name_mutable)) + "\" con otro tipo anteriormente, línea: " + QString::number(init->noLinea));
+            init->anotacion = "Error semántico: Se declaró la variable \"" + std::string(var_name_mutable) + "\" con otro tipo anteriormente, línea: " + std::to_string(init->noLinea);
+            correct = false;
+        }
         delete[] var_name_mutable;  // Liberar memoria
     }
 
     // Recorrer los hijos del nodo
     for (int i = 0; i < init->hijos.size(); i++) {
-        procesarTablaHash(init->hijos.at(i),var_tipo);
+        if(!procesarTablaHash(init->hijos.at(i), error, var_tipo)){
+            correct = false;
+        }
     }
+    return correct;
 }
 
 
@@ -745,25 +880,29 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             QStandardItemModel *modelSyn = new QStandardItemModel;
             QStandardItem *rootSyntatic = modelSyn->invisibleRootItem();
-            bool exito = showSintaticData(sint, textVistaAbajo, rootSyntatic);
+            showSintaticData(sint, textVistaAbajo, rootSyntatic);
             syntacticTreeView->setModel(modelSyn);
             syntacticTreeView->show();
             syntacticTreeView->expandAll();
 
+            currentMemLoc = 0;
+            for(int i=0; i<SIZE; i++){
+                if(hashTable[i]) hashTable[i] = NULL;
+
+            }
+            bool correct = procesarTablaHash(sint, textVistaAbajo);
+            printSymTabToView(textVistaAbajo);
             QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
             if (modelSemantic) {
                 modelSemantic->clear();
             }
             QStandardItemModel *modelSem = new QStandardItemModel;
             QStandardItem *rootSem = modelSem->invisibleRootItem();
-            showSemanticData(sint, textVistaAbajo, rootSem);
+            showSemanticData(sint, textVistaAbajo, correct, rootSem);
             semanticTreeView->setModel(modelSem);
             semanticTreeView->show();
             semanticTreeView->expandAll();
-            if(exito){
-                procesarTablaHash(sint);
-                printSymTabToView(textVistaAbajo);
-            }
+
         }
     });
 
