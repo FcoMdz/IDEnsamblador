@@ -787,7 +787,7 @@
                 $$->nombre = "sent-assign";
                 Nodo *id = new struct Nodo;
                 id->nombre = "identificador";
-                id->valor = $1;
+                id->valor = $1[0];
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
                 $$->noLinea = yylineno;

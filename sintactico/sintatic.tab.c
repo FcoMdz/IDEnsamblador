@@ -2483,7 +2483,7 @@ yyreduce:
                 (yyval.nodo)->nombre = "sent-assign";
                 Nodo *id = new struct Nodo;
                 id->nombre = "identificador";
-                id->valor = (yyvsp[-3].cadena);
+                id->valor = (yyvsp[-3].cadena)[0];
                 (yyval.nodo)->hijos.push_back(id);
                 (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
                 (yyval.nodo)->noLinea = yylineno;
@@ -3134,6 +3134,7 @@ Nodo* getSintactic(const char* filename){
         error->valor = "No se pudo abrir el archivo";
         inicial = error;
     }
+    yylineno = 1;
     yyin = file;
     yyparse();
     fclose(file);
