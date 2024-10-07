@@ -25,6 +25,7 @@
         std::string valor;
         std::vector<Nodo*> hijos;
         std::string anotacion;
+        int noLinea;
     } Nodo;
     Nodo *inicial = new struct Nodo;
     int yylex(void);
@@ -122,6 +123,7 @@
             $$->nombre = "program";
             $$->hijos.push_back($3);
             $$->hijos.push_back($4);
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     list-decl:
@@ -134,6 +136,7 @@
             $$->nombre = "list-decl";
             $$->hijos.push_back($1);
             $$->hijos.push_back($2);
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     decl: 
@@ -143,6 +146,7 @@
             $$->nombre = "decl";
             $$->hijos.push_back($1);
             $$->hijos.push_back($2);
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | tipo error{
@@ -150,6 +154,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "declaracion - tipo error, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     tipo: 
@@ -158,6 +163,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | FLOAT {
@@ -165,6 +171,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | BOOL {
@@ -172,6 +179,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "tipo";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | error {
@@ -179,6 +187,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "Error sintactico";
                 $$->valor = "falta tipo, linea: " + errorLine;
+                $$->noLinea = yylineno;
                 inicial = $$;
                 yyerrok;
         }
@@ -189,6 +198,7 @@
                 $$->nombre = "list-id";
                 $$->valor = $3;
                 $$->hijos.push_back($1);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | IDENTIFICADOR {
@@ -196,6 +206,7 @@
             $$ = new struct Nodo;
             $$->nombre = "identificador";
             $$->valor = $1;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | COM error{
@@ -203,6 +214,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta id, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | error{
@@ -210,6 +222,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta id, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -223,6 +236,7 @@
             $$->nombre = "list-sent";
             $$->hijos.push_back($1);
             $$->hijos.push_back($2);
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     sent: 
@@ -230,6 +244,7 @@
             std::cout << "sent-if\n";
                 $$ = $1;
                 inicial = $$;
+                
             }
         | sent-while {
             std::cout << "sent-while\n";
@@ -276,6 +291,7 @@
             $$->nombre = "sent-if";
             $$->hijos.push_back($3);
             $$->hijos.push_back($6);
+            $$->noLinea = yylineno;
             inicial = $$;
             }      
         | IF PI exp-bool PD THEN bloque ELSE bloque FI {
@@ -285,6 +301,7 @@
             $$->hijos.push_back($3);
             $$->hijos.push_back($6);
             $$->hijos.push_back($8);
+            $$->noLinea = yylineno;
             inicial = $$;
             }
         | IF error{
@@ -292,6 +309,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta condicion entre parentesis, then y el bloque y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD error{
@@ -299,6 +317,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta then, el bloque y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error THEN error{
@@ -306,6 +325,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta condicion, el bloque y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error{
@@ -313,6 +333,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error FI{
@@ -327,6 +348,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if-else falta bloque y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         } 
         | IF error ELSE error{
@@ -334,6 +356,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if-else falta bloque if, bloque else y finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error ELSE bloque error{
@@ -341,6 +364,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if-else falta bloque if, finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         } 
         | IF PI exp-bool PD THEN bloque ELSE bloque error{
@@ -348,6 +372,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if-else falta finalizacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         } 
         | IF PI exp-bool PD error bloque ELSE bloque FI {
@@ -355,6 +380,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta THEN, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error ELSE bloque FI {
@@ -362,6 +388,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque siguiente, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN bloque error bloque FI {
@@ -369,6 +396,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta sentencia else, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN bloque ELSE error FI {
@@ -376,6 +404,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque después de else, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error PD THEN bloque ELSE bloque FI {
@@ -383,6 +412,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta paréntesis de inicio y expresión boleana, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error bloque FI {
@@ -390,6 +420,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta paréntesis de termino y THEN, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error THEN bloque ELSE bloque FI {
@@ -397,6 +428,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta paréntesis de inicio, termino y expresión, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD error bloque FI {
@@ -404,6 +436,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta THEN, ELSE y bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI error bloque ELSE bloque FI {
@@ -411,6 +444,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta expresión boleana, THEN, ELSE y bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI exp-bool PD THEN error FI {
@@ -418,6 +452,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF error ELSE bloque FI {
@@ -425,6 +460,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PI error FI {
@@ -432,6 +468,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta Exoresión, Parentesis derecho, THEN, bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }  
         | IF PD exp-bool PI error{
@@ -439,6 +476,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta THEN, bloque, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN error{
@@ -446,6 +484,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque error{
@@ -453,6 +492,8 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta FI, linea: " + errorLine;
+            
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque ELSE error{
@@ -460,6 +501,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta bloque, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque ELSE bloque error{
@@ -467,6 +509,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI error bloque ELSE bloque error{
@@ -474,6 +517,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta, THEN, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI THEN bloque error bloque error{
@@ -481,6 +525,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta, ELSE, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IF PD exp-bool PI error bloque error bloque error{
@@ -488,6 +533,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "if falta, THEN, ELSE, FI, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     sent-while: 
@@ -497,6 +543,7 @@
             $$->nombre = "sent-while";
             $$->hijos.push_back($3);
             $$->hijos.push_back($5);
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | WHILE error{
@@ -504,6 +551,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "while falta condicion entre parentesis y cuerpo, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | WHILE error bloque{
@@ -511,6 +559,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "while falta expresion entre parentesis, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | WHILE PI exp-bool PD error{
@@ -518,6 +567,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "while falta bloque, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -528,6 +578,7 @@
                 $$->nombre = "sent-do";
                 $$->hijos.push_back($2);
                 $$->hijos.push_back($5);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | DO error{
@@ -535,6 +586,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta cuerpo, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO bloque error{
@@ -542,6 +594,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta until, condicion y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO UNTIL error{
@@ -549,6 +602,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, condicion y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PI exp-bool PD error{
@@ -556,6 +610,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PYC{
@@ -563,6 +618,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y condicion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO bloque UNTIL error{
@@ -570,6 +626,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO bloque PI exp-bool PD error{
@@ -577,6 +634,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO bloque PYC error{
@@ -584,6 +642,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta condicion y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO UNTIL bloque error{
@@ -591,6 +650,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do desorganizado, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO UNTIL PI exp-bool PD error{
@@ -598,6 +658,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do desorganizado, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO UNTIL PYC{
@@ -605,6 +666,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do desorganizado, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PI exp-bool PD bloque error{
@@ -612,6 +674,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PI exp-bool PD UNTIL error{
@@ -626,6 +689,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PYC bloque{
@@ -633,6 +697,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PYC UNTIL{
@@ -640,6 +705,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | DO PYC PI exp-bool PD{
@@ -647,6 +713,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -657,6 +724,7 @@
             $$ = new struct Nodo;
             $$->nombre = "read";
             $$->valor = $2;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | READ error{
@@ -664,6 +732,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "read sentencia incompleta, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | READ IDENTIFICADOR error{
@@ -671,6 +740,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta punto y coma en read, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | READ error PYC{
@@ -678,6 +748,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta el id para leer, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -687,6 +758,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "write";
                 $$->hijos.push_back($2);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | WRITE error{
@@ -694,6 +766,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "write sentencia incompleta, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -703,6 +776,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "bloque";
                 $$->hijos.push_back($2);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         
@@ -716,6 +790,7 @@
                 id->valor = $1;
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         
@@ -724,6 +799,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta la sentencia de asignacion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IDENTIFICADOR ASIG error{
@@ -731,6 +807,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta la expresion de asignación y un punto y coma, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | IDENTIFICADOR error PYC{
@@ -738,6 +815,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta la asignacion y la expresion, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         
@@ -748,6 +826,7 @@
                 $$->nombre = "or";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | comb {
@@ -763,6 +842,7 @@
                 $$->nombre = "and";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | igualdad {
@@ -778,6 +858,7 @@
                 $$->nombre = "igualdad";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | igualdad DIS rel {
@@ -786,6 +867,7 @@
                 $$->nombre = "distinto";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | rel {
@@ -802,6 +884,7 @@
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($2);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | expr {
@@ -815,6 +898,7 @@
             $$ = new struct Nodo;
             $$->nombre = "men";
             $$->valor = $1;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
         | MENIGL {
@@ -822,6 +906,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "menigl";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | MAY {
@@ -829,6 +914,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "may";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | MAYIGL {
@@ -836,6 +922,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "mayigl";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         |error{
@@ -843,6 +930,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta op-rel, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
     expr: 
@@ -852,6 +940,7 @@
                 $$->nombre = "resta";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | expr MAS term {
@@ -860,6 +949,7 @@
                 $$->nombre = "suma";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | term {
@@ -875,6 +965,7 @@
                 $$->nombre = "multiplicacion";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             
             }
@@ -884,6 +975,7 @@
                 $$->nombre = "division";
                 $$->hijos.push_back($1);
                 $$->hijos.push_back($3);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | unario {
@@ -897,6 +989,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "negacion";
                 $$->hijos.push_back($2);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | RES unario {
@@ -904,6 +997,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "menos";
                 $$->hijos.push_back($2);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | factor {
@@ -918,6 +1012,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "(exp-bool)";
                 $$->hijos.push_back($2);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | IDENTIFICADOR {
@@ -925,6 +1020,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "identificador";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | NUMERO {
@@ -932,6 +1028,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "numero";
                 $$->valor = std::to_string($1);
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | TRUE {
@@ -939,6 +1036,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "true";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         | FALSE {
@@ -946,6 +1044,7 @@
                 $$ = new struct Nodo;
                 $$->nombre = "false";
                 $$->valor = $1;
+                $$->noLinea = yylineno;
                 inicial = $$;
             }
         |error{
@@ -953,6 +1052,7 @@
             $$ = new struct Nodo;
             $$->nombre = "Error sintactico";
             $$->valor = "falta factor, linea: " + errorLine;
+            $$->noLinea = yylineno;
             inicial = $$;
         }
 %%
@@ -990,6 +1090,7 @@ Nodo* getSintactic(const char* filename){
         error->valor = "No se pudo abrir el archivo";
         inicial = error;
     }
+    yylineno = 1;
     yyin = file;
     yyparse();
     fclose(file);

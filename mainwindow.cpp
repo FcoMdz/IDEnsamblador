@@ -125,7 +125,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
 
             view->appendRow(node);
 
