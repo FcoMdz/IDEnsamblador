@@ -158,24 +158,40 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
 void printSymTabToView(QTableWidget *table) {
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(QStringList() << "Variable name" << "Type" << "Location" << "Line Numbers");
-    table->setRowCount(SIZE);
-    bool checkError = false;
+
+    int sizecount = 0;
     for (int i = 0; i < SIZE; ++i) {
         if (hashTable[i] != NULL) {
             BucketList l = hashTable[i];
             while (l != NULL) {
-                table->setItem(i,0, new QTableWidgetItem(QString::fromStdString(l->name)));
-                table->setItem(i,1, new QTableWidgetItem(QString::fromStdString(l->tipo)));
-                QString output = QString("%1").arg(l->memloc);
-                table->setItem(i,2, new QTableWidgetItem(output));
-                QString aux = "";
-                LineList t = l->lines;
-                while (t != NULL) {
-                    aux.append(QString::number(t->lineno) + " ");
-                    t = t->next;
+                if(l->name != ""){
+                    sizecount++;
                 }
-                table->setItem(i,3, new QTableWidgetItem(aux));
                 l = l->next;
+            }
+        }
+    }
+    table->setRowCount(sizecount);
+    bool checkError = false;
+    int outputcount = 0;
+    for (int i = 0; i < SIZE; ++i) {
+        if (hashTable[i] != NULL) {
+            BucketList l = hashTable[i];
+            while (l != NULL) {
+                if(l->name != ""){
+                    table->setItem(outputcount,0, new QTableWidgetItem(QString::fromStdString(l->name)));
+                    table->setItem(outputcount,1, new QTableWidgetItem(QString::fromStdString(l->tipo)));
+                    QString output = QString("%1").arg(l->memloc);
+                    table->setItem(outputcount,2, new QTableWidgetItem(output));
+                    QString aux = "";
+                    LineList t = l->lines;
+                    while (t != NULL) {
+                        aux.append(QString::number(t->lineno) + " ");
+                        t = t->next;
+                    }
+                    table->setItem(outputcount++,3, new QTableWidgetItem(aux));
+                }
+                 l = l->next;
             }
         }
     }
@@ -318,6 +334,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
     return "";
 }
 
+
 bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem *view) {
     if(init != NULL){
         //qDebug() << "iteracion: " << init->nombre;
@@ -402,6 +419,8 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                 BucketList l = getVariable(init->valor);
                 if(l!=NULL){
                     node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " .type(" + QString::fromStdString(l->tipo) + ") .value(" + QString::fromStdString(init->anotacion) + ")" );
+                }else{
+                    node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
                 }
             }else{
                 node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");

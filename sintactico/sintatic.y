@@ -789,7 +789,13 @@
                 Nodo *id = new struct Nodo;
                 id->nombre = "identificador";
                 std::string variable = std::string($1).substr(0,std::string($1).find("="));
-                id->valor = variable;
+                std::string trimed = "";
+                for(int i=0; i<variable.length(); i++){
+                    if(variable[i] != ' ' && variable[i] != '\t'){
+                        trimed += variable[i];
+                    }
+                }
+                id->valor = trimed;
                 id->noLinea = yylineno;
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
