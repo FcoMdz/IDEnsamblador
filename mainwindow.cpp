@@ -27,6 +27,7 @@
 //#include "sintatic.tab.c"
 #include "lex.yy.c"
 
+int currentMemLoc = 0;
 class CustomQPlainTextEdit : public QPlainTextEdit {
 public:
     // Constructor
@@ -40,12 +41,83 @@ protected:
     }
 };
 
+/* SIZE is the size of the hash table */
+#define SIZE 211
+
+/* SHIFT is the power of two used as multiplier
+   in hash function  */
+#define SHIFT 32
+
+/* the hash function */
+static int hash(const std::string& key) {
+    int temp = 0;
+    int i = 0;
+    while (i < key.length()) {
+        temp = ((temp << SHIFT) + key[i]) % SIZE;
+        ++i;
+    }
+    return temp;
+}
+
 int dialogYesNo(QString message){
     QMessageBox msgBox;
     msgBox.setText(message);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     return msgBox.exec();
 }
+
+typedef struct LineListRec {
+    int lineno;
+    struct LineListRec* next;
+} *LineList;
+
+typedef struct BucketListRec {
+    std::string name;
+    LineList lines;
+    int memloc;
+    struct BucketListRec * next;
+} * BucketList;
+
+
+static BucketList hashTable[SIZE];
+
+void st_insert(const std::string& name, int lineno, int loc) {
+    int h = hash(name);
+    BucketList l = hashTable[h];
+
+    while ((l != NULL) && (l->name != name)) {  // Ahora usamos la comparación directa con std::string
+        l = l->next;
+    }
+
+    if (l == NULL) { // Si la variable no está en la tabla, la insertamos
+        l = (BucketList) malloc(sizeof(struct BucketListRec));
+        l->name = name;  // Guardamos la variable como std::string
+        l->lines = (LineList) malloc(sizeof(struct LineListRec));
+        l->lines->lineno = lineno;
+        l->memloc = loc;
+        l->lines->next = NULL;
+        l->next = hashTable[h];
+        hashTable[h] = l;
+    } else { // Si ya existe, solo actualizamos los números de línea
+        LineList t = l->lines;
+        while (t->next != NULL) t = t->next;
+        t->next = (LineList) malloc(sizeof(struct LineListRec));
+        t->next->lineno = lineno;
+        t->next->next = NULL;
+    }
+}
+
+
+int getNextMemLocation() {
+    return currentMemLoc++;  // Incrementa y devuelve la ubicación de memoria actual
+}
+char* toMutableCharArray(const std::string& str) {
+    char* mutableStr = new char[str.size() + 1];  // Crear un array dinámico
+    std::copy(str.begin(), str.end(), mutableStr);  // Copiar el contenido de la cadena
+    mutableStr[str.size()] = '\0';  // Asegurarse de terminar con un carácter nulo
+    return mutableStr;
+}
+
 
 void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *error){
     table->setColumnCount(4);
@@ -69,6 +141,25 @@ void showLexicData(std::vector<Lexico> *vec, QTableWidget *table, QTextEdit *err
     table->resizeColumnsToContents();
     table->resizeRowsToContents();
 }
+void printSymTabToView(QTextEdit *view) {
+    view->append("Variable Name      Location   Line Numbers");
+    view->append("----------------  --------   -------------");
+    for (int i = 0; i < SIZE; ++i) {
+        if (hashTable[i] != NULL) {
+            BucketList l = hashTable[i];
+            while (l != NULL) {
+                QString output = QString("%1\t%2\t").arg(QString::fromStdString(l->name)).arg(l->memloc);
+                LineList t = l->lines;
+                while (t != NULL) {
+                    output.append(QString::number(t->lineno) + " ");
+                    t = t->next;
+                }
+                view->append(output);
+                l = l->next;
+            }
+        }
+    }
+}
 
 bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
 
@@ -84,7 +175,7 @@ bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
 
             view->appendRow(node);
 
@@ -125,7 +216,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
             }
         }else{
 
-            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + ", " + QString::number(init->noLinea));
+            QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
 
             view->appendRow(node);
 
@@ -152,6 +243,28 @@ bool showSemanticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL) 
     }
     return true;
 }
+void procesarTablaHash(Nodo *init) {
+    if (init == NULL) return;
+
+    if (QString::fromStdString(init->nombre).compare("identificador", Qt::CaseInsensitive) == 0) {
+        std::string var_name = init->valor;   // Nombre de la variable
+        int lineno = init->noLinea;;  // Asume que puedes obtener el número de línea
+        int memloc = getNextMemLocation();  // Genera ubicación en memoria
+
+        char* var_name_mutable = toMutableCharArray(var_name);
+        // Insertar en la tabla hash
+        st_insert(var_name_mutable, lineno, memloc);
+
+        delete[] var_name_mutable;  // Liberar memoria
+    }
+
+    // Recorrer los hijos del nodo
+    for (int i = 0; i < init->hijos.size(); i++) {
+        procesarTablaHash(init->hijos.at(i));
+    }
+}
+
+
 
 void formatText(QPlainTextEdit *editor, int initialCursor){
     //Estilo default
@@ -625,7 +738,7 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             QStandardItemModel *modelSyn = new QStandardItemModel;
             QStandardItem *rootSyntatic = modelSyn->invisibleRootItem();
-            showSintaticData(sint, textVistaAbajo, rootSyntatic);
+            bool exito = showSintaticData(sint, textVistaAbajo, rootSyntatic);
             syntacticTreeView->setModel(modelSyn);
             syntacticTreeView->show();
             syntacticTreeView->expandAll();
@@ -640,7 +753,10 @@ MainWindow::MainWindow(QWidget *parent) :
             semanticTreeView->setModel(modelSem);
             semanticTreeView->show();
             semanticTreeView->expandAll();
-
+            if(exito){
+                procesarTablaHash(sint);
+                printSymTabToView(textVistaAbajo);
+            }
         }
     });
 
