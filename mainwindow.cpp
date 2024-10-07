@@ -83,7 +83,7 @@ typedef struct BucketListRec {
 
 static BucketList hashTable[SIZE];
 
-bool st_insert(const std::string& name,const std::string& tipo, int lineno, int loc) {
+bool st_insert(const std::string& name,const std::string& tipo, int lineno, int loc, QTextEdit *error) {
 
     int h = hash(name);
     BucketList l = hashTable[h];
@@ -96,6 +96,10 @@ bool st_insert(const std::string& name,const std::string& tipo, int lineno, int 
         currentMemLoc++;
         l = (BucketList) calloc(1, sizeof(struct BucketListRec));
         l->name = name;  // Guardamos la variable como std::string
+        if(tipo == ""){
+            error->append("Error semántico: No está la variable declarada \"" + QString::fromStdString(std::string(name)) + "\" anteriormente, línea: " + QString::number(lineno));
+            return false;
+        }
         l->tipo = tipo;
         l->lines = (LineList) calloc(1, sizeof(struct LineListRec));
         l->lines->lineno = lineno;
@@ -106,6 +110,7 @@ bool st_insert(const std::string& name,const std::string& tipo, int lineno, int 
         hashTable[h] = l;
     } else { // Si ya existe, solo actualizamos los números de línea
         if(l->tipo != tipo && tipo != ""){
+            error->append("Error semántico: Variable ya declarada con otro tipo \"" + QString::fromStdString(std::string(name)) + "\" con otro tipo anteriormente, línea: " + QString::number(lineno));
             return false;
         }
         LineList t = l->lines;
@@ -389,9 +394,7 @@ bool procesarTablaHash(Nodo *init, QTextEdit *error, std::string var_tipo = "") 
         char* var_name_mutable = toMutableCharArray(var_name);
         // Insertar en la tabla hash
 
-        if(!st_insert(var_name_mutable,var_tipo, lineno, memloc) && var_tipo != "s"){
-            error->append("Error semántico: Se declaró la variable \"" + QString::fromStdString(std::string(var_name_mutable)) + "\" con otro tipo anteriormente, línea: " + QString::number(init->noLinea));
-            init->anotacion = "Error semántico: Se declaró la variable \"" + std::string(var_name_mutable) + "\" con otro tipo anteriormente, línea: " + std::to_string(init->noLinea);
+        if(!st_insert(var_name_mutable,var_tipo, lineno, memloc, error) && var_tipo != "s"){
             correct = false;
         }
         delete[] var_name_mutable;  // Liberar memoria

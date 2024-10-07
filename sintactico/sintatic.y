@@ -788,7 +788,8 @@
                 $$->noLinea = yylineno;
                 Nodo *id = new struct Nodo;
                 id->nombre = "identificador";
-                id->valor = $1[0];
+                std::string variable = std::string($1).substr(0,std::string($1).find("="));
+                id->valor = variable;
                 id->noLinea = yylineno;
                 $$->hijos.push_back(id);
                 $$->hijos.push_back($3);
