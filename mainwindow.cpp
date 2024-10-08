@@ -339,13 +339,13 @@ std::string eval(Nodo *init, QTextEdit *error) {
                         init->tipo = l->tipo;
                         return l->value;
                     }else{
-                        init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
-                        error->append("Error semántico, la variable " + QString::fromStdString(init->valor) + " no es compatible con la operación, línea: " + QString::number(init->noLinea));
+                        init->anotacion = "Error semántico: la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
+                        error->append("Error semántico: la variable " + QString::fromStdString(init->valor) + " no es compatible con la operación, línea: " + QString::number(init->noLinea));
                         return "0";
                     }
                 }else{
-                    init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
-                    error->append("Error semántico, no existe la declaración de la variable " + QString::fromStdString(init->valor));
+                    init->anotacion = "Error semántico: no existe la declaración de la variable " + init->valor;
+                    error->append("Error semántico: no existe la declaración de la variable " + QString::fromStdString(init->valor));
                     return "0";
                 }
             }catch(const std::invalid_argument&){
@@ -562,7 +562,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                         init->anotacion = l->value;
                         init->tipo = l->tipo;
                     }else{
-                        init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
+                        init->anotacion = "Error semántico: no existe la declaración de la variable " + init->valor;
                     }
                 }
                 //Caso 1 asignaciones
@@ -573,19 +573,19 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     if(l!=NULL){
                         //Revisar el tipo de variable
                         if(l->tipo != "bool" && (result == "false" || result == "true")){
-                            init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
-                            error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
+                            init->anotacion = "Error semántico: asignación de tipos incompatible " + init->hijos.at(0)->valor;
+                            error->append("Error semántico: asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + ", linea: " + QString::number(init->noLinea));
                         }else if(l->tipo == "int" && init->hijos.at(1)->tipo == "float"){
-                            init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
-                            error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
+                            init->anotacion = "Error semántico: asignación de tipos incompatible " + init->hijos.at(0)->valor;
+                            error->append("Error semántico: asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + ", linea: " + QString::number(init->noLinea));
                         }else{
                             l->value = result;
                             init->anotacion = result;
                             init->tipo = init->hijos.at(0)->tipo;
                         }
                     }else{
-                        init->anotacion = "Error semántico, no existe la declaración de la variable " + init->hijos.at(0)->valor;
-                        error->append("Error semántico, no existe la declaración de la variable "  + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
+                        init->anotacion = "Error semántico: no existe la declaración de la variable " + init->hijos.at(0)->valor;
+                        error->append("Error semántico: no existe la declaración de la variable "  + QString::fromStdString(init->hijos.at(0)->valor) + ", linea: " + QString::number(init->noLinea));
                     }
                 }
                 //Caso 2 operaciones
