@@ -2,11 +2,12 @@ program{
 	int x,y,z;
 	float x,a,b,c,y;
 	bool test;
-	test=true;
-	not test;
+	test=false;
+	test=not test;
  	suma=45;
 	x=32.32;
 	x=23;
+	x=-x
 	y=2+3-1;
 	z=y+7;
 	y=y+1;

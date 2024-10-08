@@ -110,7 +110,7 @@ bool st_insert(const std::string& name,const std::string& tipo, int lineno, int 
         hashTable[h] = l;
     } else { // Si ya existe, solo actualizamos los números de línea
         if(l->tipo != tipo && tipo != ""){
-            error->append("Error semántico: Variable ya declarada con otro tipo \"" + QString::fromStdString(std::string(name)) + "\" con otro tipo anteriormente, línea: " + QString::number(lineno));
+            error->append("Error semántico: Variable ya declarada con otro tipo \"" + QString::fromStdString(std::string(name)) + "\", línea: " + QString::number(lineno));
             return false;
         }
         LineList t = l->lines;
@@ -307,7 +307,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
             try{
                 BucketList l = getVariable(init->valor);
                 if(l!=NULL){
-                    if(l->tipo == "int" || l->tipo == "float"){
+                    if(l->tipo == "int" || l->tipo == "float" || l->tipo == "bool"){
                         return l->value;
                     }else{
                         init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
@@ -355,7 +355,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     rightValue = std::stof(rightString);
                 }
 
-                std::string res = "ERROR";
+                std::string res = "0";
                 if (init->hijos.at(1)->nombre == "men") {
                     res = (leftValue < rightValue) ? "true" : "false";
                 } else if (init->hijos.at(1)->nombre == "may") {
@@ -411,7 +411,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 }
                 bool leftValue = leftString == "true" ? true : false;
                 bool rightValue = rightString == "true" ? true : false;
-                std::string res = "ERROR";
+                std::string res = "0";
                 if (init->hijos.at(1)->nombre == "and") {
                     res = (leftValue && rightValue) ? "true" : "false";
                 } else if (init->hijos.at(1)->nombre == "or") {
@@ -431,10 +431,8 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     return "0";
                 }
                 bool leftValue = leftString == "true" ? true : false;
-                std::string res = "ERROR";
-                if (init->hijos.at(1)->nombre == "negacion") {
-                    res = (!leftValue) ? "true" : "false";
-                }
+                std::string res = "0";
+                res = (!leftValue) ? "true" : "false";
                 init->anotacion = res;
                 return res;
             }
@@ -442,8 +440,16 @@ std::string eval(Nodo *init, QTextEdit *error) {
         else if( init->nombre == "menos"){
             if (init->hijos.size() >= 1) {
                 std::string leftString = eval(init->hijos.at(0), error);
-                init->anotacion = leftString;
-                return leftString;
+
+                if(leftString == "true" || leftString == "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                float leftValue = std::stof(leftString) * -1;
+                std::string res =  std::to_string(leftValue);
+                init->anotacion = res;
+                return res;
             }
         }
     }
@@ -899,19 +905,29 @@ MainWindow::MainWindow(QWidget *parent) :
                 out << codeEditor->toPlainText();
                 file.close();
                 resultsTable->setRowCount(0);
+                hashTableView->setRowCount(0);
                 textVistaAbajo->clear();
                 QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
                 if (modelSyntactic) {
                     modelSyntactic->clear();
                 }
+                QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
+                if (modelSemantic) {
+                    modelSemantic->clear();
+                }
                 codeEditor->clear();
             }
         }else{
             resultsTable->setRowCount(0);
+            hashTableView->setRowCount(0);
             textVistaAbajo->clear();
             QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
             if (modelSyntactic) {
                 modelSyntactic->clear();
+            }
+            QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
+            if (modelSemantic) {
+                modelSemantic->clear();
             }
             codeEditor->clear();
         }
