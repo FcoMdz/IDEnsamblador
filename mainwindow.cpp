@@ -452,6 +452,24 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 return res;
             }
         }
+        else if( init->nombre == "read" ){
+            BucketList l = getVariable(init->valor);
+            if(l!=NULL){
+                init->anotacion = l->value;
+                return l->value;
+            }else{
+                error->append("Error semántico: Error de lectura, línea: " + QString::number(init->noLinea)) ;
+                init->anotacion = "Error semántico:  Error de lectura";
+                return "0";
+            }
+        }
+        else if( init->nombre == "write" ){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                init->anotacion = leftString;
+                return leftString;
+            }
+        }
     }
     return "";
 }
@@ -544,6 +562,9 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     result = eval(init, error);
                 }
                 if (init->nombre == "negacion" || init->nombre == "menos") {
+                    result = eval(init, error);
+                }
+                if (init->nombre == "read" || init->nombre == "write") {
                     result = eval(init, error);
                 }
             }
