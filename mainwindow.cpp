@@ -115,7 +115,7 @@ bool st_insert(const std::string& name,const std::string& tipo, int lineno, int 
         }
         LineList t = l->lines;
         while (t->next != NULL) t = t->next;
-        t->next = (LineList) malloc(sizeof(struct LineListRec));
+        t->next = (LineList) calloc(1,sizeof(struct LineListRec));
         t->next->lineno = lineno;
         t->next->next = NULL;
     }
@@ -286,7 +286,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 } else if (init->nombre == "division") {
                     if (rightValue == 0) {
                         error->append("Error: División por cero");
-                        return 0;
+                        return "0";
                     }
                     result = leftValue / rightValue;
                 }
@@ -301,7 +301,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 return init->valor;
             } catch (const std::invalid_argument&) {
                 error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
-                return 0;
+                return "0";
             }
         } else if(init->nombre == "identificador"){
             try{
@@ -312,22 +312,138 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     }else{
                         init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
                         error->append("Error semántico, la variable " + QString::fromStdString(init->valor) + " no es compatible con la operación, línea: " + QString::number(init->noLinea));
-                        return 0;
+                        return "0";
                     }
                 }else{
                     init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
                     error->append("Error semántico, no existe la declaración de la variable " + QString::fromStdString(init->valor));
-                    return 0;
+                    return "0";
                 }
             }catch(const std::invalid_argument&){
                 error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
-                return 0;
+                return "0";
             }
         }else if(init->nombre == "booleano"){
             if(init->valor == "true"){
                 return "true";
             }else{
                 return "false";
+            }
+        } else if (init->nombre == "op-rel") {
+            if (init->hijos.size() >= 2) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                std::string rightString = eval(init->hijos.at(2), error);
+
+                float leftValue = 0;
+                float rightValue = 0;
+
+                if ((leftString == "true" || leftString == "false") && (rightString != "true" && rightString != "false")) {
+                    error->append("Error semántico: Comparación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    init->anotacion = "Error semántico: Comparación incompatible entre booleano y número";
+                    return "0";
+                }
+                if ((rightString == "true" || rightString == "false") && (leftString != "true" && leftString != "false")) {
+                    error->append("Error semántico: Comparación incompatible entre booleano y número, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Comparación incompatible entre booleano y número";
+                    return "0";
+                }
+
+                if (!leftString.empty()) {
+                    leftValue = std::stof(leftString);
+                }
+                if (!rightString.empty()) {
+                    rightValue = std::stof(rightString);
+                }
+
+                std::string res = "ERROR";
+                if (init->hijos.at(1)->nombre == "men") {
+                    res = (leftValue < rightValue) ? "true" : "false";
+                } else if (init->hijos.at(1)->nombre == "may") {
+                    res = (leftValue > rightValue) ? "true" : "false";
+                } else if (init->hijos.at(1)->nombre == "menigl") {
+                    res = (leftValue <= rightValue) ? "true" : "false";
+                } else if (init->hijos.at(1)->nombre == "mayigl") {
+                    res = (leftValue >= rightValue) ? "true" : "false";
+                }
+                init->anotacion = res;
+                return res;
+            }
+
+        }else if(init->nombre == "igualdad" || init->nombre == "distinto"){
+            if (init->hijos.size() >= 2) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                std::string rightString = eval(init->hijos.at(1), error);
+
+                float leftValue = 0;
+                float rightValue = 0;
+                std::string res = "false";
+                if (init->nombre == "igualdad") {
+                    res = (leftString == rightString) ? "true" : "false";
+
+                } else if (init->nombre == "distinto") {
+                    res =(leftString != rightString) ? "true" : "false";
+                }
+                // Guardamos el resultado en el nodo y lo devolvemos
+                init->anotacion = res;
+                return res;
+            }
+        }
+        else if(init->nombre == "(exp-bool)"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                init->anotacion = leftString;
+                return leftString;
+            }
+        } else if(init->nombre == "and" || init->nombre == "or"){
+            if (init->hijos.size() >= 2) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                std::string rightString = eval(init->hijos.at(1), error);
+
+                if(leftString != "true" && leftString != "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                if( rightString != "true" && rightString != "false"){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                bool leftValue = leftString == "true" ? true : false;
+                bool rightValue = rightString == "true" ? true : false;
+                std::string res = "ERROR";
+                if (init->hijos.at(1)->nombre == "and") {
+                    res = (leftValue && rightValue) ? "true" : "false";
+                } else if (init->hijos.at(1)->nombre == "or") {
+                    res = (leftValue || rightValue) ? "true" : "false";
+                }
+                init->anotacion = res;
+                return res;
+            }
+        }
+        else if(init->nombre == "negacion"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = eval(init->hijos.at(0), error);
+
+                if(leftString != "true" && leftString != "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                bool leftValue = leftString == "true" ? true : false;
+                std::string res = "ERROR";
+                if (init->hijos.at(1)->nombre == "negacion") {
+                    res = (!leftValue) ? "true" : "false";
+                }
+                init->anotacion = res;
+                return res;
+            }
+        }
+        else if( init->nombre == "menos"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = eval(init->hijos.at(0), error);
+                init->anotacion = leftString;
+                return leftString;
             }
         }
     }
@@ -408,6 +524,21 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     result = eval(init, error);
                     init->anotacion = result;
 
+                }
+                if (init->nombre == "op-rel" || init->nombre == "igualdad" || init->nombre == "distinto" || init->nombre == "exp-bool") {
+                    // Obtener el valor evaluado con la función eval
+                    result = eval(init, error);
+                    //init->anotacion = result;
+
+                }
+                if (init->nombre == "(exp-bool)") {
+                    result = eval(init, error);
+                }
+                if (init->nombre == "and" || init->nombre == "or") {
+                    result = eval(init, error);
+                }
+                if (init->nombre == "negacion" || init->nombre == "menos") {
+                    result = eval(init, error);
                 }
             }
 
