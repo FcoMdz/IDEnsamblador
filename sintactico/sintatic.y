@@ -723,7 +723,12 @@
             std::cout << "read\n";
             $$ = new struct Nodo;
             $$->nombre = "read";
-            $$->valor = $2;
+            std::string variable = "";
+            std::string valor = std::string($2);
+            for(int i=0; i<valor.length()-1; i++){
+                variable+=valor[i];
+            }
+            $$->valor = variable;
             $$->noLinea = yylineno;
             inicial = $$;
         }
