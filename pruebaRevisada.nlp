@@ -1,13 +1,14 @@
 program{
 	int x,y,z;
 	float x,a,b,c,y;
-	bool test;
+	bool test,x;
 	test=false;
 	test=not test;
  	suma=45;
 	x=32.32;
 	x=23;
 	x=-x;
+	x=5+9.5;
 	y=2+3-1;
 	z=y+7;
 	y=y+1;
@@ -15,7 +16,7 @@ program{
 	x=(5-3)*(8/2);
 	y=5+3-2*4/7-9;
 	z=8/2+15*4;
-	y=14.54;
+	y=14.54+8;
 	if(2>3)then{
         y=a+3;
   	}else{

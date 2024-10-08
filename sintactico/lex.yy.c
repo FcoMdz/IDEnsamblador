@@ -374,8 +374,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 45
-#define YY_END_OF_BUFFER 46
+#define YY_NUM_RULES 46
+#define YY_END_OF_BUFFER 47
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -385,18 +385,18 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[111] =
     {   0,
-        0,    0,   46,   44,    2,    1,   44,   44,   36,   37,
+        0,    0,   47,   45,    2,    1,   45,   45,   36,   37,
        24,   22,   35,   23,   25,   42,   34,   27,   33,   29,
-       43,   26,   43,   43,   43,   43,   43,   43,   43,   43,
-       43,   43,   43,   43,   43,   38,   39,    1,   32,    0,
-       40,    0,   41,    0,   42,   28,   31,   30,   43,   43,
-       43,   43,    8,   43,   43,    7,   43,    4,   43,   43,
-       19,   43,   43,   43,   43,   43,   43,   43,    0,    0,
-       41,   42,   18,   43,   43,   43,   43,   43,   15,   17,
-       43,   43,   43,   43,   43,   43,   43,   41,   16,   43,
-        6,   43,   43,   43,   12,    5,   20,   43,   43,   43,
+       44,   26,   44,   44,   44,   44,   44,   44,   44,   44,
+       44,   44,   44,   44,   44,   38,   39,    1,   32,    0,
+       40,    0,   41,    0,   42,   28,   31,   30,   44,   44,
+       44,   44,    8,   44,   44,    7,   44,    4,   44,   44,
+       19,   44,   44,   44,   44,   44,   44,   44,    0,    0,
+       41,   43,   18,   44,   44,   44,   44,   44,   15,   17,
+       44,   44,   44,   44,   44,   44,   44,   41,   16,   44,
+        6,   44,   44,   44,   12,    5,   20,   44,   44,   44,
 
-       11,   21,   14,   43,    9,   10,   13,   43,    3,    0
+       11,   21,   14,   44,    9,   10,   13,   44,    3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -521,11 +521,11 @@ static const flex_int16_t yy_chk[174] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[46] =
+static const flex_int32_t yy_rule_can_match_eol[47] =
     {   0,
 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 1, 0, 0, 0, 0,     };
+    1, 1, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -834,7 +834,7 @@ YY_DECL
 		}
 
 	{
-#line 126 "lexic.l"
+#line 128 "lexic.l"
 
 #line 839 "lex.yy.c"
 
@@ -906,7 +906,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 127 "lexic.l"
+#line 129 "lexic.l"
 {
     countLines++; 
     countColumn=1;
@@ -914,7 +914,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 131 "lexic.l"
+#line 133 "lexic.l"
 {
     countColumn++;
     //printf("Espacio\n");
@@ -922,7 +922,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 135 "lexic.l"
+#line 137 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -938,7 +938,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 147 "lexic.l"
+#line 149 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -954,7 +954,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 159 "lexic.l"
+#line 161 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -970,7 +970,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 171 "lexic.l"
+#line 173 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -986,7 +986,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 183 "lexic.l"
+#line 185 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1002,7 +1002,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 195 "lexic.l"
+#line 197 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1018,7 +1018,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 207 "lexic.l"
+#line 209 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1034,7 +1034,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 219 "lexic.l"
+#line 221 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1050,7 +1050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 231 "lexic.l"
+#line 233 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1066,7 +1066,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 243 "lexic.l"
+#line 245 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1082,7 +1082,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 255 "lexic.l"
+#line 257 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1098,7 +1098,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 267 "lexic.l"
+#line 269 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1114,7 +1114,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 279 "lexic.l"
+#line 281 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1130,7 +1130,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 291 "lexic.l"
+#line 293 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1146,7 +1146,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 303 "lexic.l"
+#line 305 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1162,7 +1162,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 315 "lexic.l"
+#line 317 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1178,7 +1178,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 327 "lexic.l"
+#line 329 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1194,7 +1194,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 339 "lexic.l"
+#line 341 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1210,7 +1210,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 351 "lexic.l"
+#line 353 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1226,7 +1226,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 363 "lexic.l"
+#line 365 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1242,7 +1242,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 375 "lexic.l"
+#line 377 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1258,7 +1258,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 387 "lexic.l"
+#line 389 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1274,7 +1274,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 399 "lexic.l"
+#line 401 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1290,7 +1290,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 411 "lexic.l"
+#line 413 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1306,7 +1306,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 423 "lexic.l"
+#line 425 "lexic.l"
 {
         //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1322,7 +1322,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 435 "lexic.l"
+#line 437 "lexic.l"
 {
         //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1338,7 +1338,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 447 "lexic.l"
+#line 449 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1354,7 +1354,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 459 "lexic.l"
+#line 461 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1370,7 +1370,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 471 "lexic.l"
+#line 473 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1386,7 +1386,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 483 "lexic.l"
+#line 485 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1402,7 +1402,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 495 "lexic.l"
+#line 497 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1418,7 +1418,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 507 "lexic.l"
+#line 509 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1434,7 +1434,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 519 "lexic.l"
+#line 521 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1450,7 +1450,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 531 "lexic.l"
+#line 533 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1466,7 +1466,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 543 "lexic.l"
+#line 545 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1482,7 +1482,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 555 "lexic.l"
+#line 557 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1498,7 +1498,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 567 "lexic.l"
+#line 569 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1515,7 +1515,7 @@ YY_RULE_SETUP
 case 40:
 /* rule 40 can match eol */
 YY_RULE_SETUP
-#line 579 "lexic.l"
+#line 581 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1532,7 +1532,7 @@ YY_RULE_SETUP
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 591 "lexic.l"
+#line 593 "lexic.l"
 {
         lexVec.push_back(Lexico());
         lexVec[lexVec.size()-1].estilo = "Comentario";
@@ -1549,7 +1549,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 604 "lexic.l"
+#line 606 "lexic.l"
 {
     //printf("lex num: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1559,13 +1559,29 @@ YY_RULE_SETUP
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
-        yylval.numero = std::atof(yytext);
-        if(ret)  return (NUMERO);
+        yylval.numeroint = std::atoi(yytext);
+        if(ret)  return (NUMEROINT);
     }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 616 "lexic.l"
+#line 618 "lexic.l"
+{
+    //printf("lex num: %s\n",yytext);
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Numero";
+        lexVec[lexVec.size()-1].clave = "NUMERO";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+        yylval.numerofloat = std::atof(yytext);
+        if(ret)  return (NUMEROFLOAT);
+    }
+	YY_BREAK
+case 44:
+YY_RULE_SETUP
+#line 630 "lexic.l"
 {
     //printf("lex: %s\n",yytext);
         lexVec.push_back(Lexico());
@@ -1579,9 +1595,9 @@ YY_RULE_SETUP
         if(ret) return (IDENTIFICADOR);
     }
 	YY_BREAK
-case 44:
+case 45:
 YY_RULE_SETUP
-#line 628 "lexic.l"
+#line 642 "lexic.l"
 {
     lexVec.push_back(Lexico());
     lexVec[lexVec.size()-1].estilo = "Error";
@@ -1593,12 +1609,12 @@ YY_RULE_SETUP
     //if(ret) return 0;
 }
 	YY_BREAK
-case 45:
+case 46:
 YY_RULE_SETUP
-#line 638 "lexic.l"
+#line 652 "lexic.l"
 ECHO;
 	YY_BREAK
-#line 1601 "lex.yy.c"
+#line 1617 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2574,7 +2590,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 638 "lexic.l"
+#line 652 "lexic.l"
 
 
 /*Sección de codigo*/

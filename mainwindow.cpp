@@ -263,9 +263,13 @@ std::string eval(Nodo *init, QTextEdit *error) {
             init->nombre == "multiplicacion" || init->nombre == "division" ) {
 
             if (init->hijos.size() >= 2) {
+
                 // Evaluamos recursivamente los hijos
                 std::string leftString = eval(init->hijos.at(0), error);
                 std::string rightString = eval(init->hijos.at(1), error);
+
+
+
                 float leftValue = 0;
                 float rightValue = 0;
                 if(leftString == "true" || leftString == "false"){
@@ -298,13 +302,30 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     result = leftValue / rightValue;
                 }
 
+                //REVISAR LOS TIPOS ENTRE LOS OPERADORES PARA COMPROBAR QUE SEAN COMPATIBLES, SI NO SACAR ERROR Y EN CASO QUE SÍ, SUBIR EL TIPO DE DATO A INIT
+                if(init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int"){
+                    init->tipo = "int";
+                }else{
+                    init->tipo = "float"; //si algún valor es promovido
+                }
+
                 // Guardamos el resultado en el nodo y lo devolvemos
                 init->anotacion = std::to_string(result);
                 return std::to_string(result);
             }
-        } else if (init->nombre == "numero") {
+        } else if (init->nombre == "numerofloat") {
             try {
                 // Convertimos el valor del nodo de string a float
+                init->tipo = "float";
+                return init->valor;
+            } catch (const std::invalid_argument&) {
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return "0";
+            }
+        } else if (init->nombre == "numeroint") {
+            try {
+                // Convertimos el valor del nodo de string a float
+                init->tipo = "int";
                 return init->valor;
             } catch (const std::invalid_argument&) {
                 error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
@@ -315,6 +336,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 BucketList l = getVariable(init->valor);
                 if(l!=NULL){
                     if(l->tipo == "int" || l->tipo == "float" || l->tipo == "bool"){
+                        init->tipo = l->tipo;
                         return l->value;
                     }else{
                         init->anotacion = "Error semántico, la variable " + init->valor + " no es compatible con la operación, línea: " + std::to_string(init->noLinea);
@@ -331,6 +353,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 return "0";
             }
         }else if(init->nombre == "booleano"){
+            init->tipo = "bool";
             if(init->valor == "true"){
                 return "true";
             }else{
@@ -372,6 +395,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 } else if (init->hijos.at(1)->nombre == "mayigl") {
                     res = (leftValue >= rightValue) ? "true" : "false";
                 }
+                init->tipo = "bool";
                 init->anotacion = res;
                 return res;
             }
@@ -391,6 +415,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     res =(leftString != rightString) ? "true" : "false";
                 }
                 // Guardamos el resultado en el nodo y lo devolvemos
+                init->tipo = "bool";
                 init->anotacion = res;
                 return res;
             }
@@ -398,6 +423,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
         else if(init->nombre == "(exp-bool)"){
             if (init->hijos.size() >= 1) {
                 std::string leftString = eval(init->hijos.at(0), error);
+                init->tipo = init->hijos.at(0)->tipo;
                 init->anotacion = leftString;
                 return leftString;
             }
@@ -424,6 +450,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 } else if (init->hijos.at(1)->nombre == "or") {
                     res = (leftValue || rightValue) ? "true" : "false";
                 }
+                init->tipo = "bool";
                 init->anotacion = res;
                 return res;
             }
@@ -440,7 +467,10 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 bool leftValue = leftString == "true" ? true : false;
                 std::string res = "0";
                 res = (!leftValue) ? "true" : "false";
+
+                init->tipo = "bool";
                 init->anotacion = res;
+
                 return res;
             }
         }
@@ -455,6 +485,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 }
                 float leftValue = std::stof(leftString) * -1;
                 std::string res =  std::to_string(leftValue);
+                init->tipo = init->hijos.at(0)->tipo;
                 init->anotacion = res;
                 return res;
             }
@@ -462,6 +493,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
         else if( init->nombre == "read" ){
             BucketList l = getVariable(init->valor);
             if(l!=NULL){
+                init->tipo = l->tipo;
                 init->anotacion = l->value;
                 return l->value;
             }else{
@@ -473,6 +505,7 @@ std::string eval(Nodo *init, QTextEdit *error) {
         else if( init->nombre == "write" ){
             if (init->hijos.size() >= 1) {
                 std::string leftString = eval(init->hijos.at(0), error);
+                init->tipo = init->hijos.at(0)->tipo;
                 init->anotacion = leftString;
                 return leftString;
             }
@@ -527,6 +560,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     BucketList l = getVariable(init->valor);
                     if(l!=NULL){
                         init->anotacion = l->value;
+                        init->tipo = l->tipo;
                     }else{
                         init->anotacion = "Error semántico, no existe la declaración de la variable " + init->valor;
                     }
@@ -541,12 +575,13 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                         if(l->tipo != "bool" && (result == "false" || result == "true")){
                             init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
                             error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
-                        }else if(l->tipo == "int" && std::stof(result) != std::stoi(result)){
+                        }else if(l->tipo == "int" && init->hijos.at(1)->tipo == "float"){
                             init->anotacion = "Error semántico, asignación de tipos incompatible " + init->hijos.at(0)->valor;
                             error->append("Error semántico, asignación de tipos incompatible " + QString::fromStdString(init->hijos.at(0)->valor) + " linea, " + QString::number(init->noLinea));
                         }else{
                             l->value = result;
                             init->anotacion = result;
+                            init->tipo = init->hijos.at(0)->tipo;
                         }
                     }else{
                         init->anotacion = "Error semántico, no existe la declaración de la variable " + init->hijos.at(0)->valor;
@@ -580,21 +615,34 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                 if (init->nombre == "read" || init->nombre == "write") {
                     result = eval(init, error);
                 }
+                if(init->nombre=="list-id"){
+                    BucketList l = getVariable(init->valor);
+                    if(l!=NULL){
+                        init->tipo = l->tipo;
+                    }else{
+                        init->tipo = "";
+                    }
+
+                }
             }
 
 
 
             //Agregar a la vista junto a las anotaciones
+            //Corregir formato de número
+            if(init->tipo == "int" && init->anotacion != ""){
+                init->anotacion = std::to_string(std::stoi(init->anotacion));
+            }
 
             if(init->nombre == "identificador" || init->nombre == "list-id"){
                 BucketList l = getVariable(init->valor);
                 if(l!=NULL){
-                    node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " .type(" + QString::fromStdString(l->tipo) + ") .value(" + QString::fromStdString(init->anotacion) + ")" );
+                    node->setText(QString::fromStdString(init->nombre) + " (" + QString::fromStdString(init->tipo) + "): " + QString::fromStdString(init->valor) + " .type(" + QString::fromStdString(l->tipo) + ") .value(" + QString::fromStdString(init->anotacion) + ")" );
                 }else{
-                    node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
+                    node->setText(QString::fromStdString(init->nombre) + " (" + QString::fromStdString(init->tipo) + "): " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
                 }
             }else{
-                node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
+                node->setText(QString::fromStdString(init->nombre) + " (" + QString::fromStdString(init->tipo) + "): " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
             }
 
             if(init->nombre != "list-decl" && init->nombre!="list-sent"){

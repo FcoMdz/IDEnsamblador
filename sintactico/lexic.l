@@ -119,7 +119,9 @@ IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
 CADENA ["][^"]*["]
 COMENTARIO_LINEA \/\/.*
 COMENTARIO_MULTI \/\*(.|\n)*\*\/
-NUMERO {DIGITO}+(\.{DIGITO}+)?
+NUMEROINT {DIGITO}+
+NUMEROFLOAT {DIGITO}+(\.{DIGITO}+)
+
 
 /*Reglas de detección*/
 /*"\n" {return 0;}*/
@@ -601,7 +603,7 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         }
         //printf("lex: comentario\n");
     }
-{NUMERO} {
+{NUMEROINT} {
     //printf("lex num: %s\n",yytext);
         lexVec.push_back(Lexico());
         lexVec[lexVec.size()-1].estilo = "Numero";
@@ -610,8 +612,20 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
-        yylval.numero = std::atof(yytext);
-        if(ret)  return (NUMERO);
+        yylval.numeroint = std::atoi(yytext);
+        if(ret)  return (NUMEROINT);
+    }
+{NUMEROFLOAT} {
+    //printf("lex num: %s\n",yytext);
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Numero";
+        lexVec[lexVec.size()-1].clave = "NUMERO";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+        yylval.numerofloat = std::atof(yytext);
+        if(ret)  return (NUMEROFLOAT);
     }
 {IDENTIFICADOR} {
     //printf("lex: %s\n",yytext);

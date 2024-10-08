@@ -25,6 +25,7 @@
         std::string valor;
         std::vector<Nodo*> hijos;
         std::string anotacion;
+        std::string tipo;
         int noLinea;
     } Nodo;
     Nodo *inicial = new struct Nodo;
@@ -41,10 +42,11 @@
 
 %locations
 
-%token PROGRAM IF THEN ELSE FI DO UNTIL WHILE BREAK READ WRITE FLOAT INT BOOL NOT AND OR TRUE FALSE MAS RES MUL DIV ELE MEN MENIGL MAY MAYIGL IGU DIS ASIG PYC COM PI PD LI LD CADENA NUMERO IDENTIFICADOR OTRO SPACE SALTOLINEA
+%token PROGRAM IF THEN ELSE FI DO UNTIL WHILE BREAK READ WRITE FLOAT INT BOOL NOT AND OR TRUE FALSE MAS RES MUL DIV ELE MEN MENIGL MAY MAYIGL IGU DIS ASIG PYC COM PI PD LI LD CADENA NUMEROFLOAT NUMEROINT IDENTIFICADOR OTRO SPACE SALTOLINEA
 
 %union{
-    float numero;
+    float numerofloat;
+    int numeroint;
     char* cadena;
     struct Nodo* nodo;
 }
@@ -89,7 +91,8 @@
 %type <cadena> LI
 %type <cadena> LD
 %type <cadena> IDENTIFICADOR
-%type <numero> NUMERO
+%type <numerofloat> NUMEROFLOAT
+%type <numeroint> NUMEROINT
 %type <cadena> SPACE
 %type <nodo> program
 %type <nodo> list-decl
@@ -1036,12 +1039,22 @@
                 $$->noLinea = yylineno;
                 inicial = $$;
             }
-        | NUMERO {
-                std::cout << "Numero: " << $1 <<  "\n";
+        | NUMEROFLOAT {
+                std::cout << "Numero float: " << $1 <<  "\n";
                 $$ = new struct Nodo;
-                $$->nombre = "numero";
+                $$->nombre = "numerofloat";
                 $$->valor = std::to_string($1);
                 $$->noLinea = yylineno;
+                $$->tipo="float";
+                inicial = $$;
+            }
+        | NUMEROINT {
+                std::cout << "Numero int: " << $1 <<  "\n";
+                $$ = new struct Nodo;
+                $$->nombre = "numeroint";
+                $$->valor = std::to_string($1);
+                $$->noLinea = yylineno;
+                $$->tipo="int";
                 inicial = $$;
             }
         | TRUE {
@@ -1050,6 +1063,7 @@
                 $$->nombre = "booleano";
                 $$->valor = $1;
                 $$->noLinea = yylineno;
+                $$->tipo="bool";
                 inicial = $$;
             }
         | FALSE {
@@ -1058,6 +1072,7 @@
                 $$->nombre = "booleano";
                 $$->valor = $1;
                 $$->noLinea = yylineno;
+                $$->tipo="bool";
                 inicial = $$;
             }
         |error{
