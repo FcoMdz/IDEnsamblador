@@ -7,7 +7,7 @@ program{
  	suma=45;
 	x=32.32;
 	x=23;
-	x=-x
+	x=-x;
 	y=2+3-1;
 	z=y+7;
 	y=y+1;

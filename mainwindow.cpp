@@ -213,7 +213,10 @@ bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
 
             QStandardItem *node = new QStandardItem(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor));
 
-            view->appendRow(node);
+            if(init->nombre != "list-decl" && init->nombre!="list-sent"){
+                view->appendRow(node);
+            }
+
 
             bool comprobado = true;
             if(QString::fromStdString(init->nombre).compare("Error sintactico", Qt::CaseInsensitive) == 0){
@@ -222,8 +225,12 @@ bool showSintaticData(Nodo *init, QTextEdit *error, QStandardItem *view = NULL){
                 comprobado = false;
             }
             for(int i=0; i<init->hijos.size(); i++){
-
-                bool res = showSintaticData(init->hijos.at(i), error, node);
+                bool res = false;
+                if(init->nombre != "list-decl" && init->nombre!="list-sent"){
+                    res = showSintaticData(init->hijos.at(i), error, node);
+                }else{
+                    res = showSintaticData(init->hijos.at(i), error, view);
+                }
                 if(!res){
                     //if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
                     //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
@@ -494,7 +501,13 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
             QStandardItem *node = new QStandardItem();
             for(int i=0; i<init->hijos.size(); i++){
 
-                bool res = showSemanticData(init->hijos.at(i), error, correct, node);
+                bool res = false;
+                if(init->nombre != "list-decl" && init->nombre!="list-sent"){
+                    res = showSemanticData(init->hijos.at(i), error, correct, node);
+                }else{
+                    res = showSemanticData(init->hijos.at(i), error, correct, view);
+                }
+
                 if(!res){
                     //if(!QString::fromStdString(init->nombre).isEmpty() && init->hijos.size() > 1){
                     //    error->append("Error sintáctico: " + QString::fromStdString(init->hijos.at(i)->valor) + ", en: " + QString::fromStdString(init->hijos.at(init->hijos.size()-2)->nombre));
@@ -584,8 +597,10 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                 node->setText(QString::fromStdString(init->nombre) + ": " + QString::fromStdString(init->valor) + " (" + QString::fromStdString(init->anotacion) + ")");
             }
 
+            if(init->nombre != "list-decl" && init->nombre!="list-sent"){
+                view->appendRow(node);
+            }
 
-            view->appendRow(node);
 
 
 
