@@ -356,11 +356,24 @@ std::string eval(Nodo *init, QTextEdit *error) {
                         result = leftValue / rightValue;  // División flotante si uno es float
                     }
                 } else if (init->nombre == "suma") {
-                    result = leftValue + rightValue;
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        result = static_cast<int>(leftValue) + static_cast<int>(rightValue);  // División entera
+                    } else {
+                        result = leftValue + rightValue;  // División flotante si uno es float
+                    }
+
                 } else if (init->nombre == "resta") {
-                    result = leftValue - rightValue;
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        result = static_cast<int>(leftValue) - static_cast<int>(rightValue);  // División entera
+                    } else {
+                        result = leftValue - rightValue;  // División flotante si uno es float
+                    }
                 } else if (init->nombre == "multiplicacion") {
-                    result = leftValue * rightValue;
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        result = static_cast<int>(leftValue) * static_cast<int>(rightValue);  // División entera
+                    } else {
+                        result = leftValue * rightValue;  // División flotante si uno es float
+                    }
                 }
 
                 // Verificar los tipos entre los operadores
