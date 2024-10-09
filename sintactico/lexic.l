@@ -2,8 +2,9 @@
 /*Variables*/
 %{
     #include <iostream>
-    #include "sintatic.tab.hpp"
+    #include "sintatic.tab.c"
     #include <vector>
+    #include <algorithm>
     int yylex(void);
     void showError(char* other);
     void yyrestart(FILE *);
@@ -45,6 +46,7 @@
         yyrestart(file); 
         yylex();
         fclose(file);
+        yylineno = 1;
         return lexVec;
     }
 
@@ -61,6 +63,7 @@
         text_index = 0;
         yy_scan_string(input_text);
         yylex();
+        yylineno = 1;
         return lexVec;
     }
 
@@ -68,9 +71,11 @@
 
     }
 %}
-%option noyywrap
+
+%option noyywrap noinput nounput yylineno
 /*Especificaciones regex*/
-SPACE [ ]|[\t]|[\n]|[\r]
+SPACE [ ]|[\t]|[\r]
+SALTOLINEA [\n]+
 LETRA [a-z|A-Z]
 DIGITO [0-9]
 PROGRAM "program"
@@ -114,12 +119,17 @@ IDENTIFICADOR {LETRA}({LETRA}|{DIGITO})*
 CADENA ["][^"]*["]
 COMENTARIO_LINEA \/\/.*
 COMENTARIO_MULTI \/\*(.|\n)*\*\/
-NUMERO {DIGITO}+(\.{DIGITO}+)?
+NUMEROINT {DIGITO}+
+NUMEROFLOAT {DIGITO}+(\.{DIGITO}+)
+
 
 /*Reglas de detección*/
 /*"\n" {return 0;}*/
 %%
-"\n" {countLines++; countColumn=1;}
+{SALTOLINEA} {
+    countLines++; 
+    countColumn=1;
+}
 {SPACE} {
     countColumn++;
     //printf("Espacio\n");
@@ -588,9 +598,12 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
+        for(int i=0; i < strlen(yytext); i++){
+            if(yytext[i] == '\n')countLines += 1;
+        }
         //printf("lex: comentario\n");
     }
-{NUMERO} {
+{NUMEROINT} {
     //printf("lex num: %s\n",yytext);
         lexVec.push_back(Lexico());
         lexVec[lexVec.size()-1].estilo = "Numero";
@@ -599,8 +612,20 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
         lexVec[lexVec.size()-1].columna = countColumn;
         lexVec[lexVec.size()-1].fila = countLines;
         countColumn += strlen(yytext);
-        yylval.numero = std::atof(yytext);
-        if(ret)  return (NUMERO);
+        yylval.numeroint = std::atoi(yytext);
+        if(ret)  return (NUMEROINT);
+    }
+{NUMEROFLOAT} {
+    //printf("lex num: %s\n",yytext);
+        lexVec.push_back(Lexico());
+        lexVec[lexVec.size()-1].estilo = "Numero";
+        lexVec[lexVec.size()-1].clave = "NUMERO";
+        lexVec[lexVec.size()-1].lexema = yytext;
+        lexVec[lexVec.size()-1].columna = countColumn;
+        lexVec[lexVec.size()-1].fila = countLines;
+        countColumn += strlen(yytext);
+        yylval.numerofloat = std::atof(yytext);
+        if(ret)  return (NUMEROFLOAT);
     }
 {IDENTIFICADOR} {
     //printf("lex: %s\n",yytext);
@@ -622,7 +647,7 @@ NUMERO {DIGITO}+(\.{DIGITO}+)?
     lexVec[lexVec.size()-1].columna = countColumn;
     lexVec[lexVec.size()-1].fila = countLines;
      //printf("lex: %s\n",yytext);
-    return 0;
+    //if(ret) return 0;
 }
 %%
 

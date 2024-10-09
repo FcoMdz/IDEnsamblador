@@ -1,6 +1,5 @@
 program{
     /*
-    
     int x,y,z;
     bool test, test2;
     bool test, test2;
@@ -27,9 +26,21 @@ program{
         }
     }
     */
-    while(x){
-        while(z){;
-            
+!
+	int x=10;
+	while(x){
+        while(y){
+            while(z){
+            }
+            read a;
+            write x;
         }
+        read b;
     }
+    write x;
+	if(x>2) 
+		then x
+	while{}
+	hola
+    write y;
 }
