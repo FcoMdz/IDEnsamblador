@@ -2639,9 +2639,9 @@ yyreduce:
                          {
             std::cout << "expr op-rel expr\n";
                 (yyval.nodo) = new struct Nodo;
-                (yyval.nodo)->nombre = "op-rel";
+                (yyval.nodo)->nombre = (yyvsp[-1].nodo)->nombre;
+                (yyval.nodo)->valor = (yyvsp[-1].nodo)->valor;
                 (yyval.nodo)->hijos.push_back((yyvsp[-2].nodo));
-                (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
                 (yyval.nodo)->hijos.push_back((yyvsp[0].nodo));
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);

@@ -421,10 +421,10 @@ std::string eval(Nodo *init, QTextEdit *error) {
             }else{
                 return "false";
             }
-        } else if (init->nombre == "op-rel") {
+        } else if (init->nombre == "men" || init->nombre == "may" || init->nombre == "menigl" || init->nombre == "mayigl") {
             if (init->hijos.size() >= 2) {
                 std::string leftString = eval(init->hijos.at(0), error);
-                std::string rightString = eval(init->hijos.at(2), error);
+                std::string rightString = eval(init->hijos.at(1), error);
 
                 float leftValue = 0;
                 float rightValue = 0;
@@ -448,13 +448,13 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 }
 
                 std::string res = "0";
-                if (init->hijos.at(1)->nombre == "men") {
+                if (init->nombre == "men") {
                     res = (leftValue < rightValue) ? "true" : "false";
-                } else if (init->hijos.at(1)->nombre == "may") {
+                } else if (init->nombre == "may") {
                     res = (leftValue > rightValue) ? "true" : "false";
-                } else if (init->hijos.at(1)->nombre == "menigl") {
+                } else if (init->nombre == "menigl") {
                     res = (leftValue <= rightValue) ? "true" : "false";
-                } else if (init->hijos.at(1)->nombre == "mayigl") {
+                } else if (init->nombre == "mayigl") {
                     res = (leftValue >= rightValue) ? "true" : "false";
                 }
                 init->tipo = "bool";
@@ -597,7 +597,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
             for(int i=0; i<init->hijos.size(); i++){
 
                 bool res = false;
-                if(init->nombre != "list-decl" && init->nombre!="list-sent"){
+                if(init->nombre != "list-decl" && init->nombre!="list-sent" && init->nombre != "list-id" && init->nombre != "identificador"){
                     res = showSemanticData(init->hijos.at(i), error, correct, node);
                 }else{
                     res = showSemanticData(init->hijos.at(i), error, correct, view);
@@ -659,7 +659,7 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
                     init->anotacion = result;
 
                 }
-                if (init->nombre == "op-rel" || init->nombre == "igualdad" || init->nombre == "distinto" || init->nombre == "exp-bool") {
+                if (init->nombre == "men" || init->nombre=="may" || init->nombre=="mayigl" || init->nombre == "menigl" || init->nombre == "igualdad" || init->nombre == "distinto" || init->nombre == "exp-bool") {
                     // Obtener el valor evaluado con la función eval
                     result = eval(init, error);
                     //init->anotacion = result;
@@ -694,6 +694,10 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
             //Corregir formato de número
             if(init->tipo == "int" && init->anotacion != ""){
                 init->anotacion = std::to_string(std::stoi(init->anotacion));
+            }
+
+            if(init->tipo == "float" && init->anotacion != ""){
+                init->anotacion = std::to_string(std::stof(init->anotacion));
             }
 
             if(init->nombre == "identificador" || init->nombre == "list-id"){

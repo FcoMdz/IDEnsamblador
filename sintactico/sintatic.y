@@ -896,9 +896,9 @@
         expr op-rel expr {
             std::cout << "expr op-rel expr\n";
                 $$ = new struct Nodo;
-                $$->nombre = "op-rel";
+                $$->nombre = $2->nombre;
+                $$->valor = $2->valor;
                 $$->hijos.push_back($1);
-                $$->hijos.push_back($2);
                 $$->hijos.push_back($3);
                 $$->noLinea = yylineno;
                 inicial = $$;
