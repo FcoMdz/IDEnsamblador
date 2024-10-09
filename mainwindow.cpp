@@ -259,6 +259,7 @@ BucketList getVariable(std::string name){
 std::string eval(Nodo *init, QTextEdit *error) {
     if (init != NULL) {
         // Si es un nodo de operación
+        /*
         if (init->nombre == "suma" || init->nombre == "resta" ||
             init->nombre == "multiplicacion" || init->nombre == "division" ) {
 
@@ -307,6 +308,67 @@ std::string eval(Nodo *init, QTextEdit *error) {
                     init->tipo = "int";
                 }else{
                     init->tipo = "float"; //si algún valor es promovido
+                }
+
+                // Guardamos el resultado en el nodo y lo devolvemos
+                init->anotacion = std::to_string(result);
+                return std::to_string(result);
+            }*/
+        if (init->nombre == "suma" || init->nombre == "resta" ||
+            init->nombre == "multiplicacion" || init->nombre == "division" ) {
+
+            if (init->hijos.size() >= 2) {
+                // Evaluamos recursivamente los hijos
+                std::string leftString = eval(init->hijos.at(0), error);
+                std::string rightString = eval(init->hijos.at(1), error);
+
+                float leftValue = 0;
+                float rightValue = 0;
+
+                if(leftString == "true" || leftString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+                if(rightString == "true" || rightString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+
+                if(leftString != ""){
+                    leftValue = std::stof(leftString);  // Hijo izquierdo
+                }
+                if(rightString != ""){
+                    rightValue = std::stof(rightString);  // Hijo derecho
+                }
+
+                float result = 0;
+
+                // Verificar si es división
+                if (init->nombre == "division") {
+                    if (rightValue == 0) {
+                        error->append("Error: División por cero");
+                        return "0";
+                    }
+                    // Si ambos son enteros, realizamos división entera
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        result = static_cast<int>(leftValue) / static_cast<int>(rightValue);  // División entera
+                    } else {
+                        result = leftValue / rightValue;  // División flotante si uno es float
+                    }
+                } else if (init->nombre == "suma") {
+                    result = leftValue + rightValue;
+                } else if (init->nombre == "resta") {
+                    result = leftValue - rightValue;
+                } else if (init->nombre == "multiplicacion") {
+                    result = leftValue * rightValue;
+                }
+
+                // Verificar los tipos entre los operadores
+                if(init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int"){
+                    init->tipo = "int";
+                    result = static_cast<int>(result);  // Convertimos el resultado final a entero si ambos operandos son enteros
+                } else {
+                    init->tipo = "float";  // Promoción a float si alguno es float
                 }
 
                 // Guardamos el resultado en el nodo y lo devolvemos
@@ -445,9 +507,9 @@ std::string eval(Nodo *init, QTextEdit *error) {
                 bool leftValue = leftString == "true" ? true : false;
                 bool rightValue = rightString == "true" ? true : false;
                 std::string res = "0";
-                if (init->hijos.at(1)->nombre == "and") {
+                if (init->nombre == "and") {
                     res = (leftValue && rightValue) ? "true" : "false";
-                } else if (init->hijos.at(1)->nombre == "or") {
+                } else if (init->nombre == "or") {
                     res = (leftValue || rightValue) ? "true" : "false";
                 }
                 init->tipo = "bool";
@@ -1175,6 +1237,8 @@ MainWindow::MainWindow(QWidget *parent) :
             textVistaAbajo->clear();
             lex->swap(vec);
             showLexicData(lex, resultsTable, textVistaAbajo);
+            resultsTable->resizeColumnsToContents();  // Ajusta el ancho de las columnas al contenido
+            resultsTable->resizeRowsToContents();     // Ajusta la altura de las filas al contenido
             sint->nombre = "apuntador";
             sint->hijos.clear();
             sint->hijos.push_back(getSintactic(fileName->toStdString().c_str()));
@@ -1197,6 +1261,9 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             bool correct = procesarTablaHash(sint, textVistaAbajo);
             printSymTabToView(hashTableView);
+            hashTableView->resizeColumnsToContents();  // Ajusta el ancho de las columnas al contenido
+            hashTableView->resizeRowsToContents();     // Ajusta la altura de las filas al contenido
+
             QStandardItemModel *modelSemantic = qobject_cast<QStandardItemModel*>(semanticTreeView->model());
             if (modelSemantic) {
                 modelSemantic->clear();
