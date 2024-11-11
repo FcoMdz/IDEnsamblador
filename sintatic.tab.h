@@ -106,7 +106,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 47 "sintatic.y"
+#line 48 "sintatic.y"
 
     float numerofloat;
     int numeroint;

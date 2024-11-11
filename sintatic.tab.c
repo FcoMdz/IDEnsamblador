@@ -94,6 +94,7 @@
         std::vector<Nodo*> hijos;
         std::string anotacion;
         std::string tipo;
+        std::string codigo_p;
         int noLinea;
     } Nodo;
     Nodo *inicial = new struct Nodo;
@@ -107,7 +108,7 @@
     extern char *lineptr;
     #define YYERROR_VERBOSE 1
 
-#line 111 "sintatic.tab.c"
+#line 112 "sintatic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -599,18 +600,18 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   123,   123,   133,   136,   146,   155,   164,   172,   180,
-     188,   198,   207,   215,   223,   233,   236,   246,   252,   257,
-     262,   267,   272,   277,   291,   300,   310,   318,   326,   334,
-     342,   349,   357,   365,   373,   381,   389,   397,   405,   413,
-     421,   429,   437,   445,   453,   461,   469,   477,   485,   493,
-     502,   510,   518,   526,   534,   543,   552,   560,   568,   578,
-     587,   595,   603,   611,   619,   627,   635,   643,   651,   659,
-     667,   675,   683,   690,   698,   706,   714,   725,   738,   746,
-     754,   764,   772,   782,   792,   813,   821,   829,   839,   848,
-     855,   864,   871,   880,   889,   896,   906,   912,   920,   928,
-     936,   944,   953,   962,   971,   978,   988,   997,  1003,  1011,
-    1019,  1025,  1034,  1042,  1051,  1060,  1069,  1078
+       0,   124,   124,   134,   137,   147,   156,   165,   173,   181,
+     189,   199,   208,   216,   224,   234,   237,   247,   253,   258,
+     263,   268,   273,   278,   292,   301,   311,   319,   327,   335,
+     343,   350,   358,   366,   374,   382,   390,   398,   406,   414,
+     422,   430,   438,   446,   454,   462,   470,   478,   486,   494,
+     503,   511,   519,   527,   535,   544,   553,   561,   569,   579,
+     588,   596,   604,   612,   620,   628,   636,   644,   652,   660,
+     668,   676,   684,   691,   699,   707,   715,   726,   739,   747,
+     755,   765,   773,   783,   793,   814,   822,   830,   840,   849,
+     856,   865,   872,   881,   890,   897,   907,   913,   921,   929,
+     937,   945,   954,   963,   972,   979,   989,   998,  1004,  1012,
+    1020,  1026,  1035,  1043,  1052,  1061,  1070,  1079
 };
 #endif
 
@@ -1433,7 +1434,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: PROGRAM LI list-decl list-sent LD  */
-#line 123 "sintatic.y"
+#line 124 "sintatic.y"
                                          {
             std::cout << "program\n";
             (yyval.nodo) = new struct Nodo;
@@ -1443,19 +1444,19 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1447 "sintatic.tab.c"
+#line 1448 "sintatic.tab.c"
     break;
 
   case 3: /* list-decl: %empty  */
-#line 133 "sintatic.y"
+#line 134 "sintatic.y"
         {
             (yyval.nodo) = NULL;
         }
-#line 1455 "sintatic.tab.c"
+#line 1456 "sintatic.tab.c"
     break;
 
   case 4: /* list-decl: list-decl decl  */
-#line 136 "sintatic.y"
+#line 137 "sintatic.y"
                          {
             std::cout << "list-decl decl\n";
             (yyval.nodo) = new struct Nodo;
@@ -1465,11 +1466,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1469 "sintatic.tab.c"
+#line 1470 "sintatic.tab.c"
     break;
 
   case 5: /* decl: tipo list-id PYC  */
-#line 146 "sintatic.y"
+#line 147 "sintatic.y"
                         {
             std::cout << "tipo list-id;\n";
             (yyval.nodo) = new struct Nodo;
@@ -1479,11 +1480,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1483 "sintatic.tab.c"
+#line 1484 "sintatic.tab.c"
     break;
 
   case 6: /* decl: tipo error  */
-#line 155 "sintatic.y"
+#line 156 "sintatic.y"
                     {
             std::cout << "Error decl - tipo error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1492,11 +1493,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1496 "sintatic.tab.c"
+#line 1497 "sintatic.tab.c"
     break;
 
   case 7: /* tipo: INT  */
-#line 164 "sintatic.y"
+#line 165 "sintatic.y"
             {
             std::cout << "int\n";
                 (yyval.nodo) = new struct Nodo;
@@ -1505,11 +1506,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 1509 "sintatic.tab.c"
+#line 1510 "sintatic.tab.c"
     break;
 
   case 8: /* tipo: FLOAT  */
-#line 172 "sintatic.y"
+#line 173 "sintatic.y"
                 {
             std::cout << "float\n";
                 (yyval.nodo) = new struct Nodo;
@@ -1518,11 +1519,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 1522 "sintatic.tab.c"
+#line 1523 "sintatic.tab.c"
     break;
 
   case 9: /* tipo: BOOL  */
-#line 180 "sintatic.y"
+#line 181 "sintatic.y"
                {
             std::cout << "bool\n";
                 (yyval.nodo) = new struct Nodo;
@@ -1531,11 +1532,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 1535 "sintatic.tab.c"
+#line 1536 "sintatic.tab.c"
     break;
 
   case 10: /* tipo: error  */
-#line 188 "sintatic.y"
+#line 189 "sintatic.y"
                 {
                 std::cout << "Error tipo\n";
                 (yyval.nodo) = new struct Nodo;
@@ -1545,11 +1546,11 @@ yyreduce:
                 inicial = (yyval.nodo);
                 yyerrok;
         }
-#line 1549 "sintatic.tab.c"
+#line 1550 "sintatic.tab.c"
     break;
 
   case 11: /* list-id: list-id COM IDENTIFICADOR  */
-#line 198 "sintatic.y"
+#line 199 "sintatic.y"
                                    {
                 std::cout << "list-id, id: " << (yyvsp[0].cadena) << "\n";
                 (yyval.nodo) = new struct Nodo;
@@ -1559,11 +1560,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 1563 "sintatic.tab.c"
+#line 1564 "sintatic.tab.c"
     break;
 
   case 12: /* list-id: IDENTIFICADOR  */
-#line 207 "sintatic.y"
+#line 208 "sintatic.y"
                         {
             std::cout << "id: " << (yyvsp[0].cadena) << "\n";
             (yyval.nodo) = new struct Nodo;
@@ -1572,11 +1573,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1576 "sintatic.tab.c"
+#line 1577 "sintatic.tab.c"
     break;
 
   case 13: /* list-id: COM error  */
-#line 215 "sintatic.y"
+#line 216 "sintatic.y"
                    {
             std::cout << "Error id\n";
             (yyval.nodo) = new struct Nodo;
@@ -1585,11 +1586,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1589 "sintatic.tab.c"
+#line 1590 "sintatic.tab.c"
     break;
 
   case 14: /* list-id: error  */
-#line 223 "sintatic.y"
+#line 224 "sintatic.y"
                {
             std::cout << "Error id\n";
             (yyval.nodo) = new struct Nodo;
@@ -1598,19 +1599,19 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1602 "sintatic.tab.c"
+#line 1603 "sintatic.tab.c"
     break;
 
   case 15: /* list-sent: %empty  */
-#line 233 "sintatic.y"
+#line 234 "sintatic.y"
         {
             (yyval.nodo) = NULL;
         }
-#line 1610 "sintatic.tab.c"
+#line 1611 "sintatic.tab.c"
     break;
 
   case 16: /* list-sent: list-sent sent  */
-#line 236 "sintatic.y"
+#line 237 "sintatic.y"
                          {
             std::cout << "list-sent sent\n";
             (yyval.nodo) = new struct Nodo;
@@ -1620,83 +1621,83 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1624 "sintatic.tab.c"
+#line 1625 "sintatic.tab.c"
     break;
 
   case 17: /* sent: sent-if  */
-#line 246 "sintatic.y"
+#line 247 "sintatic.y"
                 {
             std::cout << "sent-if\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
                 
             }
-#line 1635 "sintatic.tab.c"
+#line 1636 "sintatic.tab.c"
     break;
 
   case 18: /* sent: sent-while  */
-#line 252 "sintatic.y"
+#line 253 "sintatic.y"
                      {
             std::cout << "sent-while\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 1645 "sintatic.tab.c"
+#line 1646 "sintatic.tab.c"
     break;
 
   case 19: /* sent: sent-do  */
-#line 257 "sintatic.y"
+#line 258 "sintatic.y"
                   {
             std::cout << "sent-do\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 1655 "sintatic.tab.c"
+#line 1656 "sintatic.tab.c"
     break;
 
   case 20: /* sent: sent-read  */
-#line 262 "sintatic.y"
+#line 263 "sintatic.y"
                     {
             std::cout << "sent-read \n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 1665 "sintatic.tab.c"
+#line 1666 "sintatic.tab.c"
     break;
 
   case 21: /* sent: sent-write  */
-#line 267 "sintatic.y"
+#line 268 "sintatic.y"
                      {
             std::cout << "sent-write\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 1675 "sintatic.tab.c"
+#line 1676 "sintatic.tab.c"
     break;
 
   case 22: /* sent: sent-assign  */
-#line 272 "sintatic.y"
+#line 273 "sintatic.y"
                       {
             std::cout << "sent-assign\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 1685 "sintatic.tab.c"
+#line 1686 "sintatic.tab.c"
     break;
 
   case 23: /* sent: BREAK  */
-#line 277 "sintatic.y"
+#line 278 "sintatic.y"
                 {
             std::cout << "break\n";
                 (yyval.nodo) = new struct Nodo;
                 (yyval.nodo)->nombre = "break";
                 inicial = (yyval.nodo);
             }
-#line 1696 "sintatic.tab.c"
+#line 1697 "sintatic.tab.c"
     break;
 
   case 24: /* sent-if: IF PI exp-bool PD THEN bloque FI  */
-#line 291 "sintatic.y"
+#line 292 "sintatic.y"
                                          {
             std::cout << "if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1706,11 +1707,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
             }
-#line 1710 "sintatic.tab.c"
+#line 1711 "sintatic.tab.c"
     break;
 
   case 25: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque FI  */
-#line 300 "sintatic.y"
+#line 301 "sintatic.y"
                                                        {
             std::cout << "if-else\n";
             (yyval.nodo) = new struct Nodo;
@@ -1721,11 +1722,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
             }
-#line 1725 "sintatic.tab.c"
+#line 1726 "sintatic.tab.c"
     break;
 
   case 26: /* sent-if: IF error  */
-#line 310 "sintatic.y"
+#line 311 "sintatic.y"
                   {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1734,11 +1735,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1738 "sintatic.tab.c"
+#line 1739 "sintatic.tab.c"
     break;
 
   case 27: /* sent-if: IF PI exp-bool PD error  */
-#line 318 "sintatic.y"
+#line 319 "sintatic.y"
                                  {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1747,11 +1748,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1751 "sintatic.tab.c"
+#line 1752 "sintatic.tab.c"
     break;
 
   case 28: /* sent-if: IF error THEN error  */
-#line 326 "sintatic.y"
+#line 327 "sintatic.y"
                              {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1760,11 +1761,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1764 "sintatic.tab.c"
+#line 1765 "sintatic.tab.c"
     break;
 
   case 29: /* sent-if: IF PI exp-bool PD THEN error  */
-#line 334 "sintatic.y"
+#line 335 "sintatic.y"
                                       {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1773,11 +1774,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1777 "sintatic.tab.c"
+#line 1778 "sintatic.tab.c"
     break;
 
   case 30: /* sent-if: IF error FI  */
-#line 342 "sintatic.y"
+#line 343 "sintatic.y"
                      {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1785,11 +1786,11 @@ yyreduce:
             (yyval.nodo)->valor = "if falta condicion y bloque, linea: " + errorLine;
             inicial = (yyval.nodo);
         }
-#line 1789 "sintatic.tab.c"
+#line 1790 "sintatic.tab.c"
     break;
 
   case 31: /* sent-if: IF PI exp-bool PD THEN bloque ELSE error  */
-#line 349 "sintatic.y"
+#line 350 "sintatic.y"
                                                   {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1798,11 +1799,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1802 "sintatic.tab.c"
+#line 1803 "sintatic.tab.c"
     break;
 
   case 32: /* sent-if: IF error ELSE error  */
-#line 357 "sintatic.y"
+#line 358 "sintatic.y"
                              {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1811,11 +1812,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1815 "sintatic.tab.c"
+#line 1816 "sintatic.tab.c"
     break;
 
   case 33: /* sent-if: IF error ELSE bloque error  */
-#line 365 "sintatic.y"
+#line 366 "sintatic.y"
                                     {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1824,11 +1825,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1828 "sintatic.tab.c"
+#line 1829 "sintatic.tab.c"
     break;
 
   case 34: /* sent-if: IF PI exp-bool PD THEN bloque ELSE bloque error  */
-#line 373 "sintatic.y"
+#line 374 "sintatic.y"
                                                          {
             std::cout << "Error\n";
             (yyval.nodo) = new struct Nodo;
@@ -1837,11 +1838,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1841 "sintatic.tab.c"
+#line 1842 "sintatic.tab.c"
     break;
 
   case 35: /* sent-if: IF PI exp-bool PD error bloque ELSE bloque FI  */
-#line 381 "sintatic.y"
+#line 382 "sintatic.y"
                                                         {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1850,11 +1851,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1854 "sintatic.tab.c"
+#line 1855 "sintatic.tab.c"
     break;
 
   case 36: /* sent-if: IF PI exp-bool PD THEN error ELSE bloque FI  */
-#line 389 "sintatic.y"
+#line 390 "sintatic.y"
                                                       {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1863,11 +1864,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1867 "sintatic.tab.c"
+#line 1868 "sintatic.tab.c"
     break;
 
   case 37: /* sent-if: IF PI exp-bool PD THEN bloque error bloque FI  */
-#line 397 "sintatic.y"
+#line 398 "sintatic.y"
                                                         {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1876,11 +1877,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1880 "sintatic.tab.c"
+#line 1881 "sintatic.tab.c"
     break;
 
   case 38: /* sent-if: IF PI exp-bool PD THEN bloque ELSE error FI  */
-#line 405 "sintatic.y"
+#line 406 "sintatic.y"
                                                       {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1889,11 +1890,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1893 "sintatic.tab.c"
+#line 1894 "sintatic.tab.c"
     break;
 
   case 39: /* sent-if: IF error PD THEN bloque ELSE bloque FI  */
-#line 413 "sintatic.y"
+#line 414 "sintatic.y"
                                                  {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1902,11 +1903,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1906 "sintatic.tab.c"
+#line 1907 "sintatic.tab.c"
     break;
 
   case 40: /* sent-if: IF PI exp-bool PD THEN error bloque FI  */
-#line 421 "sintatic.y"
+#line 422 "sintatic.y"
                                                  {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1915,11 +1916,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1919 "sintatic.tab.c"
+#line 1920 "sintatic.tab.c"
     break;
 
   case 41: /* sent-if: IF error THEN bloque ELSE bloque FI  */
-#line 429 "sintatic.y"
+#line 430 "sintatic.y"
                                               {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1928,11 +1929,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1932 "sintatic.tab.c"
+#line 1933 "sintatic.tab.c"
     break;
 
   case 42: /* sent-if: IF PI exp-bool PD error bloque FI  */
-#line 437 "sintatic.y"
+#line 438 "sintatic.y"
                                             {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1941,11 +1942,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1945 "sintatic.tab.c"
+#line 1946 "sintatic.tab.c"
     break;
 
   case 43: /* sent-if: IF PI error bloque ELSE bloque FI  */
-#line 445 "sintatic.y"
+#line 446 "sintatic.y"
                                             {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1954,11 +1955,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1958 "sintatic.tab.c"
+#line 1959 "sintatic.tab.c"
     break;
 
   case 44: /* sent-if: IF PI exp-bool PD THEN error FI  */
-#line 453 "sintatic.y"
+#line 454 "sintatic.y"
                                           {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1967,11 +1968,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1971 "sintatic.tab.c"
+#line 1972 "sintatic.tab.c"
     break;
 
   case 45: /* sent-if: IF error ELSE bloque FI  */
-#line 461 "sintatic.y"
+#line 462 "sintatic.y"
                                   {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1980,11 +1981,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1984 "sintatic.tab.c"
+#line 1985 "sintatic.tab.c"
     break;
 
   case 46: /* sent-if: IF PI error FI  */
-#line 469 "sintatic.y"
+#line 470 "sintatic.y"
                          {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -1993,11 +1994,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 1997 "sintatic.tab.c"
+#line 1998 "sintatic.tab.c"
     break;
 
   case 47: /* sent-if: IF PD exp-bool PI error  */
-#line 477 "sintatic.y"
+#line 478 "sintatic.y"
                                  {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2006,11 +2007,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2010 "sintatic.tab.c"
+#line 2011 "sintatic.tab.c"
     break;
 
   case 48: /* sent-if: IF PD exp-bool PI THEN error  */
-#line 485 "sintatic.y"
+#line 486 "sintatic.y"
                                       {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2019,11 +2020,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2023 "sintatic.tab.c"
+#line 2024 "sintatic.tab.c"
     break;
 
   case 49: /* sent-if: IF PD exp-bool PI THEN bloque error  */
-#line 493 "sintatic.y"
+#line 494 "sintatic.y"
                                              {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2033,11 +2034,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2037 "sintatic.tab.c"
+#line 2038 "sintatic.tab.c"
     break;
 
   case 50: /* sent-if: IF PD exp-bool PI THEN bloque ELSE error  */
-#line 502 "sintatic.y"
+#line 503 "sintatic.y"
                                                   {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2046,11 +2047,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2050 "sintatic.tab.c"
+#line 2051 "sintatic.tab.c"
     break;
 
   case 51: /* sent-if: IF PD exp-bool PI THEN bloque ELSE bloque error  */
-#line 510 "sintatic.y"
+#line 511 "sintatic.y"
                                                          {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2059,11 +2060,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2063 "sintatic.tab.c"
+#line 2064 "sintatic.tab.c"
     break;
 
   case 52: /* sent-if: IF PD exp-bool PI error bloque ELSE bloque error  */
-#line 518 "sintatic.y"
+#line 519 "sintatic.y"
                                                           {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2072,11 +2073,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2076 "sintatic.tab.c"
+#line 2077 "sintatic.tab.c"
     break;
 
   case 53: /* sent-if: IF PD exp-bool PI THEN bloque error bloque error  */
-#line 526 "sintatic.y"
+#line 527 "sintatic.y"
                                                           {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2085,11 +2086,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2089 "sintatic.tab.c"
+#line 2090 "sintatic.tab.c"
     break;
 
   case 54: /* sent-if: IF PD exp-bool PI error bloque error bloque error  */
-#line 534 "sintatic.y"
+#line 535 "sintatic.y"
                                                            {
             std::cout << "Error if\n";
             (yyval.nodo) = new struct Nodo;
@@ -2098,11 +2099,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2102 "sintatic.tab.c"
+#line 2103 "sintatic.tab.c"
     break;
 
   case 55: /* sent-while: WHILE PI exp-bool PD bloque  */
-#line 543 "sintatic.y"
+#line 544 "sintatic.y"
                                     {
             std::cout << "while\n";
             (yyval.nodo) = new struct Nodo;
@@ -2112,11 +2113,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2116 "sintatic.tab.c"
+#line 2117 "sintatic.tab.c"
     break;
 
   case 56: /* sent-while: WHILE error  */
-#line 552 "sintatic.y"
+#line 553 "sintatic.y"
                      {
             std::cout << "Error while\n";
             (yyval.nodo) = new struct Nodo;
@@ -2125,11 +2126,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2129 "sintatic.tab.c"
+#line 2130 "sintatic.tab.c"
     break;
 
   case 57: /* sent-while: WHILE error bloque  */
-#line 560 "sintatic.y"
+#line 561 "sintatic.y"
                             {
             std::cout << "Error while\n";
             (yyval.nodo) = new struct Nodo;
@@ -2138,11 +2139,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2142 "sintatic.tab.c"
+#line 2143 "sintatic.tab.c"
     break;
 
   case 58: /* sent-while: WHILE PI exp-bool PD error  */
-#line 568 "sintatic.y"
+#line 569 "sintatic.y"
                                     {
             std::cout << "Error while\n";
             (yyval.nodo) = new struct Nodo;
@@ -2151,11 +2152,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2155 "sintatic.tab.c"
+#line 2156 "sintatic.tab.c"
     break;
 
   case 59: /* sent-do: DO bloque UNTIL PI exp-bool PD PYC  */
-#line 578 "sintatic.y"
+#line 579 "sintatic.y"
                                            {
             std::cout << "do\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2165,11 +2166,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2169 "sintatic.tab.c"
+#line 2170 "sintatic.tab.c"
     break;
 
   case 60: /* sent-do: DO error  */
-#line 587 "sintatic.y"
+#line 588 "sintatic.y"
                   {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2178,11 +2179,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2182 "sintatic.tab.c"
+#line 2183 "sintatic.tab.c"
     break;
 
   case 61: /* sent-do: DO bloque error  */
-#line 595 "sintatic.y"
+#line 596 "sintatic.y"
                          {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2191,11 +2192,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2195 "sintatic.tab.c"
+#line 2196 "sintatic.tab.c"
     break;
 
   case 62: /* sent-do: DO UNTIL error  */
-#line 603 "sintatic.y"
+#line 604 "sintatic.y"
                         {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2204,11 +2205,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2208 "sintatic.tab.c"
+#line 2209 "sintatic.tab.c"
     break;
 
   case 63: /* sent-do: DO PI exp-bool PD error  */
-#line 611 "sintatic.y"
+#line 612 "sintatic.y"
                                  {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2217,11 +2218,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2221 "sintatic.tab.c"
+#line 2222 "sintatic.tab.c"
     break;
 
   case 64: /* sent-do: DO PYC  */
-#line 619 "sintatic.y"
+#line 620 "sintatic.y"
                 {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2230,11 +2231,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2234 "sintatic.tab.c"
+#line 2235 "sintatic.tab.c"
     break;
 
   case 65: /* sent-do: DO bloque UNTIL error  */
-#line 627 "sintatic.y"
+#line 628 "sintatic.y"
                                {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2243,11 +2244,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2247 "sintatic.tab.c"
+#line 2248 "sintatic.tab.c"
     break;
 
   case 66: /* sent-do: DO bloque PI exp-bool PD error  */
-#line 635 "sintatic.y"
+#line 636 "sintatic.y"
                                         {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2256,11 +2257,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2260 "sintatic.tab.c"
+#line 2261 "sintatic.tab.c"
     break;
 
   case 67: /* sent-do: DO bloque PYC error  */
-#line 643 "sintatic.y"
+#line 644 "sintatic.y"
                              {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2269,11 +2270,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2273 "sintatic.tab.c"
+#line 2274 "sintatic.tab.c"
     break;
 
   case 68: /* sent-do: DO UNTIL bloque error  */
-#line 651 "sintatic.y"
+#line 652 "sintatic.y"
                                {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2282,11 +2283,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2286 "sintatic.tab.c"
+#line 2287 "sintatic.tab.c"
     break;
 
   case 69: /* sent-do: DO UNTIL PI exp-bool PD error  */
-#line 659 "sintatic.y"
+#line 660 "sintatic.y"
                                        {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2295,11 +2296,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2299 "sintatic.tab.c"
+#line 2300 "sintatic.tab.c"
     break;
 
   case 70: /* sent-do: DO UNTIL PYC  */
-#line 667 "sintatic.y"
+#line 668 "sintatic.y"
                       {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2308,11 +2309,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2312 "sintatic.tab.c"
+#line 2313 "sintatic.tab.c"
     break;
 
   case 71: /* sent-do: DO PI exp-bool PD bloque error  */
-#line 675 "sintatic.y"
+#line 676 "sintatic.y"
                                         {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2321,11 +2322,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2325 "sintatic.tab.c"
+#line 2326 "sintatic.tab.c"
     break;
 
   case 72: /* sent-do: DO PI exp-bool PD UNTIL error  */
-#line 683 "sintatic.y"
+#line 684 "sintatic.y"
                                        {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2333,11 +2334,11 @@ yyreduce:
             (yyval.nodo)->valor = "do falta bloque, until y punto y coma, linea: " + errorLine;
             inicial = (yyval.nodo);
         }
-#line 2337 "sintatic.tab.c"
+#line 2338 "sintatic.tab.c"
     break;
 
   case 73: /* sent-do: DO PI exp-bool PD PYC  */
-#line 690 "sintatic.y"
+#line 691 "sintatic.y"
                                {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2346,11 +2347,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2350 "sintatic.tab.c"
+#line 2351 "sintatic.tab.c"
     break;
 
   case 74: /* sent-do: DO PYC bloque  */
-#line 698 "sintatic.y"
+#line 699 "sintatic.y"
                        {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2359,11 +2360,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2363 "sintatic.tab.c"
+#line 2364 "sintatic.tab.c"
     break;
 
   case 75: /* sent-do: DO PYC UNTIL  */
-#line 706 "sintatic.y"
+#line 707 "sintatic.y"
                       {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2372,11 +2373,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2376 "sintatic.tab.c"
+#line 2377 "sintatic.tab.c"
     break;
 
   case 76: /* sent-do: DO PYC PI exp-bool PD  */
-#line 714 "sintatic.y"
+#line 715 "sintatic.y"
                                {
             std::cout << "Error do\n";
             (yyval.nodo) = new struct Nodo;
@@ -2385,11 +2386,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2389 "sintatic.tab.c"
+#line 2390 "sintatic.tab.c"
     break;
 
   case 77: /* sent-read: READ IDENTIFICADOR PYC  */
-#line 725 "sintatic.y"
+#line 726 "sintatic.y"
                                {
             std::cout << "read\n";
             (yyval.nodo) = new struct Nodo;
@@ -2403,11 +2404,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2407 "sintatic.tab.c"
+#line 2408 "sintatic.tab.c"
     break;
 
   case 78: /* sent-read: READ error  */
-#line 738 "sintatic.y"
+#line 739 "sintatic.y"
                     {
             std::cout << "Error read\n";
             (yyval.nodo) = new struct Nodo;
@@ -2416,11 +2417,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2420 "sintatic.tab.c"
+#line 2421 "sintatic.tab.c"
     break;
 
   case 79: /* sent-read: READ IDENTIFICADOR error  */
-#line 746 "sintatic.y"
+#line 747 "sintatic.y"
                                   {
             std::cout << "Error read\n";
             (yyval.nodo) = new struct Nodo;
@@ -2429,11 +2430,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2433 "sintatic.tab.c"
+#line 2434 "sintatic.tab.c"
     break;
 
   case 80: /* sent-read: READ error PYC  */
-#line 754 "sintatic.y"
+#line 755 "sintatic.y"
                         {
             std::cout << "Error read\n";
             (yyval.nodo) = new struct Nodo;
@@ -2442,11 +2443,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2446 "sintatic.tab.c"
+#line 2447 "sintatic.tab.c"
     break;
 
   case 81: /* sent-write: WRITE exp-bool PYC  */
-#line 764 "sintatic.y"
+#line 765 "sintatic.y"
                            {
             std::cout << "write\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2455,11 +2456,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2459 "sintatic.tab.c"
+#line 2460 "sintatic.tab.c"
     break;
 
   case 82: /* sent-write: WRITE error  */
-#line 772 "sintatic.y"
+#line 773 "sintatic.y"
                      {
             std::cout << "Error write\n";
             (yyval.nodo) = new struct Nodo;
@@ -2468,11 +2469,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2472 "sintatic.tab.c"
+#line 2473 "sintatic.tab.c"
     break;
 
   case 83: /* bloque: LI list-sent LD  */
-#line 782 "sintatic.y"
+#line 783 "sintatic.y"
                         {
             std::cout << "bloque\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2481,11 +2482,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2485 "sintatic.tab.c"
+#line 2486 "sintatic.tab.c"
     break;
 
   case 84: /* sent-assign: IDENTIFICADOR ASIG exp-bool PYC  */
-#line 792 "sintatic.y"
+#line 793 "sintatic.y"
                                         {
             std::cout << "id=exp-bool;\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2506,11 +2507,11 @@ yyreduce:
                 (yyval.nodo)->hijos.push_back((yyvsp[-1].nodo));
                 inicial = (yyval.nodo);
             }
-#line 2510 "sintatic.tab.c"
+#line 2511 "sintatic.tab.c"
     break;
 
   case 85: /* sent-assign: IDENTIFICADOR error  */
-#line 813 "sintatic.y"
+#line 814 "sintatic.y"
                              {
             std::cout << "Error assign\n";
             (yyval.nodo) = new struct Nodo;
@@ -2519,11 +2520,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2523 "sintatic.tab.c"
+#line 2524 "sintatic.tab.c"
     break;
 
   case 86: /* sent-assign: IDENTIFICADOR ASIG error  */
-#line 821 "sintatic.y"
+#line 822 "sintatic.y"
                                   {
             std::cout << "Error assign\n";
             (yyval.nodo) = new struct Nodo;
@@ -2532,11 +2533,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2536 "sintatic.tab.c"
+#line 2537 "sintatic.tab.c"
     break;
 
   case 87: /* sent-assign: IDENTIFICADOR error PYC  */
-#line 829 "sintatic.y"
+#line 830 "sintatic.y"
                                  {
             std::cout << "Error assign\n";
             (yyval.nodo) = new struct Nodo;
@@ -2545,11 +2546,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2549 "sintatic.tab.c"
+#line 2550 "sintatic.tab.c"
     break;
 
   case 88: /* exp-bool: exp-bool OR comb  */
-#line 839 "sintatic.y"
+#line 840 "sintatic.y"
                           {
             std::cout << "or\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2559,21 +2560,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2563 "sintatic.tab.c"
+#line 2564 "sintatic.tab.c"
     break;
 
   case 89: /* exp-bool: comb  */
-#line 848 "sintatic.y"
+#line 849 "sintatic.y"
                {
             std::cout << "comb\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2573 "sintatic.tab.c"
+#line 2574 "sintatic.tab.c"
     break;
 
   case 90: /* comb: comb AND igualdad  */
-#line 855 "sintatic.y"
+#line 856 "sintatic.y"
                           {
             std::cout << "and\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2583,21 +2584,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2587 "sintatic.tab.c"
+#line 2588 "sintatic.tab.c"
     break;
 
   case 91: /* comb: igualdad  */
-#line 864 "sintatic.y"
+#line 865 "sintatic.y"
                    {
             std::cout << "igualdad\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2597 "sintatic.tab.c"
+#line 2598 "sintatic.tab.c"
     break;
 
   case 92: /* igualdad: igualdad IGU rel  */
-#line 871 "sintatic.y"
+#line 872 "sintatic.y"
                          {
             std::cout << "igu\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2607,11 +2608,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2611 "sintatic.tab.c"
+#line 2612 "sintatic.tab.c"
     break;
 
   case 93: /* igualdad: igualdad DIS rel  */
-#line 880 "sintatic.y"
+#line 881 "sintatic.y"
                            {
             std::cout << "dis\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2621,21 +2622,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2625 "sintatic.tab.c"
+#line 2626 "sintatic.tab.c"
     break;
 
   case 94: /* igualdad: rel  */
-#line 889 "sintatic.y"
+#line 890 "sintatic.y"
               {
             std::cout << "rel\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2635 "sintatic.tab.c"
+#line 2636 "sintatic.tab.c"
     break;
 
   case 95: /* rel: expr op-rel expr  */
-#line 896 "sintatic.y"
+#line 897 "sintatic.y"
                          {
             std::cout << "expr op-rel expr\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2646,21 +2647,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2650 "sintatic.tab.c"
+#line 2651 "sintatic.tab.c"
     break;
 
   case 96: /* rel: expr  */
-#line 906 "sintatic.y"
+#line 907 "sintatic.y"
                {
             std::cout << "expr\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2660 "sintatic.tab.c"
+#line 2661 "sintatic.tab.c"
     break;
 
   case 97: /* op-rel: MEN  */
-#line 912 "sintatic.y"
+#line 913 "sintatic.y"
             {
             std::cout << "men\n";
             (yyval.nodo) = new struct Nodo;
@@ -2669,11 +2670,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2673 "sintatic.tab.c"
+#line 2674 "sintatic.tab.c"
     break;
 
   case 98: /* op-rel: MENIGL  */
-#line 920 "sintatic.y"
+#line 921 "sintatic.y"
                  {
             std::cout << "menigl\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2682,11 +2683,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2686 "sintatic.tab.c"
+#line 2687 "sintatic.tab.c"
     break;
 
   case 99: /* op-rel: MAY  */
-#line 928 "sintatic.y"
+#line 929 "sintatic.y"
               {
             std::cout << "may\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2695,11 +2696,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2699 "sintatic.tab.c"
+#line 2700 "sintatic.tab.c"
     break;
 
   case 100: /* op-rel: MAYIGL  */
-#line 936 "sintatic.y"
+#line 937 "sintatic.y"
                  {
             std::cout << "mayigl\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2708,11 +2709,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2712 "sintatic.tab.c"
+#line 2713 "sintatic.tab.c"
     break;
 
   case 101: /* op-rel: error  */
-#line 944 "sintatic.y"
+#line 945 "sintatic.y"
               {
             std::cout << "Error op-rel\n";
             (yyval.nodo) = new struct Nodo;
@@ -2721,11 +2722,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2725 "sintatic.tab.c"
+#line 2726 "sintatic.tab.c"
     break;
 
   case 102: /* expr: expr RES term  */
-#line 953 "sintatic.y"
+#line 954 "sintatic.y"
                       {
             std::cout << "res\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2735,11 +2736,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2739 "sintatic.tab.c"
+#line 2740 "sintatic.tab.c"
     break;
 
   case 103: /* expr: expr MAS term  */
-#line 962 "sintatic.y"
+#line 963 "sintatic.y"
                         {
             std::cout << "mas\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2749,21 +2750,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2753 "sintatic.tab.c"
+#line 2754 "sintatic.tab.c"
     break;
 
   case 104: /* expr: term  */
-#line 971 "sintatic.y"
+#line 972 "sintatic.y"
                {
             std::cout << "term\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2763 "sintatic.tab.c"
+#line 2764 "sintatic.tab.c"
     break;
 
   case 105: /* term: term MUL unario  */
-#line 978 "sintatic.y"
+#line 979 "sintatic.y"
                         {
             std::cout << "mul\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2774,11 +2775,11 @@ yyreduce:
                 inicial = (yyval.nodo);
             
             }
-#line 2778 "sintatic.tab.c"
+#line 2779 "sintatic.tab.c"
     break;
 
   case 106: /* term: term DIV unario  */
-#line 988 "sintatic.y"
+#line 989 "sintatic.y"
                           {
             std::cout << "div\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2788,21 +2789,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2792 "sintatic.tab.c"
+#line 2793 "sintatic.tab.c"
     break;
 
   case 107: /* term: unario  */
-#line 997 "sintatic.y"
+#line 998 "sintatic.y"
                  {
             std::cout << "Unario\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2802 "sintatic.tab.c"
+#line 2803 "sintatic.tab.c"
     break;
 
   case 108: /* unario: NOT unario  */
-#line 1003 "sintatic.y"
+#line 1004 "sintatic.y"
                    {
             std::cout << "Not unario\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2811,11 +2812,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2815 "sintatic.tab.c"
+#line 2816 "sintatic.tab.c"
     break;
 
   case 109: /* unario: RES unario  */
-#line 1011 "sintatic.y"
+#line 1012 "sintatic.y"
                      {
             std::cout << "RES unario\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2824,21 +2825,21 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2828 "sintatic.tab.c"
+#line 2829 "sintatic.tab.c"
     break;
 
   case 110: /* unario: factor  */
-#line 1019 "sintatic.y"
+#line 1020 "sintatic.y"
                  {
             std::cout << "Factor\n";
                 (yyval.nodo) = (yyvsp[0].nodo);
                 inicial = (yyval.nodo);
             }
-#line 2838 "sintatic.tab.c"
+#line 2839 "sintatic.tab.c"
     break;
 
   case 111: /* factor: PI exp-bool PD  */
-#line 1025 "sintatic.y"
+#line 1026 "sintatic.y"
                        {
             //!Revisar
                 std::cout << "(exp-bool)\n";
@@ -2848,11 +2849,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2852 "sintatic.tab.c"
+#line 2853 "sintatic.tab.c"
     break;
 
   case 112: /* factor: IDENTIFICADOR  */
-#line 1034 "sintatic.y"
+#line 1035 "sintatic.y"
                         {
                 std::cout << "id: "<< (yyvsp[0].cadena) << "\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2861,11 +2862,11 @@ yyreduce:
                 (yyval.nodo)->noLinea = yylineno;
                 inicial = (yyval.nodo);
             }
-#line 2865 "sintatic.tab.c"
+#line 2866 "sintatic.tab.c"
     break;
 
   case 113: /* factor: NUMEROFLOAT  */
-#line 1042 "sintatic.y"
+#line 1043 "sintatic.y"
                       {
                 std::cout << "Numero float: " << (yyvsp[0].numerofloat) <<  "\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2875,11 +2876,11 @@ yyreduce:
                 (yyval.nodo)->tipo="float";
                 inicial = (yyval.nodo);
             }
-#line 2879 "sintatic.tab.c"
+#line 2880 "sintatic.tab.c"
     break;
 
   case 114: /* factor: NUMEROINT  */
-#line 1051 "sintatic.y"
+#line 1052 "sintatic.y"
                     {
                 std::cout << "Numero int: " << (yyvsp[0].numeroint) <<  "\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2889,11 +2890,11 @@ yyreduce:
                 (yyval.nodo)->tipo="int";
                 inicial = (yyval.nodo);
             }
-#line 2893 "sintatic.tab.c"
+#line 2894 "sintatic.tab.c"
     break;
 
   case 115: /* factor: TRUE  */
-#line 1060 "sintatic.y"
+#line 1061 "sintatic.y"
                {
                 std::cout << "True\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2903,11 +2904,11 @@ yyreduce:
                 (yyval.nodo)->tipo="bool";
                 inicial = (yyval.nodo);
             }
-#line 2907 "sintatic.tab.c"
+#line 2908 "sintatic.tab.c"
     break;
 
   case 116: /* factor: FALSE  */
-#line 1069 "sintatic.y"
+#line 1070 "sintatic.y"
                 {
                 std::cout << "False\n";
                 (yyval.nodo) = new struct Nodo;
@@ -2917,11 +2918,11 @@ yyreduce:
                 (yyval.nodo)->tipo="bool";
                 inicial = (yyval.nodo);
             }
-#line 2921 "sintatic.tab.c"
+#line 2922 "sintatic.tab.c"
     break;
 
   case 117: /* factor: error  */
-#line 1078 "sintatic.y"
+#line 1079 "sintatic.y"
               {
             std::cout << "Error factor\n";
             (yyval.nodo) = new struct Nodo;
@@ -2930,11 +2931,11 @@ yyreduce:
             (yyval.nodo)->noLinea = yylineno;
             inicial = (yyval.nodo);
         }
-#line 2934 "sintatic.tab.c"
+#line 2935 "sintatic.tab.c"
     break;
 
 
-#line 2938 "sintatic.tab.c"
+#line 2939 "sintatic.tab.c"
 
       default: break;
     }
@@ -3132,7 +3133,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 1086 "sintatic.y"
+#line 1087 "sintatic.y"
 
 
 

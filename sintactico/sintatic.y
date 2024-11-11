@@ -26,6 +26,7 @@
         std::vector<Nodo*> hijos;
         std::string anotacion;
         std::string tipo;
+        std::string codigo_p;
         int noLinea;
     } Nodo;
     Nodo *inicial = new struct Nodo;

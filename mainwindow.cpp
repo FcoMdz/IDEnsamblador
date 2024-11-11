@@ -258,62 +258,6 @@ BucketList getVariable(std::string name){
 
 std::string eval(Nodo *init, QTextEdit *error) {
     if (init != NULL) {
-        // Si es un nodo de operación
-        /*
-        if (init->nombre == "suma" || init->nombre == "resta" ||
-            init->nombre == "multiplicacion" || init->nombre == "division" ) {
-
-            if (init->hijos.size() >= 2) {
-
-                // Evaluamos recursivamente los hijos
-                std::string leftString = eval(init->hijos.at(0), error);
-                std::string rightString = eval(init->hijos.at(1), error);
-
-
-
-                float leftValue = 0;
-                float rightValue = 0;
-                if(leftString == "true" || leftString == "false"){
-                    error->append("Error semántico: Operación incompatible entre booleano y numero, linea: " + QString::number(init->noLinea));
-                    return "0";
-                }
-                if(rightString == "true" || rightString == "false"){
-                    error->append("Error semántico: Operación incompatible entre booleano y numero, linea: " + QString::number(init->noLinea));
-                    return "0";
-                }
-                if(leftString != ""){
-                    leftValue = std::stof(leftString);  // Hijo izquierdo
-                }
-                if(rightString != ""){
-                     rightValue = std::stof(rightString);  // Hijo derecho
-                }
-                float result = 0;
-                // Realizamos la operación correspondiente
-                if (init->nombre == "suma") {
-                    result = leftValue + rightValue;
-                } else if (init->nombre == "resta") {
-                    result = leftValue - rightValue;
-                } else if (init->nombre == "multiplicacion") {
-                    result = leftValue * rightValue;
-                } else if (init->nombre == "division") {
-                    if (rightValue == 0) {
-                        error->append("Error: División por cero");
-                        return "0";
-                    }
-                    result = leftValue / rightValue;
-                }
-
-                //REVISAR LOS TIPOS ENTRE LOS OPERADORES PARA COMPROBAR QUE SEAN COMPATIBLES, SI NO SACAR ERROR Y EN CASO QUE SÍ, SUBIR EL TIPO DE DATO A INIT
-                if(init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int"){
-                    init->tipo = "int";
-                }else{
-                    init->tipo = "float"; //si algún valor es promovido
-                }
-
-                // Guardamos el resultado en el nodo y lo devolvemos
-                init->anotacion = std::to_string(result);
-                return std::to_string(result);
-            }*/
         if (init->nombre == "suma" || init->nombre == "resta" ||
             init->nombre == "multiplicacion" || init->nombre == "division" ) {
 
@@ -756,6 +700,17 @@ bool procesarTablaHash(Nodo *init, QTextEdit *error, std::string var_tipo = "") 
             correct = false;
         }
         delete[] var_name_mutable;  // Liberar memoria
+    }
+    if(QString::fromStdString(init->nombre).compare("read", Qt::CaseInsensitive) == 0){
+        std::string var_name = init->valor;
+        int lineno = init->noLinea;
+        int memloc = getNextMemLocation();
+        char* var_name_mutable = toMutableCharArray(var_name);
+
+        if(!st_insert(var_name_mutable, var_tipo, lineno, memloc, error) && var_tipo != "s"){
+            correct = false;
+        }
+
     }
 
     // Recorrer los hijos del nodo
