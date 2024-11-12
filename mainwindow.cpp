@@ -28,6 +28,7 @@
 #include "lex.yy.c"
 
 int currentMemLoc = 0;
+int labelCount = 1;
 class CustomQPlainTextEdit : public QPlainTextEdit {
 public:
     // Constructor
@@ -186,7 +187,12 @@ void printSymTabToView(QTableWidget *table) {
                     QString aux = "";
                     LineList t = l->lines;
                     while (t != NULL) {
-                        aux.append(QString::number(t->lineno) + " ");
+                        if(t->next != NULL){
+                            aux.append(QString::number(t->lineno) + ", ");
+                        }else{
+                            aux.append(QString::number(t->lineno));
+                        }
+
                         t = t->next;
                     }
                     table->setItem(outputcount++,3, new QTableWidgetItem(aux));
@@ -681,6 +687,474 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
     return true;
 }
 
+
+
+std::string evalInterCode(Nodo *init, QTextEdit *error, QTextEdit *input) {
+    if (init != NULL) {
+        if (init->nombre == "suma" || init->nombre == "resta" ||
+            init->nombre == "multiplicacion" || init->nombre == "division" ) {
+
+            if (init->hijos.size() >= 2) {
+                // Evaluamos recursivamente los hijosdoG1
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                std::string rightString = evalInterCode(init->hijos.at(1), error, input);
+
+                float leftValue = 0;
+                float rightValue = 0;
+
+                if(leftString == "true" || leftString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+                if(rightString == "true" || rightString == "false"){
+                    error->append("Error semántico: Operación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    return "0";
+                }
+
+                if(leftString != ""){
+                    leftValue = std::stof(leftString);  // Hijo izquierdo
+
+                }
+                if(rightString != ""){
+                    rightValue = std::stof(rightString);  // Hijo derecho
+                }
+
+                float result = 0;
+
+                // Verificar si es división
+                if (init->nombre == "division") {
+                    if (rightValue == 0) {
+                        error->append("Error: División por cero, linea: " + QString::number(init->noLinea));
+                        return "0";
+                    }
+                    // Si ambos son enteros, realizamos división entera
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        init->codigo_p = "DVI";
+                    } else {
+                        init->codigo_p = "DVR";
+                    }
+                } else if (init->nombre == "suma") {
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        init->codigo_p = "ADI";
+                    } else {
+                        init->codigo_p = "ADR";
+                    }
+
+                } else if (init->nombre == "resta") {
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        init->codigo_p = "SBI";
+                    } else {
+                        init->codigo_p = "SBR";
+                    }
+                } else if (init->nombre == "multiplicacion") {
+                    if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                        init->codigo_p = "MPI";
+                    } else {
+                        init->codigo_p = "MPR";
+                    }
+                }
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return std::to_string(result);
+            }
+        } else if (init->nombre == "numerofloat") {
+            try {
+                // Convertimos el valor del nodo de string a float
+                init->codigo_p = "LDC " + init->valor;
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return init->valor;
+            } catch (const std::invalid_argument&) {
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return "0";
+            }
+        } else if (init->nombre == "numeroint") {
+            try {
+                // Convertimos el valor del nodo de string a float
+                init->codigo_p = "LDC " + init->valor;
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return init->valor;
+            } catch (const std::invalid_argument&) {
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return "0";
+            }
+        } else if(init->nombre == "identificador"){
+            try{
+                BucketList l = getVariable(init->valor);
+                if(l!=NULL){
+                    if(l->tipo == "int" || l->tipo == "float" || l->tipo == "bool"){
+                        init->codigo_p = "LOD " + std::to_string(l->memloc);
+                        if(!init->codigo_p.empty()){
+                            input->append(QString::fromStdString(init->codigo_p));
+                        }
+                        return l->value;
+                    }
+                }
+            }catch(const std::invalid_argument&){
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return "0";
+            }
+        }else if(init->nombre == "booleano"){
+            init->tipo = "bool";
+            if(init->valor == "true"){
+                init->codigo_p = "LDC 1";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return "true";
+            }else{
+                init->codigo_p = "LDC 0";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return "false";
+            }
+        } else if (init->nombre == "men" || init->nombre == "may" || init->nombre == "menigl" || init->nombre == "mayigl") {
+            if (init->hijos.size() >= 2) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                std::string rightString = evalInterCode(init->hijos.at(1), error, input);
+
+                float leftValue = 0;
+                float rightValue = 0;
+
+                if ((leftString == "true" || leftString == "false") && (rightString != "true" && rightString != "false")) {
+                    error->append("Error semántico: Comparación incompatible entre booleano y número, línea: " + QString::number(init->noLinea));
+                    init->anotacion = "Error semántico: Comparación incompatible entre booleano y número";
+                    return "0";
+                }
+                if ((rightString == "true" || rightString == "false") && (leftString != "true" && leftString != "false")) {
+                    error->append("Error semántico: Comparación incompatible entre booleano y número, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Comparación incompatible entre booleano y número";
+                    return "0";
+                }
+
+                if (!leftString.empty()) {
+                    leftValue = std::stof(leftString);
+                }
+                if (!rightString.empty()) {
+                    rightValue = std::stof(rightString);
+                }
+
+                std::string res = "0";
+                if (init->nombre == "men") {
+                    init->codigo_p = "LES";
+                    res = (leftValue < rightValue) ? "true" : "false";
+                } else if (init->nombre == "may") {
+                    init->codigo_p = "GT";
+                    res = (leftValue > rightValue) ? "true" : "false";
+                } else if (init->nombre == "menigl") {
+                    init->codigo_p = "LEQ";
+                    res = (leftValue <= rightValue) ? "true" : "false";
+                } else if (init->nombre == "mayigl") {
+                    init->codigo_p = "GEQ";
+                    res = (leftValue >= rightValue) ? "true" : "false";
+                }
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return res;
+            }
+
+        }else if(init->nombre == "igualdad" || init->nombre == "distinto"){
+            if (init->hijos.size() >= 2) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                std::string rightString = evalInterCode(init->hijos.at(1), error, input);
+
+                float leftValue = 0;
+                float rightValue = 0;
+                std::string res = "false";
+                if (init->nombre == "igualdad") {
+                    init->codigo_p = "EQU";
+                    res = (leftString == rightString) ? "true" : "false";
+
+                } else if (init->nombre == "distinto") {
+                    init->codigo_p = "NEQ";
+                    res =(leftString != rightString) ? "true" : "false";
+                }
+                // Guardamos el resultado en el nodo y lo devolvemos
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return res;
+            }
+        }
+        else if(init->nombre == "(exp-bool)"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                return leftString;
+            }
+        } else if(init->nombre == "and" || init->nombre == "or"){
+            if (init->hijos.size() >= 2) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                std::string rightString = evalInterCode(init->hijos.at(1), error, input);
+
+                if(leftString != "true" && leftString != "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                if( rightString != "true" && rightString != "false"){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                bool leftValue = leftString == "true" ? true : false;
+                bool rightValue = rightString == "true" ? true : false;
+                std::string res = "0";
+                if (init->nombre == "and") {
+                    init->codigo_p = "AND";
+                    res = (leftValue && rightValue) ? "true" : "false";
+                } else if (init->nombre == "or") {
+                    init->codigo_p = "OR";
+                    res = (leftValue || rightValue) ? "true" : "false";
+                }
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return res;
+            }
+        }
+        else if(init->nombre == "negacion"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+
+                if(leftString != "true" && leftString != "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                bool leftValue = leftString == "true" ? true : false;
+                std::string res = "0";
+                res = (!leftValue) ? "true" : "false";
+                init->codigo_p = "NOT";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return res;
+            }
+        }
+        else if( init->nombre == "menos"){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+
+                if(leftString == "true" || leftString == "false" ){
+                    error->append("Error semántico: Valor incompatible con la operacion, línea: " + QString::number(init->noLinea)) ;
+                    init->anotacion = "Error semántico: Valor incompatible con la operacion";
+                    return "0";
+                }
+                float leftValue = std::stof(leftString) * -1;
+                std::string res =  std::to_string(leftValue);
+                if(init->tipo == "int"){
+                    init->codigo_p = "NGI";
+                }
+                else{
+                    init->codigo_p = "NGR";
+                }
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return res;
+            }
+        }
+        else if( init->nombre == "read" ){
+            BucketList l = getVariable(init->valor);
+            if(l!=NULL){
+                init->codigo_p = "LDA " + std::to_string(l->memloc);
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                if(l->tipo == "float"){
+                    init->codigo_p = "RDR";
+                }else{
+                    init->codigo_p = "RDI";
+                }
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return l->value;
+            }
+        }
+        else if( init->nombre == "write" ){
+            if (init->hijos.size() >= 1) {
+                std::string leftString = evalInterCode(init->hijos.at(0), error, input);
+                init->codigo_p = "WRI";
+
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                return leftString;
+            }
+        }
+    }
+    return "";
+}
+
+
+bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) {
+    if(init != NULL){
+        //qDebug() << "iteracion: " << init->nombre;
+        if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
+            if(init->hijos.size() > 0){
+                bool exito = showInterCode(init->hijos.at(0), error, correct, input);
+                if(exito && correct){
+                    error->append("Código intermedio completo sin problemas");
+                }
+                return exito;
+            }
+        }else{
+            bool comprobado = true;
+            int actualLabel = labelCount;
+            int siguienteLabel = labelCount;
+            //Antes de recorrer hijos instrucciones necesarias
+            std::string result = "";
+            //Caso 3 do
+            if (init->nombre == "sent-do") {
+                actualLabel = labelCount++;
+                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+            }
+
+            //Caso 4 while
+            if (init->nombre == "sent-while") {
+                actualLabel = labelCount++;
+                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                result = evalInterCode(init->hijos.at(0), error, input);
+                siguienteLabel = labelCount++;
+                init->codigo_p = "NOT";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                init->codigo_p = "FJP L" + std::to_string(siguienteLabel);
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+            }
+
+
+            //Caso 5 if
+            if (init->nombre == "sent-if" || init->nombre == "sent-if-else") {
+                //Evaluamos el procedimiento
+                result = evalInterCode(init->hijos.at(0), error, input);
+                actualLabel = labelCount++;
+
+                init->codigo_p = "NOT";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                init->codigo_p = "FJP L" + std::to_string(actualLabel);
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                bool res = false;
+                res = showInterCode(init->hijos.at(1), error, correct, input);
+                if(!res){
+                    comprobado = false;
+                }
+                if(init->hijos.size() > 2){
+                    siguienteLabel = labelCount++;
+                    init->codigo_p = "UJP L" + std::to_string(siguienteLabel);
+                    if(!init->codigo_p.empty()){
+                        input->append(QString::fromStdString(init->codigo_p));
+                    }
+                }
+
+                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+
+                if(init->hijos.size() > 2){
+                    res = showInterCode(init->hijos.at(2), error, correct, input);
+                    init->codigo_p = "LABEL L" + std::to_string(siguienteLabel) + ":";
+                    if(!init->codigo_p.empty()){
+                        input->append(QString::fromStdString(init->codigo_p));
+                    }
+                }
+
+
+            }
+
+            if (init->nombre != "sent-if" && init->nombre != "sent-if-else") {
+                for(int i=0; i<init->hijos.size(); i++){
+
+                    bool res = false;
+                    res = showInterCode(init->hijos.at(i), error, correct, input);
+
+                    if(!res){
+                        comprobado = false;
+                    }
+                }
+            }
+
+            //Agregar casos para operacioens especificas
+
+            //Caso 1 asignaciones
+            if (init->nombre == "sent-assign") {
+                // Obtener el valor evaluado con la función eval
+
+                BucketList l = getVariable(init->hijos.at(0)->valor);
+                if(l!=NULL){
+                    init->codigo_p = "LDA " + std::to_string(l->memloc);
+                    if(!init->codigo_p.empty()){
+                        input->append(QString::fromStdString(init->codigo_p));
+                    }
+                    result = evalInterCode(init->hijos.at(1), error, input);
+                    l->value = result;
+                    init->codigo_p = "STO";
+                    if(!init->codigo_p.empty()){
+                        input->append(QString::fromStdString(init->codigo_p));
+                    }
+                }
+            }
+            //Caso 2 read y write
+            if (init->nombre == "read" || init->nombre == "write") {
+                result = evalInterCode(init, error, input);
+            }
+            //Caso 3 do
+            if (init->nombre == "sent-do") {
+                result = evalInterCode(init->hijos.at(1), error, input);
+                init->codigo_p = "FJP L" + std::to_string(actualLabel);
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+            }
+            //Caso 4 while
+            if (init->nombre == "sent-while") {
+                //Salta a comprobar la condición de while
+                init->codigo_p = "UJP L" + std::to_string(actualLabel);
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+                //Label para salir del while
+                init->codigo_p = "LABEL L" + std::to_string(siguienteLabel) + ":";
+                if(!init->codigo_p.empty()){
+                    input->append(QString::fromStdString(init->codigo_p));
+                }
+            }
+
+
+
+
+
+
+            return comprobado;
+        }
+    }
+    return true;
+}
+
+
+
+
 bool procesarTablaHash(Nodo *init, QTextEdit *error, std::string var_tipo = "") {
     if (init == NULL) return true;
     if (QString::fromStdString(init->nombre).compare("decl", Qt::CaseInsensitive) == 0) {
@@ -831,9 +1305,9 @@ MainWindow::MainWindow(QWidget *parent) :
         // antCursor, lleva el control de donde esta el cursor cuando se mueve.
         antCursor->initialEditPosition = codeEditor->textCursor().position();
         if(codeEditor->textCursor().position() < myCursor->initialEditPosition){
-            /* Si el usuario coloca el cursor en una posición previa, se regresa
-             * el apuntador inicial del analisis para observar todos los cambios que
-             * hace el usuario.
+            //Si el usuario coloca el cursor en una posición previa, se regresa
+            //el apuntador inicial del analisis para observar todos los cambios que
+            //hace el usuario.
             myCursor->initialEditPosition = codeEditor->textCursor().position();
         }
     });*/
@@ -916,6 +1390,12 @@ MainWindow::MainWindow(QWidget *parent) :
     resultsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     resultsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    // Crear un campo de texto no editable
+    QTextEdit *interCodeText = new QTextEdit();
+    interCodeText->setReadOnly(true); // Hacer que el texto sea no editable
+    interCodeText->setLineWrapMode(QTextEdit::NoWrap); // Desactivar el ajuste automático de líneas (opcional)
+
+
 
     QStackedWidget *stackedWidget = new QStackedWidget;
     //Añadir widgets al stackwidget para poder moverse entre ventanas.
@@ -923,6 +1403,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stackedWidget->addWidget(syntacticTreeView);
     stackedWidget->addWidget(semanticTreeView);
     stackedWidget->addWidget(hashTableView);
+    stackedWidget->addWidget(interCodeText);
 
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
@@ -948,6 +1429,9 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     QObject::connect(button5, &QPushButton::clicked, [stackedWidget]() {
         stackedWidget->setCurrentIndex(3);
+    });
+    QObject::connect(button4, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(4);
     });
 
 
@@ -1024,6 +1508,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 file.close();
                 resultsTable->setRowCount(0);
                 hashTableView->setRowCount(0);
+                interCodeText->clear();
                 textVistaAbajo->clear();
                 QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
                 if (modelSyntactic) {
@@ -1038,6 +1523,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }else{
             resultsTable->setRowCount(0);
             hashTableView->setRowCount(0);
+            interCodeText->clear();
             textVistaAbajo->clear();
             QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
             if (modelSyntactic) {
@@ -1242,10 +1728,19 @@ MainWindow::MainWindow(QWidget *parent) :
             }
             QStandardItemModel *modelSem = new QStandardItemModel;
             QStandardItem *rootSem = modelSem->invisibleRootItem();
-            showSemanticData(sint, textVistaAbajo, correct, rootSem);
+            bool resSemantic = showSemanticData(sint, textVistaAbajo, correct, rootSem);
             semanticTreeView->setModel(modelSem);
             semanticTreeView->show();
             semanticTreeView->expandAll();
+            if(resSemantic){
+                labelCount = 1;
+                interCodeText->clear();
+                showInterCode(sint, textVistaAbajo, correct, interCodeText);
+                interCodeText->append("STP");
+            }else{
+                textVistaAbajo->append("Corriga los errores semánticos para continuar con el código intermedio");
+            }
+
 
         }
     });
