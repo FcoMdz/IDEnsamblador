@@ -1198,12 +1198,23 @@ int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion
                             input->append(QString::number(contadorInstrucciones++) + ": DVF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                         }
                     } else if (init->nombre == "suma") {
-                        input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-
+                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                            input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }else{
+                            input->append(QString::number(contadorInstrucciones++) + ": ADF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }
                     } else if (init->nombre == "resta") {
-                        input->append(QString::number(contadorInstrucciones++) + ": SUB " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                            input->append(QString::number(contadorInstrucciones++) + ": SUB " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }else{
+                            input->append(QString::number(contadorInstrucciones++) + ": SBF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }
                     } else if (init->nombre == "multiplicacion") {
-                        input->append(QString::number(contadorInstrucciones++) + ": MUL " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                            input->append(QString::number(contadorInstrucciones++) + ": MUL " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }else{
+                            input->append(QString::number(contadorInstrucciones++) + ": MLF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }
                     }
                     liberarRegistro(); //Libera derecho
                     return registroIzquierdo;
@@ -1398,6 +1409,9 @@ int simTinyCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) {
             if(l!=NULL){
                 result += evalTinyCode(init->hijos.at(1), error, input, true);
                 result++;
+                if(l->tipo=="float"){ //Aseguramos que se haga casting del resultado a float
+                    result++;
+                }
             }
         }
 
@@ -1478,6 +1492,9 @@ bool showTinyCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) 
                 if(l!=NULL){
                     result = evalTinyCode(init->hijos.at(1), error, input);
                     //Almacenamos el resultado de los anteriores valores
+                    if(l->tipo=="float"){ //Aseguramos que se haga casting del resultado a float
+                        input->append(QString::number(contadorInstrucciones++) + ": ITF " + QString::number(result) + "," + QString::number(result) + ",0");
+                    }
                     input->append(QString::number(contadorInstrucciones++) + ": ST " + QString::number(result) + "," + QString::number(l->memloc) + "(0)");
                     liberarRegistro(); //Libera el registro del resultado
                 }
