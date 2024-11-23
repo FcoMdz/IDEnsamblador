@@ -1195,7 +1195,7 @@ int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion
                         if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
                             input->append(QString::number(contadorInstrucciones++) + ": DIV " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                         } else {
-                            input->append(QString::number(contadorInstrucciones++) + ": DIV " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                            input->append(QString::number(contadorInstrucciones++) + ": DVF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                         }
                     } else if (init->nombre == "suma") {
                         input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));

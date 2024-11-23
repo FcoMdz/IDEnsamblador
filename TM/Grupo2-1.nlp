@@ -1,0 +1,23 @@
+/*
+	Grupo 2:
+	Dado el ID y 5 calificaciones de un alumno obtenidas a lo largo del semestre,
+	construya un programa que imprima la matrícula del alumno y el promedio de sus
+	calificaciones.
+*/
+program{
+	//Declaraciones
+	float cal1,cal2,cal3,cal4, cal5;
+	float prom;
+	int id;
+	//Lectura
+	read id;
+	read cal1;
+	read cal2;
+	read cal3;
+	read cal4;
+	read cal5;
+	//Calculo
+	write id;
+	prom=(cal1+cal2+cal3+cal4+cal5)/5;
+	write prom;
+}

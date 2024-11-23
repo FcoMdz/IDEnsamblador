@@ -43,6 +43,7 @@ typedef enum {
    opSUB,    /* RR     reg(r) = reg(s)-reg(t) */
    opMUL,    /* RR     reg(r) = reg(s)*reg(t) */
    opDIV,    /* RR     reg(r) = reg(s)/reg(t) */
+   opDVF,   /* RR     reg(r) = (float)reg(s)/(float)reg(t) */
    opLES,   /* RR     reg(r) = reg(s)<reg(t) */
    opGE,    /* RR     reg(r) = reg(s)>reg(t) */
    opLEQ,   /* RR     reg(r) = reg(s)<=reg(t) */
@@ -109,7 +110,7 @@ REGISTER dMem [DADDR_SIZE];
 REGISTER reg [NO_REGS];
 
 const char * opCodeTab[]
-        = {"HALT","IN","OUT","ADD","SUB","MUL","DIV","LES","GE","LEQ","GEQ","EQU","NEQ","AND","OR","NEG","MIN","????",
+        = {"HALT","IN","OUT","ADD","SUB","MUL","DIV","DVF","LES","GE","LEQ","GEQ","EQU","NEQ","AND","OR","NEG","MIN","????",
             /* RR opcodes */
            "LD","ST","????", /* RM opcodes */
            "LDA","LDC","LDF","JLT","JLE","JGT","JGE","JEQ","JNE","JUC","????"
@@ -473,6 +474,19 @@ STEPRESULT stepTM (void)
           reg[r].isFloat = 0;
           reg[r].value.iVal = reg[s].value.iVal / reg[t].value.iVal ;  
         }
+      }
+      else{ 
+        return srZERODIVIDE;
+      }
+      break;
+    case opDVF :
+    /***********************************/
+      if (  (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal) != 0 ) {
+          float val1 = reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
+          float val2 = reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
+          printf("%f, %f", val1, val2);
+          reg[r].isFloat = 1;
+          reg[r].value.fVal = (float)val1/(float)val2;
       }
       else{ 
         return srZERODIVIDE;
