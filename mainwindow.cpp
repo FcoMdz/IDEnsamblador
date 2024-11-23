@@ -27,8 +27,14 @@
 //#include "sintatic.tab.c"
 #include "lex.yy.c"
 
-int currentMemLoc = 0;
+int currentMemLoc = 1;
 int labelCount = 1;
+
+int contadorInstrucciones = 0; // Controla el índice de las instrucciones
+int registroDisponible = 1;   // Controla el registro en uso
+int memoriaTemporal = 0; //Donde se almacenara lo que no entra en los registros
+int contadorMemoriaTemporal = 0; //Contador de memoria durante la evaluación para saber la posición respecto al inicio
+
 class CustomQPlainTextEdit : public QPlainTextEdit {
 public:
     // Constructor
@@ -688,7 +694,6 @@ bool showSemanticData(Nodo *init, QTextEdit *error, bool correct, QStandardItem 
 }
 
 
-
 std::string evalInterCode(Nodo *init, QTextEdit *error, QTextEdit *input) {
     if (init != NULL) {
         if (init->nombre == "suma" || init->nombre == "resta" ||
@@ -1001,7 +1006,7 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
             if(init->hijos.size() > 0){
                 bool exito = showInterCode(init->hijos.at(0), error, correct, input);
                 if(exito && correct){
-                    error->append("Código intermedio completo sin problemas");
+                    error->append("Código P completo sin problemas");
                 }
                 return exito;
             }
@@ -1014,7 +1019,7 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
             //Caso 3 do
             if (init->nombre == "sent-do") {
                 actualLabel = labelCount++;
-                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                init->codigo_p = "LAB L" + std::to_string(actualLabel) + ":";
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
                 }
@@ -1023,16 +1028,16 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
             //Caso 4 while
             if (init->nombre == "sent-while") {
                 actualLabel = labelCount++;
-                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                init->codigo_p = "LAB L" + std::to_string(actualLabel) + ":";
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
                 }
                 result = evalInterCode(init->hijos.at(0), error, input);
                 siguienteLabel = labelCount++;
-                init->codigo_p = "NOT";
+                /*init->codigo_p = "NOT";
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
-                }
+                }*/
                 init->codigo_p = "FJP L" + std::to_string(siguienteLabel);
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
@@ -1046,10 +1051,6 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
                 result = evalInterCode(init->hijos.at(0), error, input);
                 actualLabel = labelCount++;
 
-                init->codigo_p = "NOT";
-                if(!init->codigo_p.empty()){
-                    input->append(QString::fromStdString(init->codigo_p));
-                }
                 init->codigo_p = "FJP L" + std::to_string(actualLabel);
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
@@ -1067,14 +1068,14 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
                     }
                 }
 
-                init->codigo_p = "LABEL L" + std::to_string(actualLabel) + ":";
+                init->codigo_p = "LAB L" + std::to_string(actualLabel) + ":";
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
                 }
 
                 if(init->hijos.size() > 2){
                     res = showInterCode(init->hijos.at(2), error, correct, input);
-                    init->codigo_p = "LABEL L" + std::to_string(siguienteLabel) + ":";
+                    init->codigo_p = "LAB L" + std::to_string(siguienteLabel) + ":";
                     if(!init->codigo_p.empty()){
                         input->append(QString::fromStdString(init->codigo_p));
                     }
@@ -1135,14 +1136,439 @@ bool showInterCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input)
                     input->append(QString::fromStdString(init->codigo_p));
                 }
                 //Label para salir del while
-                init->codigo_p = "LABEL L" + std::to_string(siguienteLabel) + ":";
+                init->codigo_p = "LAB L" + std::to_string(siguienteLabel) + ":";
                 if(!init->codigo_p.empty()){
                     input->append(QString::fromStdString(init->codigo_p));
                 }
             }
 
+            return comprobado;
+        }
+    }
+    return true;
+}
+
+//Funciones para manejar los registros
+void spillRegister(int registro, QTextEdit *input) {
+    input->append(QString::number(contadorInstrucciones++) + ": ST " + QString::number(registro) + "," + QString::number(memoriaTemporal + contadorMemoriaTemporal) + "(0)");
+    contadorMemoriaTemporal++; // Avanza en el stack
+
+}
+
+int reloadRegister(int registro, QTextEdit *input) {
+    contadorMemoriaTemporal--; // Retrocede en el stack
+    input->append(QString::number(contadorInstrucciones++) + ": LD " + QString::number(registro) + "," + QString::number(memoriaTemporal + contadorMemoriaTemporal) + "(0)");
+    return registro;
+}
+
+int asignarRegistro(QTextEdit *input) {
+    if (registroDisponible > 6) {
+        spillRegister(registroDisponible - 1, input); // Guarda el último registro usado
+        registroDisponible--;                 // Libera ese registro
+    }
+    return registroDisponible++; // Asigna el siguiente registro disponible
+}
+
+int liberarRegistro() {
+    if (registroDisponible > 0) {
+        registroDisponible--;
+    }
+    return registroDisponible;
+}
 
 
+int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion=false) {
+    if (init != NULL) {
+        if (init->nombre == "suma" || init->nombre == "resta" ||
+            init->nombre == "multiplicacion" || init->nombre == "division" ) {
+
+            if (init->hijos.size() >= 2) {
+
+                // Evaluamos recursivamente los hijos
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                int registroDerecho = evalTinyCode(init->hijos.at(1), error, input, simulacion);
+
+                if(!simulacion){
+                    // Verificar si es división
+                    if (init->nombre == "division") {
+                        // Si ambos son enteros, realizamos división entera
+                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
+                            input->append(QString::number(contadorInstrucciones++) + ": DIV " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        } else {
+                            input->append(QString::number(contadorInstrucciones++) + ": DIV " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                        }
+                    } else if (init->nombre == "suma") {
+                        input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+
+                    } else if (init->nombre == "resta") {
+                        input->append(QString::number(contadorInstrucciones++) + ": SUB " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    } else if (init->nombre == "multiplicacion") {
+                        input->append(QString::number(contadorInstrucciones++) + ": MUL " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    }
+                    liberarRegistro(); //Libera derecho
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo + registroDerecho + 1;
+                }
+            }
+        //Para los valores, se almacena el valor en un registro y posteriormente se almacena en memoria en forma de un stack
+        } else if (init->nombre == "numerofloat") {
+            // Convertimos el valor del nodo de string a float
+            if(!simulacion){
+                int reg = asignarRegistro(input);
+                input->append(QString::number(contadorInstrucciones++) + ": LDC " + QString::number(reg) + "," + QString::fromStdString(init->valor) + "(0)");
+                return reg;
+            }else{
+                return 1;
+            }
+
+
+        } else if (init->nombre == "numeroint") {
+            if(!simulacion){
+                int reg = asignarRegistro(input);
+                input->append(QString::number(contadorInstrucciones++) + ": LDC " + QString::number(reg) + "," + QString::fromStdString(init->valor) + "(0)");
+                return reg;
+            }else{
+                return 1;
+            }
+
+        } else if(init->nombre == "identificador"){
+            try{
+                BucketList l = getVariable(init->valor);
+                if(l!=NULL){
+                    if(!simulacion){
+                        if(l->tipo == "int" || l->tipo == "float" || l->tipo == "bool"){
+                            int reg = asignarRegistro(input);
+                            input->append(QString::number(contadorInstrucciones++) + ": LD " + QString::number(reg) + "," + QString::number(l->memloc) + "(0)");
+                            return reg;
+                        }
+                    }else{
+                        return 1;
+                    }
+
+                }
+            }catch(const std::invalid_argument&){
+                error->append("Error: Valor inválido en el nodo '" + QString::fromStdString(init->valor) + "'");
+                return 0;
+            }
+        }else if(init->nombre == "booleano"){
+            init->tipo = "bool";
+            if(!simulacion){
+                if(init->valor == "true"){
+                    int reg = asignarRegistro(input);
+                    input->append(QString::number(contadorInstrucciones++) + ": LDC " + QString::number(reg) + ",1(0)");
+                    return reg;
+                }else{
+                    int reg = asignarRegistro(input);
+                    input->append(QString::number(contadorInstrucciones++) + ": LDC " + QString::number(reg) + ",0(0)");
+                    return reg;
+                }
+            }else{
+                return 1;
+            }
+
+        } else if (init->nombre == "men" || init->nombre == "may" || init->nombre == "menigl" || init->nombre == "mayigl") {
+            if (init->hijos.size() >= 2) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                int registroDerecho = evalTinyCode(init->hijos.at(1), error, input, simulacion);
+                if(!simulacion){
+                    std::string res = "0";
+                    if (init->nombre == "men") {
+                        input->append(QString::number(contadorInstrucciones++) + ": LES " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    } else if (init->nombre == "may") {
+                        input->append(QString::number(contadorInstrucciones++) + ": GE " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    } else if (init->nombre == "menigl") {
+                        input->append(QString::number(contadorInstrucciones++) + ": LEQ " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    } else if (init->nombre == "mayigl") {
+                        input->append(QString::number(contadorInstrucciones++) + ": GEQ " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    }
+
+                    liberarRegistro(); //Libera derecho
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo+registroDerecho+1;
+                }
+
+            }
+
+        }else if(init->nombre == "igualdad" || init->nombre == "distinto"){
+            if (init->hijos.size() >= 2) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                int registroDerecho = evalTinyCode(init->hijos.at(1), error, input, simulacion);
+                if(!simulacion){
+                    if (init->nombre == "igualdad") {
+                        input->append(QString::number(contadorInstrucciones++) + ": EQU " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+
+                    } else if (init->nombre == "distinto") {
+                        input->append(QString::number(contadorInstrucciones++) + ": NEQ " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    }
+                    liberarRegistro(); //Libera derecho
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo+registroDerecho+1;
+                }
+
+            }
+        }
+        else if(init->nombre == "(exp-bool)"){
+            if (init->hijos.size() >= 1) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                return registroIzquierdo;
+            }
+        } else if(init->nombre == "and" || init->nombre == "or"){
+            if (init->hijos.size() >= 2) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                int registroDerecho = evalTinyCode(init->hijos.at(1), error, input, simulacion);
+                if(!simulacion){
+                    if (init->nombre == "and") {
+                        input->append(QString::number(contadorInstrucciones++) + ": AND " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    } else if (init->nombre == "or") {
+                        input->append(QString::number(contadorInstrucciones++) + ": OR " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
+                    }
+                    liberarRegistro(); //Libera derecho
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo+registroDerecho+1;
+                }
+
+            }
+        }
+        else if(init->nombre == "negacion"){
+            if (init->hijos.size() >= 1) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                if(!simulacion){
+                    input->append(QString::number(contadorInstrucciones++) + ": NEG " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + ",0");
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo+1;
+                }
+
+            }
+        }
+        else if( init->nombre == "menos"){
+            if (init->hijos.size() >= 1) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                if(!simulacion){
+                    input->append(QString::number(contadorInstrucciones++) + ": MIN " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + ",0");
+                    return registroIzquierdo;
+                }else{
+                    return registroIzquierdo+1;
+                }
+
+            }
+        }
+        else if( init->nombre == "read" ){
+            BucketList l = getVariable(init->valor);
+            if(l!=NULL){
+                if(!simulacion){
+                    input->append(QString::number(contadorInstrucciones++) + ": IN " + QString::number(asignarRegistro(input)) + ",0,0");
+                    input->append(QString::number(contadorInstrucciones++) + ": ST " + QString::number(liberarRegistro()) + "," + QString::number(l->memloc) + "(0)");
+                    return 0;
+                }else{
+                    return 2;
+                }
+
+            }
+        }
+        else if( init->nombre == "write" ){
+            if (init->hijos.size() >= 1) {
+                int registroIzquierdo = evalTinyCode(init->hijos.at(0), error, input, simulacion);
+                if(!simulacion){
+                    input->append(QString::number(contadorInstrucciones++) + ": OUT " + QString::number(registroIzquierdo) + ",0,0");
+                    liberarRegistro(); //Libera el registro izquierdo
+                    return 0;
+                }else{
+                    return registroIzquierdo+1;
+                }
+
+            }
+        }
+    }
+    return 0;
+}
+
+int simTinyCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) {
+    if(init != NULL){
+        int result = 0;
+
+        //Caso 1 asignaciones
+        if (init->nombre == "sent-assign") {
+            // Obtener el valor evaluado con la función eval
+            BucketList l = getVariable(init->hijos.at(0)->valor);
+            if(l!=NULL){
+                result += evalTinyCode(init->hijos.at(1), error, input, true);
+                result++;
+            }
+        }
+
+        //Caso 2 read y write
+        else if (init->nombre == "read" || init->nombre == "write") {
+            result += evalTinyCode(init, error, input, true);
+        }
+
+        //Caso 3 do
+        else if (init->nombre == "sent-do") {
+            result += simTinyCode(init->hijos.at(0), error, correct, input);
+            result += evalTinyCode(init->hijos.at(1), error, input, true);
+            result++;
+        }
+
+        //Caso 4 while
+        else if (init->nombre == "sent-while") {
+            result += evalTinyCode(init->hijos.at(0), error, input, true);
+            result += simTinyCode(init->hijos.at(1), error, correct, input); //Simulamos cuantos saltos hará el bloque del while
+            result += 2;
+        }
+
+
+        //Caso 5 if
+        else if (init->nombre == "sent-if" || init->nombre == "sent-if-else") {
+                //Evaluamos la condicional y condicionamos el salto previo a realizar el bloque
+                result += evalTinyCode(init->hijos.at(0), error, input, true);
+                result++;
+                result += simTinyCode(init->hijos.at(1), error, correct, input); //Simulamos cuantos saltos hará el bloque del if
+
+
+                if(init->hijos.size() > 2){ //Si es un if-else hay que evaluar el otro bloque y hacer
+                    // el salto del primer if a esta etiqueta
+                    result += simTinyCode(init->hijos.at(2), error, correct, input); //Simulamos cuantos saltos hará el bloque del if-else
+                    result++;
+
+                }
+        }
+
+        else{
+            for(int i=0; i<init->hijos.size(); i++){
+                result += simTinyCode(init->hijos.at(i), error, correct, input);
+            }
+        }
+
+        return result;
+    }
+    return 0;
+}
+
+bool showTinyCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) {
+    if(init != NULL){
+        //qDebug() << "iteracion: " << init->nombre;
+        if(QString::fromStdString(init->nombre).compare("apuntador", Qt::CaseInsensitive) == 0){
+            if(init->hijos.size() > 0){
+                bool exito = showTinyCode(init->hijos.at(0), error, correct, input);
+                if(exito && correct){
+                    error->append("Código tiny completo sin problemas");
+                }
+                return exito;
+            }
+        }else{
+            bool comprobado = true;
+
+            /**.
+             * Antes de recorrer hijos instrucciones necesarias
+             * para preparar las condicionales de los bloques
+             * de sentencia.
+             */
+            int result = 0;
+            int inicio = 0;
+            int actual = 0;
+
+            //Caso 1 asignaciones
+            if (init->nombre == "sent-assign") {
+                // Obtener el valor evaluado con la función eval
+                BucketList l = getVariable(init->hijos.at(0)->valor);
+                if(l!=NULL){
+                    result = evalTinyCode(init->hijos.at(1), error, input);
+                    //Almacenamos el resultado de los anteriores valores
+                    input->append(QString::number(contadorInstrucciones++) + ": ST " + QString::number(result) + "," + QString::number(l->memloc) + "(0)");
+                    liberarRegistro(); //Libera el registro del resultado
+                }
+            }
+
+            //Caso 2 read y write
+            else if (init->nombre == "read" || init->nombre == "write") {
+                result = evalTinyCode(init, error, input);
+            }
+
+            //Caso 3 do
+            else if (init->nombre == "sent-do") {
+                //En el código P se prepara una etiqueta antes del bloque para regresar a este punto
+                inicio = contadorInstrucciones;
+                bool res = false;
+                res = showTinyCode(init->hijos.at(0), error, correct, input);
+
+                if(!res){
+                    comprobado = false;
+                }
+                //Evalua la condicional despues de ejecutar el primer bloque
+                result = evalTinyCode(init->hijos.at(1), error, input);
+                //Agregar condicional sobre si se debe realizar el salto
+                //Incluye el salto de regreso en el PC que es el registro 7 realizando el desplazamiento
+                actual = contadorInstrucciones;
+                input->append(QString::number(contadorInstrucciones++) + ": JEQ " + QString::number(result) + "," + QString::number(inicio-actual-1) + "(7)" );
+                liberarRegistro();
+            }
+
+            //Caso 4 while
+            else if (init->nombre == "sent-while") {
+                inicio = contadorInstrucciones;
+                //Revisión de la condicional
+                result = evalTinyCode(init->hijos.at(0), error, input);
+                int saltos = simTinyCode(init->hijos.at(1), error, correct, input); //Simulamos cuantos saltos hará el bloque del while
+                //Integramos la función de brinco con los saltos simulados
+                input->append(QString::number(contadorInstrucciones++) + ": JEQ " + QString::number(result) + "," + QString::number(saltos+1) + "(7)" );
+                liberarRegistro();
+                bool res = false;
+                //Integramos el bloque
+                res = showTinyCode(init->hijos.at(1), error, correct, input);
+                if(!res){
+                    comprobado = false;
+                }
+                actual = contadorInstrucciones;
+                //Se agrega la instrucción para regresar al bloque de para comprobar la condición
+                input->append(QString::number(contadorInstrucciones++) + ": JUC " + QString::number(0) + "," + QString::number(inicio-actual-1) + "(7)" );
+            }
+
+
+            //Caso 5 if
+            else if (init->nombre == "sent-if" || init->nombre == "sent-if-else") {
+                //Evaluamos la condicional y condicionamos el salto previo a realizar el bloque
+                result = evalTinyCode(init->hijos.at(0), error, input);
+                int saltos = simTinyCode(init->hijos.at(1), error, correct, input); //Simulamos cuantos saltos hará el bloque del if
+                input->append(QString::number(contadorInstrucciones++) + ": JEQ " + QString::number(result) + "," + QString::number(saltos+1) + "(7)" );
+                liberarRegistro();
+
+                bool res = false; //Se evalua el bloque
+                res = showTinyCode(init->hijos.at(1), error, correct, input);
+                if(!res){
+                    comprobado = false;
+                }
+
+
+                if(init->hijos.size() > 2){ //Si es un if-else hay que evaluar el otro bloque y hacer
+                    // el salto del primer if a esta etiqueta
+                    int saltos = simTinyCode(init->hijos.at(2), error, correct, input); //Simulamos cuantos saltos hará el bloque del if-else
+                    //Saltamos el else en caso que el if se cumpla
+                    input->append(QString::number(contadorInstrucciones++) + ": JUC " + QString::number(0) + "," + QString::number(saltos) + "(7)" );
+                    res = showTinyCode(init->hijos.at(2), error, correct, input);
+                    if(!res){
+                        comprobado = false;
+                    }
+
+                }
+
+
+            }
+
+            else{
+                for(int i=0; i<init->hijos.size(); i++){
+
+                    bool res = false;
+                    res = showTinyCode(init->hijos.at(i), error, correct, input);
+
+                    if(!res){
+                        comprobado = false;
+                    }
+                }
+            }
 
 
 
@@ -1364,7 +1790,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *button2 = new QPushButton("Sintáctico");
     QPushButton *button3 = new QPushButton("Semántica");
     QPushButton *button5 = new QPushButton("Tabla de síbomolos");
-    QPushButton *button4 = new QPushButton("Código intermedio");
+    QPushButton *button4 = new QPushButton("Código P");
+    QPushButton *button6 = new QPushButton("Código Tiny");
 
     // Crear el cuadro de texto para el análisis sintáctico
     QTreeView *syntacticTreeView = new QTreeView;
@@ -1395,6 +1822,11 @@ MainWindow::MainWindow(QWidget *parent) :
     interCodeText->setReadOnly(true); // Hacer que el texto sea no editable
     interCodeText->setLineWrapMode(QTextEdit::NoWrap); // Desactivar el ajuste automático de líneas (opcional)
 
+    // Crear un campo de texto no editable
+    QTextEdit *tinyText = new QTextEdit();
+    tinyText->setReadOnly(true); // Hacer que el texto sea no editable
+    tinyText->setLineWrapMode(QTextEdit::NoWrap); // Desactivar el ajuste automático de líneas (opcional)
+
 
 
     QStackedWidget *stackedWidget = new QStackedWidget;
@@ -1404,6 +1836,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stackedWidget->addWidget(semanticTreeView);
     stackedWidget->addWidget(hashTableView);
     stackedWidget->addWidget(interCodeText);
+    stackedWidget->addWidget(tinyText);
 
     // Layout para organizar los botones y el cuadro de texto
     QVBoxLayout *buttonTextEditLayout = new QVBoxLayout;
@@ -1415,6 +1848,7 @@ MainWindow::MainWindow(QWidget *parent) :
     buttonLayout->addWidget(button3, 0, 2);
     buttonLayout->addWidget(button5, 0, 3);
     buttonLayout->addWidget(button4, 0, 4);
+    buttonLayout->addWidget(button6, 0, 5);
 
 
     // Conectar botones a las funciones lambda para cambiar las vistas
@@ -1432,6 +1866,9 @@ MainWindow::MainWindow(QWidget *parent) :
     });
     QObject::connect(button4, &QPushButton::clicked, [stackedWidget]() {
         stackedWidget->setCurrentIndex(4);
+    });
+    QObject::connect(button6, &QPushButton::clicked, [stackedWidget]() {
+        stackedWidget->setCurrentIndex(5);
     });
 
 
@@ -1509,6 +1946,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 resultsTable->setRowCount(0);
                 hashTableView->setRowCount(0);
                 interCodeText->clear();
+                tinyText->clear();
                 textVistaAbajo->clear();
                 QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
                 if (modelSyntactic) {
@@ -1524,6 +1962,7 @@ MainWindow::MainWindow(QWidget *parent) :
             resultsTable->setRowCount(0);
             hashTableView->setRowCount(0);
             interCodeText->clear();
+            tinyText->clear();
             textVistaAbajo->clear();
             QStandardItemModel *modelSyntactic = qobject_cast<QStandardItemModel*>(syntacticTreeView->model());
             if (modelSyntactic) {
@@ -1712,7 +2151,7 @@ MainWindow::MainWindow(QWidget *parent) :
             syntacticTreeView->show();
             syntacticTreeView->expandAll();
 
-            currentMemLoc = 0;
+            currentMemLoc = 1;
             for(int i=0; i<SIZE; i++){
                 if(hashTable[i]) hashTable[i] = NULL;
 
@@ -1734,9 +2173,16 @@ MainWindow::MainWindow(QWidget *parent) :
             semanticTreeView->expandAll();
             if(resSemantic){
                 labelCount = 1;
+                contadorInstrucciones = 0;
+                registroDisponible = 1;
+                memoriaTemporal = currentMemLoc + 1; //Inicializa la memoria temporal después de la variable más cercana
+                contadorMemoriaTemporal = 0;
                 interCodeText->clear();
+                tinyText->clear();
                 showInterCode(sint, textVistaAbajo, correct, interCodeText);
+                showTinyCode(sint, textVistaAbajo, correct, tinyText);
                 interCodeText->append("STP");
+                tinyText->append(QString::number(contadorInstrucciones++) + ": HALT 0,0,0");
             }else{
                 textVistaAbajo->append("Corriga los errores semánticos para continuar con el código intermedio");
             }
