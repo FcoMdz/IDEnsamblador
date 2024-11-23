@@ -1216,7 +1216,7 @@ int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion
             // Convertimos el valor del nodo de string a float
             if(!simulacion){
                 int reg = asignarRegistro(input);
-                input->append(QString::number(contadorInstrucciones++) + ": LDC " + QString::number(reg) + "," + QString::fromStdString(init->valor) + "(0)");
+                input->append(QString::number(contadorInstrucciones++) + ": LDF " + QString::number(reg) + "," + QString::fromStdString(init->valor) + "(0)");
                 return reg;
             }else{
                 return 1;
