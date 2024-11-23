@@ -516,14 +516,19 @@ STEPRESULT stepTM (void)
       reg[r].value.iVal = !(reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal);
       break;
     case opMIN :    
+      reg[s].isFloat ? 
+      printf("f: %f\n",reg[s].value.fVal) :
+      printf("i: %i\n",reg[s].value.iVal);
       if (reg[s].isFloat) {
-          reg[r].isFloat = 1;
-          reg[r].value.fVal =
-              (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) * -1;
-        }else{
-          reg[r].isFloat = 0;
-          reg[r].value.iVal = reg[s].value.iVal * -1 ;  
-        }
+        reg[r].isFloat = 1;
+        reg[r].value.fVal = -reg[s].value.fVal;
+      }else{
+        reg[r].isFloat = 0;
+        reg[r].value.iVal = reg[s].value.iVal;
+        printf("Asignado i: %i\n",reg[r].value.iVal);
+        reg[r].value.iVal = -reg[r].value.iVal;
+      }
+      break;
 
     /*************** RM instructions ********************/
     case opLD :    
@@ -656,8 +661,8 @@ int doCommand (void)
     /***********************************/
       for (i = 0; i < NO_REGS; i++)
       { reg[i].isFloat ?
-        printf("%1d: %4f    ", i, reg[i].value.fVal) :
-        printf("%1d: %4d    ", i, reg[i].value.iVal);
+        printf("%1d: %f    ", i, reg[i].value.fVal) :
+        printf("%1d: %i    ", i, reg[i].value.iVal);
         if ( (i % 4) == 3 ) printf ("\n");
       }
       break;
@@ -707,18 +712,20 @@ int doCommand (void)
       iloc = 0;
       dloc = 0;
       stepcnt = 0;
-      for (regNo = 0;  regNo < NO_REGS ; regNo++)
-            reg[regNo].isFloat = 0;
-            reg[regNo].value.iVal = 0 ;
+      for (regNo = 0;  regNo < NO_REGS ; regNo++){
+          reg[regNo].isFloat = 0;
+          reg[regNo].value.iVal = 0 ;
+      }
+            
       dMem[0].isFloat = 0;
       dMem[0].value.iVal = DADDR_SIZE - 1 ;
       for (loc = 1 ; loc < DADDR_SIZE ; loc++)
             reg[regNo].isFloat = 0;
-            reg[regNo].value.fVal = 0;
+            reg[regNo].value.fVal = 0.0f;
             reg[regNo].value.iVal = 0;
-            dMem[loc].isFloat = 0 ;
-            dMem[loc].value.iVal = 0 ;
-            dMem[loc].value.fVal = 0 ;
+            dMem[loc].isFloat = 0;
+            dMem[loc].value.iVal = 0;
+            dMem[loc].value.fVal = 0.0f;
       break;
 
     case 'q' : return FALSE;  /* break; */
