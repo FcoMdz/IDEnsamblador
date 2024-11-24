@@ -40,11 +40,8 @@ typedef enum {
    opIN,      /* RR     read into reg(r); s and t are ignored */
    opOUT,     /* RR     write from reg(r), s and t are ignored */
    opADD,    /* RR     reg(r) = reg(s)+reg(t) */
-   opADF,    /* RR     reg(r) = (float)reg(s)+(float)reg(t) */
    opSUB,    /* RR     reg(r) = reg(s)-reg(t) */
-   opSBF,     /* RR     reg(r) = (float)reg(s)-(float)reg(t)  */
    opMUL,    /* RR     reg(r) = reg(s)*reg(t) */
-   opMLF,   /*  RR     reg(r) = (float)reg(s)*(float)reg(t)  */
    opDIV,    /* RR     reg(r) = reg(s)/reg(t) */
    opDVF,   /* RR     reg(r) = (float)reg(s)/(float)reg(t) */
    opLES,   /* RR     reg(r) = reg(s)<reg(t) */
@@ -114,7 +111,7 @@ REGISTER dMem [DADDR_SIZE];
 REGISTER reg [NO_REGS];
 
 const char * opCodeTab[]
-        = {"HALT","IN","OUT","ADD","ADF","SUB","SBF","MUL","MLF","DIV","DVF","LES","GE","LEQ","GEQ","EQU","NEQ","AND","OR","NEG","MIN","ITF","????",
+        = {"HALT","IN","OUT","ADD","SUB","MUL","DIV","DVF","LES","GE","LEQ","GEQ","EQU","NEQ","AND","OR","NEG","MIN","ITF","????",
             /* RR opcodes */
            "LD","ST","????", /* RM opcodes */
            "LDA","LDC","LDF","JLT","JLE","JGT","JGE","JEQ","JNE","JUC","????"
@@ -443,13 +440,6 @@ STEPRESULT stepTM (void)
         reg[r].value.iVal = reg[s].value.iVal + reg[t].value.iVal ;  
       }
       break;
-    case opADF : {
-        reg[r].isFloat = 1;
-        float varADF = reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
-        float varADF1 = reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
-        reg[r].value.fVal = (float)varADF+(float)varADF1;
-        break;
-      }
     case opSUB :  
        if (reg[s].isFloat || reg[t].isFloat) {
         reg[r].isFloat = 1;
@@ -461,13 +451,6 @@ STEPRESULT stepTM (void)
         reg[r].value.iVal = reg[s].value.iVal - reg[t].value.iVal ;  
       }
       break;
-    case opSBF :  {
-        reg[r].isFloat = 1;
-        float varSBF = reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
-        float varSBF1 = reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
-        reg[r].value.fVal = (float)varSBF-(float)varSBF1;
-        break;
-      }
     case opMUL :  
        if (reg[s].isFloat || reg[t].isFloat) {
         reg[r].isFloat = 1;
@@ -479,14 +462,6 @@ STEPRESULT stepTM (void)
         reg[r].value.iVal = reg[s].value.iVal * reg[t].value.iVal ;  
       }
       break;
-    case opMLF :  {
-        reg[r].isFloat = 1;
-        float varMLF = reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
-        float varMLF1 = reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
-        reg[r].value.fVal = (float)varMLF*(float)varMLF1;
-      
-        break;
-      }
 
     case opDIV :
     /***********************************/
@@ -505,11 +480,11 @@ STEPRESULT stepTM (void)
         return srZERODIVIDE;
       }
       break;
-    case opDVF : {
+    case opDVF :
     /***********************************/
       if (  (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal) != 0 ) {
-          float valDVF = reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
-          float valDVF1 = reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
+          float valDVF = (float)reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal;
+          float valDVF1 = (float)reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal;
           reg[r].isFloat = 1;
           reg[r].value.fVal = (float)valDVF/(float)valDVF1;
       }
@@ -517,7 +492,6 @@ STEPRESULT stepTM (void)
         return srZERODIVIDE;
       }
       break;
-    }
 
     case opLES :  
       reg[r].isFloat = 0;
@@ -592,7 +566,8 @@ STEPRESULT stepTM (void)
         dMem[m].isFloat = 0;
         dMem[m].value.iVal = reg[r].value.iVal ;
       }
-       /*printf("\nST: Val reg: %i (%i), val mem: %i (%i)", reg[r], r, dMem[m], m);*/  break;
+       /*printf("\nST: Val reg: %i (%i), val mem: %i (%i)", reg[r], r, dMem[m], m);*/ 
+      break;
 
     /*************** RA instructions ********************/
     case opLDA :    
@@ -601,7 +576,8 @@ STEPRESULT stepTM (void)
       break;
     case opLDC :
       reg[r].isFloat = 0; 
-      reg[r].value.iVal = currentinstruction.iarg2 ; /*printf("\nLDC: Val: %i, val reg: %i (%i)", currentinstruction.iarg2, reg[r],r);*/   break;
+      reg[r].value.iVal = currentinstruction.iarg2 ; /*printf("\nLDC: Val: %i, val reg: %i (%i)", currentinstruction.iarg2, reg[r],r);*/
+      break;
     case opLDF:
       reg[r].isFloat = 1;
       reg[r].value.fVal = (float)currentinstruction.iarg2; // Lee un flotante

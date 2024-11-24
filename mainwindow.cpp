@@ -1198,23 +1198,11 @@ int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion
                             input->append(QString::number(contadorInstrucciones++) + ": DVF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                         }
                     } else if (init->nombre == "suma") {
-                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
-                            input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }else{
-                            input->append(QString::number(contadorInstrucciones++) + ": ADF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }
+                        input->append(QString::number(contadorInstrucciones++) + ": ADD " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                     } else if (init->nombre == "resta") {
-                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
-                            input->append(QString::number(contadorInstrucciones++) + ": SUB " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }else{
-                            input->append(QString::number(contadorInstrucciones++) + ": SBF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }
+                        input->append(QString::number(contadorInstrucciones++) + ": SUB " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                     } else if (init->nombre == "multiplicacion") {
-                        if (init->hijos.at(0)->tipo == "int" && init->hijos.at(1)->tipo == "int") {
-                            input->append(QString::number(contadorInstrucciones++) + ": MUL " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }else{
-                            input->append(QString::number(contadorInstrucciones++) + ": MLF " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
-                        }
+                        input->append(QString::number(contadorInstrucciones++) + ": MUL " + QString::number(registroIzquierdo) + "," + QString::number(registroIzquierdo) + "," + QString::number(registroDerecho));
                     }
                     liberarRegistro(); //Libera derecho
                     return registroIzquierdo;
