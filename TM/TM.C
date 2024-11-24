@@ -87,9 +87,9 @@ typedef enum {
 
 typedef struct {
       int iop  ;
-      int iarg1  ;
-      int iarg2  ;
-      int iarg3  ;
+      float iarg1  ;
+      float iarg2  ;
+      float iarg3  ;
    } INSTRUCTION;
 
 typedef struct {
@@ -145,12 +145,12 @@ int opClass( int c )
 void writeInstruction ( int loc )
 { printf( "%5d: ", loc) ;
   if ( (loc >= 0) && (loc < IADDR_SIZE) )
-  { printf("%6s%3d,", opCodeTab[iMem[loc].iop], iMem[loc].iarg1);
+  { printf("%6s %.0f,", opCodeTab[iMem[loc].iop], iMem[loc].iarg1);
     switch ( opClass(iMem[loc].iop) )
-    { case opclRR: printf("%1d,%1d", iMem[loc].iarg2, iMem[loc].iarg3);
+    { case opclRR: printf("%.1f,%.1f", iMem[loc].iarg2, iMem[loc].iarg3);
                    break;
       case opclRM:
-      case opclRA: printf("%3d(%1d)", iMem[loc].iarg2, iMem[loc].iarg3);
+      case opclRA: printf("%.1f(%.1f)", iMem[loc].iarg2, iMem[loc].iarg3);
                    break;
     }
     printf ("\n") ;
@@ -183,7 +183,7 @@ int getNum(void)
     int sign = 1;
     int temp = FALSE;
     num = 0; // Usado para enteros
-    double floatNum = 0.0; // Usado para flotantes
+    float floatNum = 0.0; // Usado para flotantes
     int hasDecimal = FALSE; // Indica si es un número flotante
     double decimalPlace = 0.1; // Para procesar dígitos después del punto decimal
 
@@ -277,7 +277,7 @@ int error( char * msg, int lineNo, int instNo)
 /********************************************/
 int readInstructions (void)
 { OPCODE op;
-  int arg1, arg2, arg3;
+  float arg1, arg2, arg3;
   int loc, regNo, lineNo;
   for (regNo = 0 ; regNo < NO_REGS ; regNo++)
       reg[regNo].isFloat = 0;
@@ -414,11 +414,11 @@ STEPRESULT stepTM (void)
       char input[LINESIZE];
       fgets(input, LINESIZE, stdin);
       if (strchr(input, '.')) {
-          reg[r].isFloat = 1;
           reg[r].value.fVal = atof(input);
+          reg[r].isFloat = 1;
       } else {
-          reg[r].isFloat = 0;
           reg[r].value.iVal = atoi(input);
+          reg[r].isFloat = 0;
       }
       break;
 
@@ -431,35 +431,40 @@ STEPRESULT stepTM (void)
       break;
     case opADD :  
       if (reg[s].isFloat || reg[t].isFloat) {
-        reg[r].isFloat = 1;
         reg[r].value.fVal =
             (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) +
             (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+          
+        reg[r].isFloat = 1;
       }else{
-        reg[r].isFloat = 0;
-        reg[r].value.iVal = reg[s].value.iVal + reg[t].value.iVal ;  
+        reg[r].value.iVal = reg[s].value.iVal + reg[t].value.iVal ; 
+        
+        reg[r].isFloat = 0; 
       }
       break;
     case opSUB :  
        if (reg[s].isFloat || reg[t].isFloat) {
-        reg[r].isFloat = 1;
         reg[r].value.fVal =
             (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) -
             (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+          
+        reg[r].isFloat = 1;
       }else{
-        reg[r].isFloat = 0;
-        reg[r].value.iVal = reg[s].value.iVal - reg[t].value.iVal ;  
+        reg[r].value.iVal = reg[s].value.iVal - reg[t].value.iVal ;
+        
+        reg[r].isFloat = 0;  
       }
       break;
-    case opMUL :  
+    case opMUL : 
+      printf("Mult: Is float? %i:%i - %i:%i\n", s,reg[s].isFloat, t,reg[t].isFloat); 
        if (reg[s].isFloat || reg[t].isFloat) {
+        reg[r].value.fVal = 
+           (float) (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) *
+           (float) (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
         reg[r].isFloat = 1;
-        reg[r].value.fVal =
-            (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) *
-            (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
-      }else{
-        reg[r].isFloat = 0;
-        reg[r].value.iVal = reg[s].value.iVal * reg[t].value.iVal ;  
+      }else{        
+        reg[r].value.iVal = reg[s].value.iVal * reg[t].value.iVal ; 
+        reg[r].isFloat = 0; 
       }
       break;
 
@@ -467,13 +472,14 @@ STEPRESULT stepTM (void)
     /***********************************/
       if (  (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal) != 0 ) {
          if (reg[s].isFloat || reg[t].isFloat) {
-          reg[r].isFloat = 1;
           reg[r].value.fVal =
               (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) /
               (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+          reg[r].isFloat = 1;
         }else{
-          reg[r].isFloat = 0;
           reg[r].value.iVal = reg[s].value.iVal / reg[t].value.iVal ;  
+          
+          reg[r].isFloat = 0;
         }
       }
       else{ 
@@ -494,115 +500,123 @@ STEPRESULT stepTM (void)
       break;
 
     case opLES :  
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) < (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opGE :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) > (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opLEQ :   
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) <= (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opGEQ :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) >= (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opEQU :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) == (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opNEQ :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) != (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opAND :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) && (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opOR :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) || (reg[t].isFloat ? reg[t].value.fVal : reg[t].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opNEG :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = !(reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal);
+      reg[r].isFloat = 0;
       break;
     case opMIN :    
       if (reg[s].isFloat) {
-        reg[r].isFloat = 1;
         reg[r].value.fVal = -reg[s].value.fVal;
+        reg[r].isFloat = 1;
       }else{
-        reg[r].isFloat = 0;
         reg[r].value.iVal = -reg[s].value.iVal;
+        reg[r].isFloat = 0;
       }
       break;
     case opITF :    
       if (reg[s].isFloat) {
-        reg[r].isFloat = 1;
         reg[r].value.fVal = reg[s].value.fVal;
-      }else{
         reg[r].isFloat = 1;
+      }else{
         reg[r].value.fVal = (float)reg[s].value.iVal;
+        reg[r].isFloat = 1;
       }
       break;
 
     /*************** RM instructions ********************/
     case opLD :    
       if(dMem[m].isFloat){
-        reg[r].isFloat = 1;
         reg[r].value.fVal = dMem[m].value.fVal ;
+        reg[r].isFloat = 1;
       }else{
-        reg[r].isFloat = 0;
         reg[r].value.iVal = dMem[m].value.iVal ;
+        reg[r].isFloat = 0;
       }/*printf("\nLD: Val reg: %i (%i), val mem: %i (%i)", reg[r], r, dMem[m], m);*/ 
       break;
     case opST :    
       if(reg[r].isFloat){
-        dMem[m].isFloat = 1;
         dMem[m].value.fVal = reg[r].value.fVal ;
+        dMem[m].isFloat = 1;
       }else{
-        dMem[m].isFloat = 0;
         dMem[m].value.iVal = reg[r].value.iVal ;
+        dMem[m].isFloat = 0;
       }
        /*printf("\nST: Val reg: %i (%i), val mem: %i (%i)", reg[r], r, dMem[m], m);*/ 
       break;
 
     /*************** RA instructions ********************/
     case opLDA :    
-      reg[r].isFloat = 0;
       reg[r].value.iVal = m ; 
+      reg[r].isFloat = 0;
       break;
     case opLDC :
-      reg[r].isFloat = 0; 
       reg[r].value.iVal = currentinstruction.iarg2 ; /*printf("\nLDC: Val: %i, val reg: %i (%i)", currentinstruction.iarg2, reg[r],r);*/
+      reg[r].isFloat = 0; 
       break;
     case opLDF:
-      reg[r].isFloat = 1;
       reg[r].value.fVal = (float)currentinstruction.iarg2; // Lee un flotante
+      reg[r].isFloat = 1;
       break;
-    case opJLT :  
-      reg[PC_REG].isFloat = 0;  
-      if ( reg[r].value.iVal <  0 ) reg[PC_REG].value.iVal = m ; break;
+    case opJLT :   
+      if ( reg[r].value.iVal <  0 ) reg[PC_REG].value.iVal = m ; 
+      reg[PC_REG].isFloat = 0; 
+      break;
     case opJLE :  
+      
+      if ( reg[r].value.iVal <=  0 ) reg[PC_REG].value.iVal = m ; 
       reg[PC_REG].isFloat = 0;  
-      if ( reg[r].value.iVal <=  0 ) reg[PC_REG].value.iVal = m ; break;
+      break;
     case opJGT :  
+      if ( reg[r].value.iVal >  0 ) reg[PC_REG].value.iVal = m ; 
       reg[PC_REG].isFloat = 0;  
-      if ( reg[r].value.iVal >  0 ) reg[PC_REG].value.iVal = m ; break;
+      break;
     case opJGE :
-      reg[PC_REG].isFloat = 0; 
-      if ( reg[r].value.iVal >=  0 ) reg[PC_REG].value.iVal = m ; break;
-    case opJEQ :
-      reg[PC_REG].isFloat = 0; 
-      if ( reg[r].value.iVal == 0 ) reg[PC_REG].value.iVal = m ; break;
+      if ( reg[r].value.iVal >=  0 ) reg[PC_REG].value.iVal = m ; 
+      reg[PC_REG].isFloat = 0;  
+      break;
+    case opJEQ : 
+      if ( reg[r].value.iVal == 0 ) reg[PC_REG].value.iVal = m ;
+      reg[PC_REG].isFloat = 0;  
+      break;
     case opJNE :
-      reg[PC_REG].isFloat = 0;
-      if ( reg[r].value.iVal != 0 ) reg[PC_REG].value.iVal = m ; break;
+      if ( reg[r].value.iVal != 0 ) reg[PC_REG].value.iVal = m ; 
+      reg[PC_REG].isFloat = 0;  
+      break;
     case opJUC : 
-      reg[PC_REG].isFloat = 0;
-      reg[PC_REG].value.iVal = m ; break;
+      reg[PC_REG].value.iVal = m ; 
+      reg[PC_REG].isFloat = 0;  
+      break;
 
     /* end of legal instructions */
   } /* case */
