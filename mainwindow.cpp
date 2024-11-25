@@ -1368,6 +1368,7 @@ int evalTinyCode(Nodo *init, QTextEdit *error, QTextEdit *input, bool simulacion
                 }
 
             }
+
         }
         else if( init->nombre == "write" ){
             if (init->hijos.size() >= 1) {
@@ -1538,7 +1539,10 @@ bool showTinyCode(Nodo *init, QTextEdit *error, bool correct, QTextEdit *input) 
                 //Evaluamos la condicional y condicionamos el salto previo a realizar el bloque
                 result = evalTinyCode(init->hijos.at(0), error, input);
                 int saltos = simTinyCode(init->hijos.at(1), error, correct, input); //Simulamos cuantos saltos hará el bloque del if
-                input->append(QString::number(contadorInstrucciones++) + ": JEQ " + QString::number(result) + "," + QString::number(saltos+1) + "(7)" );
+                if(init->hijos.size() > 2){
+                    saltos++; //Si es un if-else hay que añadir un salto adicional para que en caso que no se cumpla saltarse el JUC y entrar al bloque else
+                }
+                input->append(QString::number(contadorInstrucciones++) + ": JEQ " + QString::number(result) + "," + QString::number(saltos) + "(7)" );
                 liberarRegistro();
 
                 bool res = false; //Se evalua el bloque

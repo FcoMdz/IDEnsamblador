@@ -1,0 +1,94 @@
+/*
+En una bodega se tiene información sobre las cantidades producidas de cada tipo
+de vino, a lo largo de los últimos años. Haga un programa que calcule e imprima lo
+siguiente:
+a) El total producido de cada tipo de vino (son 5 tipos) a lo largo de los N años.
+b) El total producido de vino por año.
+c) Año en que se produjo la mayor cantidad de litros de vino del tipo 2. Imprimir
+también la cantidad de litros.
+d) Verificar si hubo algún año en el cual no se produjo el vino tipo 3. Si existe
+dicho año, imprimirlo.
+*/
+
+program{
+	int opc, opc2, opc3, ano1, ano2;
+	float vino1, vino2, vino3, vino4, vino5;
+	float vino21, vino22, vino23, vino24, vino25;
+	float total1, total2, litros;
+	ano1=1995;
+	ano2=2000;
+	do{
+		read opc;
+		if(opc==1)then{
+			do{
+			read opc2;
+			read opc3;
+			read litros;
+				if(opc2==1)then{
+					if(opc3==1)then{
+						vino1=vino1+litros;
+					}fi
+					if(opc3==2)then{
+						vino21=vino21+litros;
+					}fi
+				}fi
+				if(opc2==2)then{
+					if(opc3==1)then{
+						vino2=vino2+litros;
+					}fi
+					if(opc3==2)then{
+						vino22=vino22+litros;
+					}fi
+				}fi
+				if(opc2==3)then{
+					if(opc3==1)then{
+						vino3=vino3+litros;
+					}fi
+					if(opc3==2)then{
+						vino23=vino23+litros;
+					}fi
+				}fi
+				if(opc2==4)then{
+					if(opc3==1)then{
+						vino4=vino4+litros;
+					}fi
+					if(opc3==2)then{
+						vino24=vino24+litros;
+					}fi
+				}fi
+				if(opc2==5)then{
+					if(opc3==1)then{
+						vino5=vino5+litros;
+					}fi
+					if(opc3==2)then{
+						vino25=vino25+litros;
+					}fi
+				}fi
+			}until(opc2==0);
+		}fi
+		if(opc==2)then{
+			total1=vino1+vino2+vino3+vino4+vino5;
+			total2=vino21+vino22+vino23+vino24+vino25;
+			write total1;
+			write total2;
+		}fi
+		if(opc==3)then{
+			if(vino2<vino21)then{
+				write ano2;
+				write vino21;
+			}
+			else {
+				write ano1;
+				write vino2;
+			}fi
+		}fi
+		if(opc==4)then{
+			if(vino3==0)then{
+				write ano1;			
+			}fi
+			if(vino23==0)then{
+				write ano2;
+			}fi
+		}fi
+	}until(opc==0);
+}	

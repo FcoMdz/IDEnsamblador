@@ -456,7 +456,6 @@ STEPRESULT stepTM (void)
       }
       break;
     case opMUL : 
-      printf("Mult: Is float? %i:%i - %i:%i\n", s,reg[s].isFloat, t,reg[t].isFloat); 
        if (reg[s].isFloat || reg[t].isFloat) {
         reg[r].value.fVal = 
            (float) (reg[s].isFloat ? reg[s].value.fVal : reg[s].value.iVal) *
