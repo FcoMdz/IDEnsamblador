@@ -1,0 +1,19 @@
+/*
+	Grupo 2-2
+	El número de sonidos emitidos por un grillo en un minuto, es una función de la
+	temperatura. Como resultado de esto, es posible determinar el nivel de la
+	temperatura haciendo uso de un grillito como termómetro.
+	La fórmula para la función es: T = h / 4 + 40
+	Dónde: T representa la temperatura en grados Fahrenheit y N el número de
+	sonidos emitidos por minuto
+	Construya un programa que le permita calcular la temperatura, teniendo en cuenta
+	el número de sonidos emitidos por el grillo
+*/
+	
+program{
+	float sonidos;
+	float gradosF;
+	read sonidos;
+	gradosF = sonidos/4+40;
+	write gradosF;
+}

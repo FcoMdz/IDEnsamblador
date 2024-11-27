@@ -1,0 +1,62 @@
+/*
+En una bodega se tiene información sobre las cantidades producidas de cada tipo
+de vino, a lo largo de los últimos años. Haga un programa que calcule e imprima lo
+siguiente:
+a) El total producido de cada tipo de vino (son 5 tipos) a lo largo de los N años.
+b) El total producido de vino por año.
+c) Año en que se produjo la mayor cantidad de litros de vino del tipo 2. Imprimir
+también la cantidad de litros.
+d) Verificar si hubo algún año en el cual no se produjo el vino tipo 3. Si existe
+dicho año, imprimirlo.
+*/
+
+program{
+	int tipos, opc2, opc3, anios, ciclo, anio;
+	int vino1, vino2, vino3, vino4, vino5, Mvino2, litros;
+	float total, total1, total2;
+	read anios;
+	ciclo=1;
+	tipos=1;
+	while(ciclo<=anios){
+		total=0;
+		ciclo=ciclo+1;
+		while(tipos<=5){
+			read litros;
+			total=total+litros;
+			if(tipos==1)then{
+				vino1=vino1+litros;
+			}fi
+			if(tipos==2)then{
+				vino2=vino2+litros;
+				if(Mvino2<litros)then{
+					anio=ciclo;
+					Mvino2=litros;
+				}fi
+			}fi
+			if(tipos==3)then{
+				vino3=vino3+litros;
+				if(litros==0)then{
+					write ciclo;
+				}fi
+			}fi
+			if(tipos==4)then{
+				vino4=vino4+litros;
+			}fi
+			if(tipos==5)then{
+				vino5=vino5+litros;
+			}fi
+			tipos=tipos+1;
+		}
+		write total;
+		tipos=1;
+	}
+	write vino1;
+	write vino2;
+	write vino3;
+	write vino4;
+	write vino5;
+	write anio;
+	write Mvino2;
+	
+	
+}

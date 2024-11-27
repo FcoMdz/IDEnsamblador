@@ -1,0 +1,50 @@
+
+/*Haga un programa para calcular lo que hay que pagar por un conjunto de llamadas
+telefónicas. Por cada llamada se ingresa el tipo (Internacional, Nacional, Local) y la
+duración en minutos. El criterio que se sigue para calcular el costo de cada llamada
+es el siguiente:
+Internacional: 3 primeros minutos 7.59
+Cada minuto adicional 3.03
+Nacional: 3 primeros minutos 1.20
+Cada minuto adicional 0.48
+Loca: Las primeras 50 llamadas no se cobran. Luego, cada llamada cuesta $0.60
+*/
+
+program{
+	int tiempoLlamada, opcion, termValue, contLocal, contLlamadas;
+	float costo;
+	termValue=0;
+	contLocal=0;
+	contLlamadas=0;
+	//Se pregunta al final si se quiere realizar otro cálculo
+	while(termValue!=1){
+		read opcion;
+		read tiempoLlamada;
+		if(opcion == 1)then{
+			contLlamadas=contLlamadas+1;
+			if(tiempoLlamada>=3)then{
+				costo=costo+7.59;
+				tiempoLlamada=tiempoLlamada-3;
+			}fi
+			costo=costo+(tiempoLlamada*3.03);
+		}fi
+		if(opcion == 2)then{
+			contLlamadas=contLlamadas+1;
+			if(tiempoLlamada>=3)then{
+				costo=costo+1.20;
+				tiempoLlamada=tiempoLlamada-3;
+			}fi
+			costo=costo+(tiempoLlamada*0.48);
+		}fi
+		if(opcion == 3)then{
+			contLlamadas=contLlamadas+1;
+			contLocal=contLocal+1;
+			if(contLlamadas>50)then{
+				costo=costo+0.60;
+			}fi
+		}fi
+		read termValue;
+	}
+	write contLlamadas;
+	write costo;
+}
